@@ -5,7 +5,7 @@ int num_layers;
 int momentoPres = 0;
 int capaPres = -1;
 
-
+String versionProg = "1.0.0";
 int margenizda = 0;
 int widthreal = 0;
 int numcolumnas = 5;

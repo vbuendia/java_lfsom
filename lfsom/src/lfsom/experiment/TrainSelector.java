@@ -46,6 +46,8 @@ public class TrainSelector {
 
 	private boolean Calculando = false;
 
+	private String versionprog = "v1.0";
+
 	private int Progreso = 0;
 
 	private double MedidaKaski = Double.POSITIVE_INFINITY;
@@ -408,8 +410,14 @@ public class TrainSelector {
 		boolean isHier = exprops.isHier();
 		boolean isGCHSOM = exprops.isGCHSOM();
 		boolean isGrowing = exprops.isGrowing() || isGCHSOM;
-		int[] dimSOM = calculaDimen(datos1, widthSOM, heightSOM, isHier
-				|| isGrowing, false, 0);
+
+		int[] dimSOM = null;
+		if (exprops.getWidthSOM() == 0 || exprops.getHeightSOM() == 0) {
+			dimSOM = calculaDimen(datos1, widthSOM, heightSOM, isHier
+					|| isGrowing, false, 0);
+		} else {
+			dimSOM = new int[] { exprops.getWidthSOM(), exprops.getHeightSOM() };
+		}
 
 		widthSOM = dimSOM[0];
 		heightSOM = dimSOM[1];
@@ -864,6 +872,21 @@ public class TrainSelector {
 	 */
 	public void setNumIter(int numIter) {
 		this.numIter = numIter;
+	}
+
+	/**
+	 * @return the versionprog
+	 */
+	public String getVersionprog() {
+		return versionprog;
+	}
+
+	/**
+	 * @param versionprog
+	 *            the versionprog to set
+	 */
+	public void setVersionprog(String versionprog) {
+		this.versionprog = versionprog;
 	}
 
 }
