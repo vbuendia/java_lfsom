@@ -1020,7 +1020,7 @@ public class LFSGrowingLayer {
 	private void almacenaBatch(LFSData data, int numIterations, int i,
 			int iteraControl, LFSSOMProperties trainingProps) {
 
-		LFSInputDatum currentInput = data.getRandomInputDatum(i, numIterations);
+		LFSInputDatum currentInput = data.getRandomInputDatum();
 		LFSUnit winner = getWinner(currentInput);
 		int posRango = numIterations / this.nRangos;
 		int nRango = i / posRango;
@@ -1052,7 +1052,7 @@ public class LFSGrowingLayer {
 	private void trainFinalOnline(int i, int numIterations, int iteraControl,
 			double expParam, LFSSOMProperties trainingProps) {
 		// get new input
-		LFSInputDatum currentInput = data.getRandomInputDatum(i, numIterations);
+		LFSInputDatum currentInput = data.getRandomInputDatum();
 
 		// grabaTMP();
 		// get winner & update weight vectors

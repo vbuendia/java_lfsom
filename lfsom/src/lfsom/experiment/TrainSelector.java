@@ -39,54 +39,104 @@ import lfsom.properties.LFSSOMProperties;
 import lfsom.util.LFSPCA;
 
 /**
- * @author vicente
+ * 
+ * This class is called from the client-side: The client gives the params to
+ * train the SOMs. This class combines the values of these params and organizes
+ * the trainings.
+ * 
+ * @author Vicente Buendia
  * @version $Id: $
  */
 public class TrainSelector {
 
+	/**
+	 * To know if it's still executing
+	 */
 	private boolean Calculando = false;
 
-	private String versionprog = "v1.0";
+	/**
+	 * Version to show in client-side
+	 */
+	private String versionprog = "v1.0.2";
 
+	/**
+	 * Progress
+	 */
 	private int Progreso = 0;
 
+	/**
+	 * The best indicators to select best SOM to be saved.
+	 */
 	private double MedidaKaski = Double.POSITIVE_INFINITY;
 
 	private double MedidaTopo = Double.POSITIVE_INFINITY;
 
 	private double MedidaQuan = Double.POSITIVE_INFINITY;
 
-	private CountDownLatch doneSignal;
+	/**
+	 * Best SOM of each best indicator
+	 */
+	private LFSGrowingSOM mapaMejorKaski;
+	private LFSGrowingSOM mapaMejorQuan;
+	private LFSGrowingSOM mapaMejorTopo;
 
+	/**
+	 * Needed to multiprocess
+	 */
+	private CountDownLatch doneSignal;
+	private final Semaphore sema = new Semaphore(2);
+
+	/**
+	 * Total number of trainings, depending on parameters
+	 */
 	private int numIter = 0;
 
+	/**
+	 * The results of each training (input parameters and resulting indicators)
+	 * will be saved in a csv file.
+	 * 
+	 * datosResul contains the attribute names to save.
+	 * matrixResults[indiceResul] contains the current values of each training.
+	 * 
+	 */
 	private LFSData datosResul = null;
 
 	private double[][] matrixResults;
+
+	private int indiceResul = 0;
+
+	/**
+	 * The different initializations are precalculated and saved, so they won't
+	 * be needed to be calculated in each training.
+	 */
 
 	private LFSUnit[][] unitsPCA, unitsVector, unitsInterval;
 
 	private LFSUnit[][] unitsPCABatch, unitsVectorBatch, unitsIntervalBatch;
 
-	private int indiceResul = 0;
-
-	// private String fTopo;
-
-	// private String fData;
-
+	/**
+	 * Name of the experiment
+	 */
 	private String expName = "SOM";
 
+	/**
+	 * If it is cancelled
+	 */
 	private boolean cancelado = false;
 
+	/**
+	 * Current training
+	 */
 	private long iteact = 0;
 
-	private LFSGrowingSOM mapaMejorKaski;
-	private LFSGrowingSOM mapaMejorQuan;
-	private LFSGrowingSOM mapaMejorTopo;
-
-	private final Semaphore sema = new Semaphore(2);
-
+	/**
+	 * Minimum number of data to generate a SOM. Required for hierarchical SOM.
+	 */
 	private int minDatosExp = 300;
+
+	/**
+	 * Current and max deep allowed
+	 */
 
 	private int prof = 1;
 
@@ -99,6 +149,17 @@ public class TrainSelector {
 		prof = profun;
 	}
 
+	/**
+	 * Depending on parameters, calculates heuristic dimensions
+	 * 
+	 * @param data
+	 * @param x
+	 * @param y
+	 * @param isHier
+	 * @param isBatch
+	 * @param nWidth
+	 * @return
+	 */
 	private int[] calculaDimen(LFSData data, int x, int y, boolean isHier,
 			boolean isBatch, int nWidth) {
 		int[] dimen = new int[2];
@@ -130,6 +191,13 @@ public class TrainSelector {
 		return dimen;
 	}
 
+	/**
+	 * Precalc of Interval and Vector initializatons
+	 * 
+	 * @param data
+	 * @param xSize
+	 * @param ySize
+	 */
 	private void calculaInitLayers(LFSData data, int xSize, int ySize) {
 
 		Random rand = new Random();
@@ -147,6 +215,13 @@ public class TrainSelector {
 		}
 	}
 
+	/**
+	 * Precalc of initializations, for batch mode (dim can be different)
+	 * 
+	 * @param data
+	 * @param xSize
+	 * @param ySize
+	 */
 	private void calculaInitLayersBatch(LFSData data, int xSize, int ySize) {
 
 		Random rand = new Random();
@@ -164,6 +239,14 @@ public class TrainSelector {
 		}
 	}
 
+	/**
+	 * PCA initialization precalculation
+	 * 
+	 * @param data
+	 * @param xSize
+	 * @param ySize
+	 * @return
+	 */
 	private LFSUnit[][] calculaUnitsPCA(LFSData data, int xSize, int ySize) {
 
 		double[][] dataArray = data.getData();
@@ -219,11 +302,6 @@ public class TrainSelector {
 		double cellSizeX = diffX / xSize;
 		double cellSizeY = diffY / ySize;
 
-		// System.out.println("");
-		// System.out.println("  *** diffX: " + diffX + " diffY: " + diffY);
-
-		// ...
-
 		for (int j = 0; j < ySize; j++) {
 			for (int i = 0; i < xSize; i++) {
 				// find the closes point in the data point cloud
@@ -258,6 +336,15 @@ public class TrainSelector {
 
 		return uPCA;
 	}
+
+	/**
+	 * Trains a SOM according to SOMProperties parameters If it's better than on
+	 * of the bests, it will be saved.
+	 * 
+	 * @param datos1
+	 * @param propsMapa
+	 * @param xmulti
+	 */
 
 	private void cuerpoTrain(LFSData datos1, LFSSOMProperties propsMapa,
 			double xmulti) {
@@ -360,6 +447,12 @@ public class TrainSelector {
 
 	}
 
+	/**
+	 * Multiprocess caller
+	 * 
+	 * @author vicente
+	 * 
+	 */
 	private class UpdaterThread implements Runnable {
 
 		private LFSData datos1;
@@ -396,6 +489,12 @@ public class TrainSelector {
 		return iteact;
 	}
 
+	/**
+	 * Call to calculate sent from client side
+	 * 
+	 * @param exprops
+	 * @throws Exception
+	 */
 	public void LanzaExperimento(LFSExpProps exprops) throws Exception {
 
 		LFSData datos1 = new LFSData(exprops.getFicheroEntrada());
@@ -404,6 +503,7 @@ public class TrainSelector {
 
 	public void LanzaExperimento(LFSData datos1, LFSExpProps exprops) {
 
+		// Parameter loading
 		String ficheroEntrada = exprops.getFicheroEntrada();
 		int widthSOM = exprops.getWidthSOM();
 		int heightSOM = exprops.getHeightSOM();
@@ -442,6 +542,8 @@ public class TrainSelector {
 
 		try {
 
+			// Initializations
+
 			MedidaKaski = Double.POSITIVE_INFINITY;
 			MedidaTopo = Double.POSITIVE_INFINITY;
 			MedidaQuan = Double.POSITIVE_INFINITY;
@@ -450,13 +552,9 @@ public class TrainSelector {
 			cancelado = false;
 			Progreso = 0;
 
-			// Se carga la estructura de datos de los resultados
-
-			// Inicializacion de variables
 			double tau = 0.001;
 			double tau2 = 0.1;
 
-			int zSize = 1;
 			long seed = 1;
 			int trainingCycles = 0;
 			int trainingIterations = 1;
@@ -468,23 +566,13 @@ public class TrainSelector {
 
 			double mqeRef = Double.POSITIVE_INFINITY;
 
-			// Parametros que se pueden cambiar:
-			// -> batch
-			// -> inicializaciones
-			// -> metrica?
-			// -> sigma (radio vecindad)
-			// -> funciones de vecindad
-
 			if (isHier || isGCHSOM) {
-				// Si es hierarchical, se calcula el mqeRef de una red con 1
-				// casilla
+				// If it's hierarchical, calculates mqeRef from a 1 cell net
 
-				// Se calcula el mqeRef de una red con 1 casilla, si no venía
-				// dado
 				if (exprops.getMqeIni() == -1) {
-					LFSSOMProperties props = new LFSSOMProperties(1, 1, 1,
-							seed, trainingCycles, trainingIterations, 1, 1,
-							tau, metric, false, false, LFSUnit.INIT_RANDOM,
+					LFSSOMProperties props = new LFSSOMProperties(1, 1, seed,
+							trainingCycles, trainingIterations, 1, 1, tau,
+							metric, false, false, LFSUnit.INIT_RANDOM,
 							LFSGrowingLayer.NEIGH_GAUSS, 1, nameExp, false,
 							0.0, false, false, false);
 					props.setDataPath(dataPath);
@@ -506,24 +594,23 @@ public class TrainSelector {
 
 			}
 
-			// Se prepara un unitsPCA para asignar y no tener que calcular cada
-			// vez
+			// Initialization precalcs
 
 			unitsPCA = calculaUnitsPCA(datos1, widthSOM, heightSOM);
 			calculaInitLayers(datos1, widthSOM, heightSOM);
 
-			// Calculo de total de redes a entrenar
+			// Number of nets to train
 			int numItera = 0;
 			for (int element : bucleNeighFunc) {
-				if (element == LFSGrowingLayer.NEIGH_GAUSS) { // GAUSS no
-																// utiliza
+				if (element == LFSGrowingLayer.NEIGH_GAUSS) { // GAUSS doesn't
+																// use
 																// neighwidth
 					numItera += numRepe * bucleLearnRate.length
 							* bucleUseBatch.length * bucleSigma.length
 							* bucleInitializationMode.length;
 				}
-				if (element == LFSGrowingLayer.NEIGH_BUBBLE) { // Bubble no
-																// utiliza sigma
+				if (element == LFSGrowingLayer.NEIGH_BUBBLE) { // Bubble doesn't
+																// use sigma
 					numItera += numRepe * bucleLearnRate.length
 							* bucleUseBatch.length
 							* bucleInitializationMode.length
@@ -539,18 +626,22 @@ public class TrainSelector {
 			}
 
 			setNumIter(numItera);
-			// Fin del calculo del total de redes a entrenar
 
 			double xmulti = getNumIter() / 100;
+
+			// Setup csv to save results of all trainings
 			datosResul = new LFSData(rootPath + "/structTrain.csv");
 			matrixResults = new double[getNumIter() + nThreads][datosResul
 					.dim()];
 
+			// Start multiprocess
 			ExecutorService e = null;
 			if (nThreads > 1) {
 				e = Executors.newFixedThreadPool(nThreads);
 				doneSignal = new CountDownLatch(getNumIter());
 			}
+
+			// Bucle containing all parameter combinations
 
 			int nbSigma = 0;
 			int nbNeighWidth = 0;
@@ -594,7 +685,7 @@ public class TrainSelector {
 
 									if (ejecuta) {
 										LFSSOMProperties props = new LFSSOMProperties(
-												wSOM, hSOM, zSize, seed,
+												wSOM, hSOM, seed,
 												trainingCycles,
 												trainingIterations, bLearnRate,
 												bSigma, tau, metric, usePCA,
@@ -634,8 +725,7 @@ public class TrainSelector {
 
 			if (!this.cancelado) {
 
-				// Ya tenemos los mejores mapas. Ahora, si es hierarchical, que
-				// se generen sus hijos
+				// Save results
 
 				new File(dataPath).mkdirs();
 				String fiche = null;
@@ -680,7 +770,7 @@ public class TrainSelector {
 				LFSDataCSVWriter.writeAsCSV(datosResul, indiceResul, dataPath
 						+ "/results.csv");
 
-				// Si es GHSOM, que se generen los hijos que corresponda
+				// If it's hierarchical, generate new sons
 
 				if ((isHier || isGCHSOM) && prof < maxProf) {
 					// Se crea la lista de hijos
@@ -715,6 +805,7 @@ public class TrainSelector {
 
 	}
 
+	// Prepares a new experiment with data of clusters
 	private void lanza_experimento_clusters(double tau, LFSGrowingLayer mMejor,
 			String dataPath, String rootPath, LFSData datos1, Double mqeRef) {
 
@@ -768,6 +859,7 @@ public class TrainSelector {
 
 	}
 
+	// Generates a new experiment with data mapped to a unit
 	private void lanza_experimento_units(double tau2, LFSGrowingLayer mMejor,
 			String dataPath, String rootPath, LFSData datos1, Double mqeRef) {
 

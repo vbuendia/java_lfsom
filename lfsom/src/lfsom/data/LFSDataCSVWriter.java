@@ -43,24 +43,21 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Logger;
 
-import at.tuwien.ifs.somtoolbox.data.SOMLibTemplateVector;
-import at.tuwien.ifs.somtoolbox.data.TemplateVector;
 import at.tuwien.ifs.somtoolbox.util.FileUtils;
 import at.tuwien.ifs.somtoolbox.util.StringUtils;
 
 /**
- * This class gathers methods to write certain {@link LFSInputData},
- * {@link TemplateVector} and {@link LFSSOMLibClassInformation} in a certain
- * number of file formats, such as SOMLib, WEKA ARFF, SOMPak and ESOM.
+ * This class writes the class information to a file in CSV format.
  * 
- * @author Rudolf Mayer
+ * @author Vicente Buendia
+ * 
+ * @author Rudolf Mayer (Original "InputDataWriter" class)
  * @version $Id: InputDataWriter.java 4272 2012-04-21 02:22:36Z mayer $
  */
 public class LFSDataCSVWriter {
 
 	/**
-	 * Writes the class information to a file in CSV format; elements will be
-	 * sorted by label name.
+	 * Writes the class information to a file in CSV format.
 	 */
 
 	public static void writeAsCSV(LFSData data, long numReg, String fileName)
@@ -70,17 +67,10 @@ public class LFSDataCSVWriter {
 		PrintWriter writer = FileUtils.openFileForWriting("CVS", fileName,
 				false);
 
-		TemplateVector tv = data.templateVector();
-		if (tv == null) {
-			Logger.getLogger("at.tuwien.ifs.somtoolbox").info(
-					"Template vector not loaded - creating a generic one.");
-			tv = new SOMLibTemplateVector(data.numVectors(), data.dim());
-		}
-
 		String separator = ",";
 
 		// header: tab-separated label names
-		writer.print(StringUtils.toString(tv.getLabels(), "", "", separator,
+		writer.print(StringUtils.toString(data.getLabels(), "", "", separator,
 				"\""));
 		writer.println();
 

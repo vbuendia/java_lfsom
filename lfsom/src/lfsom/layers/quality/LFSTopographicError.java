@@ -81,8 +81,7 @@ public class LFSTopographicError implements LFSQualityMeasure {
 
 		for (int d = 0; d < numVectors; d++) {
 
-			LFSUnit[] winners = layer.getWinners(
-					data.getRandomInputDatum(d, nVectorsOrig), 2);
+			LFSUnit[] winners = layer.getWinners(data.getRandomInputDatum(), 2);
 
 			LFSUnit bmu = winners[0];
 			LFSUnit sbmu = winners[1];

@@ -184,7 +184,7 @@ public class LFSSOMProperties extends Properties {
 	}
 
 	/******************************************************************************/
-	public LFSSOMProperties(int xSize, int ySize, int zSize, long seed,
+	public LFSSOMProperties(int xSize, int ySize, long seed,
 			int trainingCycles, int trainingIterations, double lernrate,
 			double sigma, double tau, String metric, boolean usePCA,
 			boolean usebatch, int initializationMode, int neighbourFunc,

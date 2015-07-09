@@ -48,8 +48,6 @@ import org.math.array.StatisticSample;
 
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
-import at.tuwien.ifs.somtoolbox.data.SOMLibTemplateVector;
-import at.tuwien.ifs.somtoolbox.data.TemplateVector;
 import cern.colt.Sorting;
 import cern.colt.function.IntComparator;
 import cern.colt.matrix.DoubleMatrix1D;
@@ -57,11 +55,14 @@ import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.jet.math.Functions;
 
 /**
- * Reads data from a simple matrix file. Rows are separated by newlines, and
- * columns by spaces or tabs.
+ * Reads data from a csv. Rows are separated by newlines, and columns by commas.
+ * First line contains attribute names.
  * 
- * @author Rudolf Mayer
+ * @author Vicente Buendia
+ * 
+ * @author Rudolf Mayer (Original "InputData" class)
  * @version $Id: SimpleMatrixInputData.java 3358 2010-02-11 14:35:07Z mayer $
+ *          (Original)
  */
 public class LFSData {
 
@@ -71,12 +72,6 @@ public class LFSData {
 	 * The label/name of the vector.
 	 */
 	private String[] dataNames = null;
-
-	/**
-	 * Column dimension of the feature matrix before having been vectorized to
-	 * input vector.
-	 */
-	// protected int featureMatrixCols = -1;
 
 	/**
 	 * The dimension of the input vectors, i.e. the number of attributes
@@ -95,11 +90,6 @@ public class LFSData {
 
 	private Random rand = new Random();
 
-	/**
-	 * A {@link TemplateVector} attached to this input data.
-	 */
-	private TemplateVector templateVector = null;
-
 	/** holds the computed results of {@link #getDataIntervals()} */
 	private double[][] intervals;
 
@@ -109,16 +99,28 @@ public class LFSData {
 	 */
 	private double[] extremes;
 
+	/**
+	 * Matrix which holds the data
+	 * 
+	 */
 	private double[][] matrix;
 
+	/**
+	 * Attribute names
+	 */
 	private String[] labels;
 
 	public LFSData() {
 	}
 
+	/**
+	 * Gets the data from a csv file.
+	 * 
+	 * @param fileName
+	 */
+
 	public LFSData(String fileName) {
 
-		setFichOrig(fileName);
 		CSVLoader cargador = new CSVLoader();
 		try {
 			boolean cambio_col = false;
@@ -159,61 +161,32 @@ public class LFSData {
 				}
 			}
 
-			matrix = new double[matrix2.length][dim];
+			double[][] matrixAssign = new double[matrix2.length][dim];
 
 			if (cambio_col) {
 				for (int k = 0; k < matrix2.length; k++) {
 					for (int w = 0; w < matrix2[0].length; w++) {
 						if (colVale[w] != -1) {
-							matrix[k][colVale[w]] = matrix2[k][w];
+							matrixAssign[k][colVale[w]] = matrix2[k][w];
 						}
 					}
 
 				}
 
 			} else {
-				matrix = matrix2;
+				matrixAssign = matrix2;
 			}
 
 			// Fin de la comprobacion
 
-			labels = new String[dim];
+			setLabels(new String[dim]);
 			for (int i = 0; i < data1.numAttributes(); i++) {
 				if (colVale[i] != -1) {
-					labels[colVale[i]] = data1.attribute(i).name();
+					getLabels()[colVale[i]] = data1.attribute(i).name();
 				}
 			}
 
-			dataNames = new String[data1.size()];
-			for (int i = 0; i < data1.size(); i++) {
-				dataNames[i] = String.valueOf(i);
-			}
-
-			numVectors = data1.size();
-			// dim = data1.numAttributes();
-
-			templateVector = new SOMLibTemplateVector(numVectors(), labels,
-					dim());
-
-			meanVector = new DenseDoubleMatrix1D(dim);
-
-			if (data1.size() > 0) {
-				LFSInputDatum[] vectors = getInputDatum(dataNames);
-				for (int i = 0; i < dataNames.length; i++) {
-					meanVector.assign(vectors[i].getVector(), Functions.plus); // add
-																				// to
-																				// mean
-																				// vector
-				}
-				meanVector.assign(Functions.div(labels.length)); // calculating
-																	// mean
-																	// vector
-
-				// pca = new PCA(matrix);
-				if (matrix.length > 1) {
-					pca = new LFSPCA(matrix);
-				}
-			}
+			setMatrix(matrixAssign);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -221,39 +194,67 @@ public class LFSData {
 		}
 	}
 
+	/**
+	 * Get a row
+	 * 
+	 * @param d
+	 * @return
+	 */
 	public LFSInputDatum getInputDatum(int d) {
 		return new LFSInputDatum(dataNames[d], matrix[d]);
 	}
 
+	/**
+	 * Get a single value
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	double getValue(int x, int y) {
 		return matrix[x][y];
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Assigns a data matrix
 	 * 
-	 * @see
-	 * at.tuwien.ifs.somtoolbox.data.InputData#pushInputDatum(at.tuwien.ifs.
-	 * somtoolbox.data.InputDatum)
+	 * @param matrizEntrada
 	 */
-
 	public void setMatrix(double[][] matrizEntrada) {
+
 		matrix = matrizEntrada;
 		dim = matrix[0].length;
 		numVectors = matrix.length;
 
-		templateVector = new SOMLibTemplateVector(numVectors(), labels, dim());
+		dataNames = new String[numVectors];
+		for (int i = 0; i < numVectors; i++) {
+			dataNames[i] = String.valueOf(i);
+		}
 
 		meanVector = new DenseDoubleMatrix1D(dim);
 
-		pca = new LFSPCA(matrizEntrada);
+		if (matrix.length > 0) {
+			LFSInputDatum[] vectors = getInputDatum(dataNames);
+			for (int i = 0; i < dataNames.length; i++) {
+				meanVector.assign(vectors[i].getVector(), Functions.plus); // add
+																			// to
+																			// mean
+																			// vector
+			}
+			meanVector.assign(Functions.div(getLabels().length)); // calculating
+																	// mean
+																	// vector
+
+			// pca = new PCA(matrix);
+			if (matrix.length > 1) {
+				pca = new LFSPCA(matrix);
+			}
+		}
+
 	}
 
-	/**
-	 * @param fichOrig
-	 *            The fichOrig to set.
-	 */
-	private void setFichOrig(String fichOrig) {
+	public double[][] getMatrix() {
+		return matrix;
 	}
 
 	public int dim() {
@@ -268,15 +269,7 @@ public class LFSData {
 		return numVectors;
 	}
 
-	TemplateVector templateVector() {
-		return templateVector;
-	}
-
-	public void setTemplateVector(TemplateVector templateVector) {
-		this.templateVector = templateVector;
-	}
-
-	public LFSInputDatum getRandomInputDatum(int iteration, int numIterations) {
+	public LFSInputDatum getRandomInputDatum() {
 		// Get a random number
 		int randIndex = rand.nextInt(numVectors);
 		return this.getInputDatum(randIndex);
@@ -371,7 +364,7 @@ public class LFSData {
 	}
 
 	public String getLabel(int index) {
-		return labels[index];
+		return getLabels()[index];
 	}
 
 	/**
@@ -379,6 +372,21 @@ public class LFSData {
 	 */
 	public LFSPCA getPCA() {
 		return pca;
+	}
+
+	/**
+	 * @return the attribute names
+	 */
+	public String[] getLabels() {
+		return labels;
+	}
+
+	/**
+	 * @param labels
+	 *            the attribute names to set
+	 */
+	public void setLabels(String[] labels) {
+		this.labels = labels;
 	}
 
 }
