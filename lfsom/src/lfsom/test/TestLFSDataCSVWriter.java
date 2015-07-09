@@ -28,23 +28,7 @@ public class TestLFSDataCSVWriter {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		// Generate random data
-		datos = new LFSData();
-		int dim = 5;
-		int nVec = 100;
-		String[] label = new String[dim];
-		double[][] matrix2 = new double[nVec][dim];
-
-		for (int j = 0; j < dim; j++) {
-			label[j] = "Attrib-" + j;
-			for (int i = 0; i < nVec; i++) {
-
-				matrix2[i][j] = i * j; // It's needed to have std dev.
-			}
-		}
-		datos.setLabels(label);
-		datos.setMatrix(matrix2);
-
+      datos = LFSDataTest.generateTest(5,100);
 	}
 
 	/**
@@ -78,6 +62,7 @@ public class TestLFSDataCSVWriter {
 
 		Assert.assertArrayEquals("Data matrix saved", datos2.getMatrix(),
 				datos.getMatrix());
+		Assert.assertArrayEquals("Labels saved",datos2.getLabels(),datos.getLabels());
 
 	}
 
