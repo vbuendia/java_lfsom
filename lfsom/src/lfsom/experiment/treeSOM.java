@@ -28,6 +28,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
+ * Reads folders structure and generates an object which contains all nets
+ * information. It's needed for the client, to navegate trough the nets
+ * 
  * @author vicente
  * @version $Id: $
  */
@@ -56,7 +59,6 @@ public class treeSOM {
 			}
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return salida;
@@ -246,7 +248,6 @@ public class treeSOM {
 			}
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

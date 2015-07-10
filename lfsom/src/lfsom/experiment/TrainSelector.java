@@ -713,6 +713,7 @@ public class TrainSelector {
 														xmulti);
 											}
 										}
+
 									}
 
 									nbSigma++;
@@ -728,9 +729,8 @@ public class TrainSelector {
 				e.shutdown();
 			}
 
+			// Save results
 			if (!this.cancelado) {
-
-				// Save results
 
 				new File(dataPath).mkdirs();
 				String fiche = null;
@@ -738,7 +738,7 @@ public class TrainSelector {
 
 				mapaMejorTopo.getLayer().mapCompleteDataAfterTraining(datos1);
 				mapaMejorTopo.clusteriza(numClusters);
-				// String fich = getfTopo();
+
 				fiche = dataPath + "/topo.xml";
 				mapaMejorTopo.EscribeXML(fiche);
 				mapaMejorTopo.escribeProps(fiche + "props");
@@ -759,8 +759,8 @@ public class TrainSelector {
 
 				exprops.clearNets();
 				exprops.setFPadre(fPadre);
-				// Se incluyen los datos de las redes calculadas para ese
-				// experimento.
+
+				// Best nets
 				exprops.addNet("Best Kaski - Lagus Index", "kaski.xml");
 				exprops.addNet("Best Quantization Error", "quan.xml");
 				exprops.addNet("Best Topographic Error", "topo.xml");
@@ -782,7 +782,6 @@ public class TrainSelector {
 				// If it's hierarchical, generate new sons
 
 				if ((isHier || isGCHSOM) && prof < maxProf) {
-					// Se crea la lista de hijos
 
 					LFSGrowingLayer mMejor = mapaMejorKaski.getLayer();
 					mqeRef = mMejor.getQualityMeasure("QError").getMapQuality(

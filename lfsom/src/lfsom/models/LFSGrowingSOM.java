@@ -76,8 +76,6 @@ import org.xml.sax.SAXException;
  */
 public class LFSGrowingSOM {
 
-	private int progreso = 0;
-
 	private boolean Calculando = false;
 
 	private boolean subnet = false;
@@ -122,14 +120,6 @@ public class LFSGrowingSOM {
 		return Calculando;
 	}
 
-	public int getProgreso() {
-		if (layer != null && progreso < 100) {
-			return layer.getProgreso();
-		} else {
-			return progreso;
-		}
-	}
-
 	public int getDimenData() {
 		return labelAtrib.length;
 	}
@@ -140,10 +130,6 @@ public class LFSGrowingSOM {
 
 	public String[] getLabel() {
 		return labelAtrib;
-	}
-
-	public void setProgreso(int nprogreso) {
-		progreso = nprogreso;
 	}
 
 	public void saveMapCSVParcial(LFSData datum, ArrayList<Integer> listaCells,
@@ -157,9 +143,7 @@ public class LFSGrowingSOM {
 	public void initLayer(boolean norm, LFSSOMProperties props, LFSData data,
 			LFSUnit[][] units) {
 
-		layer = new LFSGrowingLayer(props.xSize(), props.ySize(),
-				props.zSize(), props.metricName(), data.dim(), norm,
-				props.pca(), props.randomSeed(), data, props, units, this);
+		layer = new LFSGrowingLayer(norm, data, props, units, this);
 
 		this.setIsSubnet(props.isSubred());
 

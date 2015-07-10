@@ -72,42 +72,48 @@ import cern.colt.matrix.DoubleMatrix1D;
 //
 
 public class LFSGrowingLayer {
-	private int dim = 0;
 
-	private int progreso = 0;
-
+	// Quality measures
 	private LFSQualityMeasure QError = null;
 
 	private LFSQualityMeasure TError = null;
 
 	private LFSQualityMeasure KError = null;
 
+	// To know if training has to finish
+	private boolean qualityReached = false;
+
 	private Random rand = null;
 
-	// private LFSUnit superUnit = null;
-
+	// Units of the layer
 	private LFSUnit[][] units = null;
 
+	// Precalculed distances among units
 	private int[][][][] distancesHex = null;
 
+	// Precalculed kernel depending on neighbour function
 	private double[][] distNeigh = null;
 
+	// Different ranges of disNeigh, assigning sigma decay
 	private int nRangos = 3;
 
 	private int xSize = 0;
 
-	private boolean qualityReached = false;
-
 	private int ySize = 0;
 
+	// The "worst" error
 	private double maxQe = 0;
 
+	// The unif having maxQe
 	private LFSUnit unitmaxQe;
 
+	// Neighbour function to apply training
 	private int neighbourFunc = NEIGH_GAUSS;
 
+	// Width of neighbour to apply in bubble and cut gauss
 	private float neighbourWidth = 15;
 
+	// Declaration of the neighbour functions
 	public static final int NEIGH_GAUSS = 10;
 
 	public static final int NEIGH_CUTGAUSS = 20;
@@ -116,28 +122,31 @@ public class LFSGrowingLayer {
 
 	public static final int NEIGH_EP = 40;
 
-	private int maxYSize, maxXSize; // Tamaños maximos para el growing
+	private int maxYSize, maxXSize;
 
-	private boolean ultFilas = false; // Control de crecimiento para ir
-										// alternando filas y columnas cuando
-										// sea posible
+	// Control to avoid growing always rows, or always cols
+	private boolean ultFilas = false;
 
+	// Link to SOM it belongs
 	private LFSGrowingSOM gSOM;
 
+	// Data to train
 	private LFSData data;
 
-	public LFSGrowingLayer(int xSize, int ySize, int zSize, String metricName,
-			int dim, boolean normalized, boolean usePCA, long seed,
-			LFSData data, LFSSOMProperties props, LFSUnit[][] units,
-			LFSGrowingSOM growSOM) {
-		this(xSize, ySize, metricName, dim, normalized, usePCA, seed, data,
-				props.getInitializationMode(), props.getNeighbourFunc(), props
-						.pcNeighbourWidth(), props.learnrate(), props.sigma(),
+	public LFSGrowingLayer(boolean normalized, LFSData data,
+			LFSSOMProperties props, LFSUnit[][] units, LFSGrowingSOM growSOM) {
+
+		this(props.xSize(), props.ySize(), props.metricName(), normalized,
+				props.pca(), props.randomSeed(), data, props
+						.getInitializationMode(), props.getNeighbourFunc(),
+				props.pcNeighbourWidth(), props.learnrate(), props.sigma(),
 				units, growSOM);
+
 		props.setXYSize(this.xSize, this.ySize);
 		props.setNumIterations(data.getData().length);
+
 		if (props.getNeighbourFunc() == LFSGrowingLayer.NEIGH_BUBBLE) {
-			// No hay atenuacion de Sigma
+			// There isn't sigma decay
 			nRangos = 1;
 		}
 
@@ -146,12 +155,20 @@ public class LFSGrowingLayer {
 			calcDistancesNEIGH(this.xSize, this.ySize, props.learnrate(),
 					props.sigma());
 		} catch (LFSException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
 
+	/**
+	 * Save csv with data mapped to a list of units
+	 * 
+	 * @param datum
+	 * @param labels
+	 * @param listaCells
+	 * @param DataPath
+	 * @param nomFich
+	 */
 	public void saveMapCSVParcial(LFSData datum, String[] labels,
 			ArrayList<Integer> listaCells, String DataPath, String nomFich) {
 		// Se recorre la lista de cells, grabando en un fichero las mapeadas
@@ -192,41 +209,12 @@ public class LFSGrowingLayer {
 
 			writer.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 
 	}
 
-	public int getProgreso() {
-		return progreso;
-	}
-
-	/**
-	 * Constructor for a new, untrained layer.
-	 * 
-	 * 
-	 * @param su
-	 *            the pointer to the corresponding unit in the upper layer map.
-	 * @param xSize
-	 *            the number of units in horizontal direction.
-	 * @param ySize
-	 *            the number of units in vertical direction.
-	 * @param zSize
-	 *            the number of units in depth
-	 * @param metricName
-	 *            the name of the distance metric to use.
-	 * @param dim
-	 *            the dimensionality of the weight vectors.
-	 * @param normalized
-	 *            the type of normalization that is applied to the weight
-	 *            vectors of newly created units. This is usually
-	 *            <code>Normalization.NONE</code> or
-	 *            <code>Normalization.UNIT_LEN</code>.
-	 * @param seed
-	 *            the random seed for creation of the units' weight vectors.
-	 * @see <a href="../data/normalisation/package.html">Normalisation</a>
-	 */
 	private LFSGrowingLayer(int xSize, int ySize, long seed,
 			LFSGrowingSOM growSOM) {
 
@@ -237,7 +225,7 @@ public class LFSGrowingLayer {
 		this.setgSOM(growSOM);
 	}
 
-	private LFSGrowingLayer(int xSize, int ySize, String metricName, int dim,
+	private LFSGrowingLayer(int xSize, int ySize, String metricName,
 			boolean normalized, boolean usePCA, long seed, LFSData data,
 			int initialisationMode, int neighFunc, float pcNeighWidth,
 			double learnrate, double sigma, LFSUnit[][] unitsAssign,
@@ -245,12 +233,12 @@ public class LFSGrowingLayer {
 
 		this(xSize, ySize, seed, growSOM);
 		this.data = data;
-		this.dim = dim;
 
 		this.neighbourFunc = neighFunc;
 		int maxSiz = this.xSize > this.ySize ? this.xSize : this.ySize;
 		this.neighbourWidth = (int) (maxSiz * pcNeighWidth);
 
+		// Heuristic of size calculation
 		double numceldas = Math.pow(data.getData().length, 0.54321);
 
 		double ratio = Math.sqrt(data.getPCA().getFirstAxisIndex()
@@ -259,7 +247,7 @@ public class LFSGrowingLayer {
 				Math.round(Math.sqrt(numceldas / ratio)));
 		int xSizeCalc = (int) (numceldas / ySizeCalc);
 
-		// Tamanyo maximo para el grow
+		// Max size to grow
 		maxYSize = 2 * ySizeCalc;
 		maxXSize = 3 * xSizeCalc;
 
@@ -272,11 +260,9 @@ public class LFSGrowingLayer {
 
 		units = new LFSUnit[this.xSize][this.ySize];
 
-		// calcDistancesHex(this.xSize, this.ySize);
 		calcDistancesHex(maxXSize + 1, maxYSize + 1, true);
 
 		if (unitsAssign != null) {
-
 			for (int j = 0; j < this.ySize; j++) {
 				for (int i = 0; i < this.xSize; i++) {
 					units[i][j] = new LFSUnit(this, i, j,
@@ -287,7 +273,7 @@ public class LFSGrowingLayer {
 
 			for (int j = 0; j < this.ySize; j++) {
 				for (int i = 0; i < this.xSize; i++) {
-					units[i][j] = new LFSUnit(this, i, j, dim, rand,
+					units[i][j] = new LFSUnit(this, i, j, data.dim(), rand,
 							normalized, initialisationMode);
 				}
 			}
@@ -296,28 +282,11 @@ public class LFSGrowingLayer {
 	}
 
 	/**
-	 * Constructor for an already trained layer as specified by 2-dimensional
-	 * array of d-dimensional weight vectors as argument <code>vectors</code>.
+	 * Load a list of values into weightvector of a unit
 	 * 
-	 * @param xSize
-	 *            the number of columns.
-	 * @param ySize
-	 *            the number of rows.
-	 * @param metricName
-	 *            the name of the distance metric to use.
-	 * @param dim
-	 *            the dimensionality of the weight vectors.
-	 * @param vectors
-	 *            the three dimensional array of <code>d</code> dimensional
-	 *            weight vectors.
-	 * @param seed
-	 *            the random seed for creation of the units' weight vectors.
-	 * @throws LFSException
-	 *             if arguments <code>x</code>, <code>y</code> and
-	 *             <code>d</code> do not correspond to the dimensions of
-	 *             argument <code>vectors</code>.
+	 * @param dimen
+	 * @param pesos
 	 */
-
 	public void chargeWeights(int dimen, String pesos) {
 		String[] strbl = pesos.split(" ");
 		int temp = 0;
@@ -328,10 +297,9 @@ public class LFSGrowingLayer {
 					this.units[i][j].setWeightVector(dimen,
 							Double.valueOf(strbl[temp++]));
 				} catch (NumberFormatException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (LFSException e) {
-					// TODO Auto-generated catch block
+
 					e.printStackTrace();
 				}
 			}
@@ -354,31 +322,34 @@ public class LFSGrowingLayer {
 	}
 
 	/**
-	 * Returns all units of the layer in a 3D array.
+	 * Returns all units of the layer in an array.
 	 * 
-	 * @return all units of the layer in a 3D array.
 	 */
 	public LFSUnit[][] getUnits() {
 		return units;
 	}
 
-	// AREA STUFF
-
 	/**
-	 * Returns the dimensionality of the weight vectors.
+	 * Calculates distances among units in a hexagonal grid
 	 * 
-	 * @return the dimensionality of the weight vectors.
+	 * @param xSize
+	 * @param ySize
+	 * @param simple
 	 */
-	public int getDim() {
-		return dim;
-	}
-
 	private void calcDistancesHex(int xSize, int ySize, boolean simple) {
 
 		HexMapDistancer HexMap = new HexMapDistancer(xSize, ySize, simple);
 		distancesHex = HexMap.map();
 	}
 
+	/**
+	 * Calculates kernel depending on neighbour function
+	 * 
+	 * @param xSize
+	 * @param ySize
+	 * @param learnrate
+	 * @param sigma
+	 */
 	private void calcDistancesNEIGH(int xSize, int ySize, double learnrate,
 			double sigma) {
 
@@ -394,6 +365,14 @@ public class LFSGrowingLayer {
 
 	}
 
+	/**
+	 * If the net grows, only have to calculate new distances
+	 * 
+	 * @param xSize
+	 * @param ySize
+	 * @param learnrate
+	 * @param sigma
+	 */
 	private void calcDistancesNEIGH_add(int xSize, int ySize, double learnrate,
 			double sigma) {
 
@@ -418,13 +397,11 @@ public class LFSGrowingLayer {
 	}
 
 	/**
-	 * Returns the neighboring unit of a unit specified by argument
-	 * <code>u</code> with the most distant weight vector.
+	 * Returns the most dissimilar neighbour of a given unit. useful to grow
+	 * between the unit with worst error and its most dissimilar neighbour.
 	 * 
 	 * @param u
-	 *            the unit for which the most dissimilar neighbor should be
-	 *            determined.
-	 * @return the neighboring unit with the most distant weight vector.
+	 * @return
 	 */
 	private LFSUnit getMostDissimilarNeighbor(LFSUnit u) {
 		LFSUnit neighbor = null;
@@ -516,8 +493,6 @@ public class LFSGrowingLayer {
 
 		return winner;
 	}
-
-	// Devuelve el primer y el segundo ganadores
 
 	/**
 	 * Returns a number of best-matching units sorted by distance (ascending)
@@ -701,8 +676,7 @@ public class LFSGrowingLayer {
 
 	/**
 	 * Maps data onto layer without recalculating the quantization error after
-	 * every single input datum.<br>
-	 * FIXME: add multi-threading
+	 * every single input datum.
 	 * 
 	 * @param data
 	 *            input data to be mapped onto layer.
@@ -721,7 +695,6 @@ public class LFSGrowingLayer {
 				try {
 					this.getUnit(x, y).clearMappedInput();
 				} catch (LFSException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -915,8 +888,6 @@ public class LFSGrowingLayer {
 		int ultControl = i;
 
 		while (i < numIterations && !qualityReached) {
-
-			progreso = (int) (i / xmulti);
 
 			if (trainingProps.batchSom()) {
 				almacenaBatch(data, numIterations, i, iteraControl,
@@ -1182,7 +1153,7 @@ public class LFSGrowingLayer {
 
 				unitVector = units[x][y].getWeightVector();
 
-				for (int ve = 0; ve < dim; ve++) {
+				for (int ve = 0; ve < units[x][y].getWeightVector().length; ve++) {
 					if (!Double.isNaN(unitVector[ve])) { // skip updating of
 															// missing
 															// values
@@ -1268,7 +1239,6 @@ public class LFSGrowingLayer {
 		newLayer.QError = this.QError;
 		newLayer.setDistancesHex(this.distancesHex);
 		newLayer.setData(this.data);
-		newLayer.setDim(this.dim);
 		newLayer.setDistNeigh(this.distNeigh);
 		newLayer.setNRangos(this.nRangos);
 
@@ -1277,10 +1247,6 @@ public class LFSGrowingLayer {
 
 	public void setNRangos(int nr) {
 		this.nRangos = nr;
-	}
-
-	public void setDim(int dimen) {
-		this.dim = dimen;
 	}
 
 	public void setData(LFSData datos) {
