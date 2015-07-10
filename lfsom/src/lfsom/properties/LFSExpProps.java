@@ -428,7 +428,7 @@ public class LFSExpProps {
 		if (strbl.length > 0) {
 			this.bucleSigma = new int[strbl.length];
 			for (int i = 0; i < strbl.length; i++) {
-				this.bucleSigma[i] = Integer.parseInt(strbl[i]);
+				this.bucleSigma[i] = (int) Float.parseFloat(strbl[i]);
 			}
 		} else {
 			this.bucleSigma = new int[1];

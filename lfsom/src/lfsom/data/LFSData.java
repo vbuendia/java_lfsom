@@ -194,6 +194,14 @@ public class LFSData {
 		}
 	}
 
+	// Create LFSData to store the training results
+	public LFSData(String[] labelsTrain) {
+		setLabels(labelsTrain);
+		dim = getLabels().length;
+		numVectors = 0;
+
+	}
+
 	/**
 	 * Get a row
 	 * 

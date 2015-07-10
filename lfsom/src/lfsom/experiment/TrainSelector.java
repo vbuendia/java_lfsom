@@ -105,6 +105,12 @@ public class TrainSelector {
 
 	private int indiceResul = 0;
 
+	public static String[] labelsTrain = new String[] { "Err.Topo", "Err.Quan",
+			"Kaski and Lagus", "LearnRate", "0=online/1=batch",
+			"Init (10=Rand 20=Interval 30=Vector 40=PCA)",
+			"Neigh. Func. (10=Gauss 20=Bubble 30=Cut Gauss)", "Neigh. Width",
+			"Growing" };
+
 	/**
 	 * The different initializations are precalculated and saved, so they won't
 	 * be needed to be calculated in each training.
@@ -490,7 +496,7 @@ public class TrainSelector {
 	}
 
 	/**
-	 * Call to calculate sent from client side
+	 * Call from client side to calculate
 	 * 
 	 * @param exprops
 	 * @throws Exception
@@ -504,7 +510,7 @@ public class TrainSelector {
 	public void LanzaExperimento(LFSData datos1, LFSExpProps exprops) {
 
 		// Parameter loading
-		String ficheroEntrada = exprops.getFicheroEntrada();
+
 		int widthSOM = exprops.getWidthSOM();
 		int heightSOM = exprops.getHeightSOM();
 		boolean isHier = exprops.isHier();
@@ -630,9 +636,8 @@ public class TrainSelector {
 			double xmulti = getNumIter() / 100;
 
 			// Setup csv to save results of all trainings
-			datosResul = new LFSData(rootPath + "/structTrain.csv");
-			matrixResults = new double[getNumIter() + nThreads][datosResul
-					.dim()];
+			datosResul = new LFSData(labelsTrain);
+			matrixResults = new double[getNumIter() + nThreads][labelsTrain.length];
 
 			// Start multiprocess
 			ExecutorService e = null;
@@ -761,7 +766,11 @@ public class TrainSelector {
 				exprops.addNet("Best Topographic Error", "topo.xml");
 
 				exprops.EscribeXML(dataPath + "/ExpProps.xml");
-				if (!ficheroEntrada.equals(dataPath + "/data.csv")) {
+
+				// Save the data used to train the net
+				String ficheroEntrada = exprops.getFicheroEntrada();
+				if (!ficheroEntrada.equals(dataPath + "/data.csv")
+						&& !ficheroEntrada.equals("noMatter")) {
 					copyFile(new File(ficheroEntrada), new File(dataPath
 							+ "/data.csv"));
 				}
