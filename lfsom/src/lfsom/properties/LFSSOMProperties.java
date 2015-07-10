@@ -221,8 +221,6 @@ public class LFSSOMProperties extends Properties {
 		this.tau = tau;
 		this.metricName = metricName;
 		this.numCycles = numCycles;
-		// this.growthQualityMeasureName =
-		// OPTION_GROWTH_QUALITY.getDefault()[0];
 		this.sigma = sigma;
 		this.randomSeed = -1;
 		this.usePCA = usePCA;

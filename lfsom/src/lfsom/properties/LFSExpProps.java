@@ -29,6 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import lfsom.layers.LFSGrowingLayer;
 import lfsom.layers.LFSUnit;
 import lfsom.output.XMLOutputter;
+import lfsom.util.LFSException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1078,4 +1079,117 @@ public class LFSExpProps {
 		return this.strBuclePcNeighWidth;
 	}
 
+	LFSSOMProperties[] generateLFSSOMProperties() {
+
+		// Parameter loading
+
+		int widthSOM = getWidthSOM();
+		int heightSOM = getHeightSOM();
+		boolean isHier = isHier();
+		boolean isGCHSOM = isGCHSOM();
+		boolean isGrowing = isGrowing() || isGCHSOM;
+
+		double[] bucleLearnRate = getBucleLearnRate();
+		boolean[] bucleUseBatch = getBucleUseBatch();
+		int[] bucleSigma = getBucleSigma();
+		int[] bucleInitializationMode = getBucleInitializationMode();
+		int[] bucleNeighFunc = getBucleNeighFunc();
+		float[] buclePcNeighWidth = getBuclePcNeighWidth();
+		String nameExp = getExpName();
+		String dataPath = getDataPath();
+		boolean isSub = isSubred();
+		double tau = 0.001;
+		long seed = 1;
+		int trainingCycles = 0;
+		int trainingIterations = 1;
+
+		String metric = null;
+
+		double mqeRef = Double.POSITIVE_INFINITY;
+
+		// Number of nets to train
+		int numProps = 0;
+		for (int element : bucleNeighFunc) {
+			if (element == LFSGrowingLayer.NEIGH_GAUSS) { // GAUSS doesn't
+															// use
+															// neighwidth
+				numProps += bucleLearnRate.length * bucleUseBatch.length
+						* bucleSigma.length * bucleInitializationMode.length;
+			}
+			if (element == LFSGrowingLayer.NEIGH_BUBBLE) { // Bubble doesn't
+															// use sigma
+				numProps += bucleLearnRate.length * bucleUseBatch.length
+						* bucleInitializationMode.length
+						* buclePcNeighWidth.length;
+			}
+			if (element == LFSGrowingLayer.NEIGH_EP
+					|| element == LFSGrowingLayer.NEIGH_CUTGAUSS) {
+				numProps += bucleLearnRate.length * bucleUseBatch.length
+						* bucleSigma.length * bucleInitializationMode.length
+						* buclePcNeighWidth.length;
+			}
+		}
+
+		LFSSOMProperties[] spList = new LFSSOMProperties[numProps];
+
+		// Bucle containing all parameter combinations
+		int id = 0;
+		int nbSigma = 0;
+		int nbNeighWidth = 0;
+		for (boolean bBatch : bucleUseBatch) {
+			nbNeighWidth = 0;
+			for (float bNeighWidth : buclePcNeighWidth) {
+				for (int bNeighFunc : bucleNeighFunc) {
+					for (double bLearnRate : bucleLearnRate) {
+
+						for (int bInitializationMode : bucleInitializationMode) {
+							boolean usePCA = bInitializationMode == LFSUnit.INIT_PCA;
+							nbSigma = 0;
+							for (int bSigma : bucleSigma) {
+
+								boolean ejecuta = true;
+								if (nbSigma > 0
+										&& bNeighFunc == LFSGrowingLayer.NEIGH_BUBBLE) {
+									ejecuta = false;
+								}
+
+								if (nbNeighWidth > 0
+										&& bNeighFunc == LFSGrowingLayer.NEIGH_GAUSS) {
+									ejecuta = false;
+								}
+
+								if (ejecuta) {
+
+									try {
+
+										LFSSOMProperties props = new LFSSOMProperties(
+												widthSOM, heightSOM, seed,
+												trainingCycles,
+												trainingIterations, bLearnRate,
+												bSigma, tau, metric, usePCA,
+												bBatch, bInitializationMode,
+												bNeighFunc, bNeighWidth,
+												nameExp, isGrowing, mqeRef,
+												isSub, isHier, isGCHSOM);
+										props.setDataPath(dataPath);
+										spList[id++] = props;
+									} catch (LFSException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+
+								}
+
+								nbSigma++;
+							}
+						}
+					}
+				}
+				nbNeighWidth++;
+			}
+		}
+
+		return spList;
+
+	}
 }

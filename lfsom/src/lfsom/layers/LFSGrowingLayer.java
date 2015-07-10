@@ -396,6 +396,47 @@ public class LFSGrowingLayer {
 
 	}
 
+	// Neighbour function applying
+	private double getHCI(double distancia, double learnrate, double opt1,
+			int rango) {
+		double hci = 0;
+		float neigh = neighbourWidth - rango * neighbourWidth / nRangos;
+		try {
+
+			switch (neighbourFunc) {
+			case NEIGH_GAUSS:
+				hci = learnrate * Math.exp(-1 * distancia / opt1);
+				break;
+			case NEIGH_CUTGAUSS:
+				if (distancia <= neigh) {
+					hci = learnrate * Math.exp(-1 * distancia / opt1);
+				} else {
+					hci = 0;
+				}
+				break;
+			case NEIGH_BUBBLE:
+				if (distancia <= neigh) {
+					hci = learnrate;
+				} else {
+					hci = 0;
+				}
+				break;
+			case NEIGH_EP:
+				if (distancia <= neigh) {
+					hci = learnrate * (1 - distancia) / (opt1 / 2);
+				} else {
+					hci = 0;
+				}
+
+				break;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return hci;
+	}
+
 	/**
 	 * Returns the most dissimilar neighbour of a given unit. useful to grow
 	 * between the unit with worst error and its most dissimilar neighbour.
@@ -686,6 +727,29 @@ public class LFSGrowingLayer {
 		mapCompleteDataAfterTraining(data, false);
 	}
 
+	private void mapCompleteDataAfterTraining(LFSData data, boolean Calc) {
+
+		LFSInputDatum datum = null;
+		LFSUnit winner = null;
+		int numVectors = data.numVectors();
+		for (int x = 0; x < xSize; x++) {
+			for (int y = 0; y < ySize; y++) {
+				try {
+					this.getUnit(x, y).clearMappedInput();
+				} catch (LFSException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		for (int i = 0; i < numVectors; i++) {
+			datum = data.getInputDatum(i);
+			winner = getWinner(datum);
+			winner.addMappedInput(datum, Calc);
+		}
+	}
+
+	// Only with a sample to save time
 	private void mapSomeDataAfterTraining(LFSData data, int n) {
 		LFSInputDatum datum = null;
 		LFSUnit winner = null;
@@ -707,32 +771,6 @@ public class LFSGrowingLayer {
 		}
 
 	}
-
-	private void mapCompleteDataAfterTraining(LFSData data, boolean Calc) {
-
-		LFSInputDatum datum = null;
-		LFSUnit winner = null;
-		int numVectors = data.numVectors();
-		for (int x = 0; x < xSize; x++) {
-			for (int y = 0; y < ySize; y++) {
-				try {
-					this.getUnit(x, y).clearMappedInput();
-				} catch (LFSException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-
-		for (int i = 0; i < numVectors; i++) {
-			datum = data.getInputDatum(i);
-			winner = getWinner(datum);
-			winner.addMappedInput(datum, Calc);
-		}
-	}
-
-	// Lo mismo que el train pero para un mapa fijo y calculando varias medidas
-	// de calidad
 
 	private double calcQualityQError(LFSData data) {
 		double QErr;
@@ -767,6 +805,8 @@ public class LFSGrowingLayer {
 		}
 	}
 
+	// Get a list of units which have to generate new nets according to a given
+	// quality
 	public ArrayList<LFSUnit> getExpandedUnits(LFSQualityMeasure qm,
 			String qmName, double fraction, double totalQuality,
 			int minDatosExp, long numTotalDat) {
@@ -784,12 +824,7 @@ public class LFSGrowingLayer {
 				for (int i = 0; i < this.getXSize(); i++) {
 					boolean willExpand = quality[i][j] > fraction
 							* totalQuality
-							&& this.getUnit(i, j).getNumberOfMappedInputs() > minDatosExp;// ||
-																							// this.getUnit(i,
-																							// j).getNumberOfMappedInputs()
-																							// >
-																							// numTotalDat/(xSize*ySize);
-
+							&& this.getUnit(i, j).getNumberOfMappedInputs() > minDatosExp;
 					if (willExpand) {
 						ExpUnits.add(this.getUnit(i, j));
 					}
@@ -801,18 +836,16 @@ public class LFSGrowingLayer {
 		return ExpUnits;
 	}
 
+	// Growing control. Gets the unit with worst error and inserts a row or a
+	// column between it and its most dissimilar unit
 	private boolean controlTamanyo(LFSSOMProperties props, LFSData datos1,
 			int i, int numIterations) {
-		// Ajuste de crecimiento o decrecimiento de la red
-		// Si la red no cumple con una medida de calidad determinada,
-		// insertar un nuevo nodo.
 
 		boolean okCalc = false;
 
 		try {
 
 			if (this.xSize < this.maxXSize || this.ySize < this.maxYSize) {
-				// grabaTMP();
 				boolean hazCol = false;
 				boolean hazFil = false;
 				if (this.xSize < 2 * this.ySize) {
@@ -848,56 +881,46 @@ public class LFSGrowingLayer {
 				this.insertRowColumn(this.unitmaxQe, d, props.learnrate(),
 						props.sigma());
 				okCalc = true;
-				// grabaTMP();
 				props.setXYSize(this.xSize, this.ySize);
 			}
 
-			// Borrado de filas y columnas poco representativas
-			// okCalc = borrado(i, numIterations) || okCalc;
-
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
+
 			e1.printStackTrace();
 		}
 		return okCalc;
 	}
 
+	// Training bucle.
 	public void trainNormal(LFSData data, int nIterations, int startIteration,
 			LFSSOMProperties trainingProps, double initialLearnrate,
 			double initialSigma) {
 
-		double expParam = nIterations / 5.0; // TODO: hidden parameter
-
-		int iteraControl = data.numVectors() / 30; // Iteraciones para control
-													// de tamaño (aumento o
-													// disminucion)
+		double expParam = nIterations / 5.0;
 
 		int numIterations = nIterations;
 		double currentLearnrate = initialLearnrate;
 
-		/*
-		 * if (trainingProps.batchSom()) { numIterations = nRangos; }
-		 */
 		float iniPcNeighWidth = trainingProps.pcNeighbourWidth();
 
 		double sigmaAct = initialSigma;
 
-		float xmulti = (numIterations - startIteration) / 100;
 		int i = startIteration;
-		int controlI = 400;
+		int controlI = 400; // Control every controlI iterations
 		int ultControl = i;
 
 		while (i < numIterations && !qualityReached) {
 
 			if (trainingProps.batchSom()) {
-				almacenaBatch(data, numIterations, i, iteraControl,
-						trainingProps);
+				// If it is batch, only map data into units
+				almacenaBatch(data, numIterations, i, trainingProps);
 			} else {
-				trainFinalOnline(i, numIterations, iteraControl, expParam,
-						trainingProps);
+				trainFinalOnline(i, numIterations, expParam, trainingProps);
 			}
 
 			boolean hazControl = false;
+
+			// The control adapts according to net size.
 			if (i > 0 && (i - ultControl) % controlI == 0) {
 				hazControl = true;
 				ultControl = i;
@@ -907,11 +930,13 @@ public class LFSGrowingLayer {
 			}
 
 			if (trainingProps.batchSom() && (hazControl || i == numIterations)) {
+				// Applies modifications to units depending on their mapped data
 				finalBatch(data, i, trainingProps);
 			}
 
 			boolean calcNuevoNeigh = false;
-			// Control del learnRate para los no growing
+
+			// learnRate modification. Doesn't apply to growing
 			if (hazControl && !trainingProps.isGrowing()) {
 				double nLrate = initialLearnrate
 						* Math.exp(-1.0 * i / expParam);
@@ -925,14 +950,14 @@ public class LFSGrowingLayer {
 				}
 			}
 
-			// Decay del neighbourwidth, para el no gauss
+			// neighbourwidth decay, except for gauss
 			if (trainingProps.getNeighbourFunc() != LFSGrowingLayer.NEIGH_GAUSS
 					&& hazControl) {
 				int neighDecay = 25;
 				if (trainingProps.isGrowing()) {
 					neighDecay = 1;
 				}
-				// Se modifica el neighwidth para ir afinando
+
 				float nPcWidthAct = (float) (iniPcNeighWidth * Math.exp(-1.0
 						* i / (numIterations / neighDecay)));
 				int nWidthAct = (int) ((this.xSize > this.ySize ? this.xSize
@@ -948,25 +973,22 @@ public class LFSGrowingLayer {
 			}
 
 			if (calcNuevoNeigh) {
-				// Se pone por separado para evitar posibilidad de calcularlo 2
-				// veces seguidas.
+				// If it have been modifications in parameters, recalculate
+				// kernel
 				calcDistancesNEIGH(this.xSize, this.ySize, currentLearnrate,
 						sigmaAct);
 			}
 
+			// Call to grow and hierarchical
 			if (trainingProps.isHier() && hazControl) {
 				growAndHier(i, numIterations, trainingProps);
 			}
 
-			// Control del tamaño para el growing
+			// Size control for growing.
+			// In batch case, always has to concur with "finalBatch"
 			if (hazControl && !qualityReached
 					&& (trainingProps.isGrowing() || trainingProps.isHier())
 					&& i < 0.85 * numIterations) {
-				// grabaTMP();
-				// Ojo, para el caso del batch no puede ejecutarse a mitad. Debe
-				// ejecutarse siempre justo despues de
-				// algun finalBatch
-				// pinch();
 				compruebaErrUnits();
 				boolean okCalc = controlTamanyo(trainingProps, data, i,
 						numIterations);
@@ -974,7 +996,7 @@ public class LFSGrowingLayer {
 					calcDistancesNEIGH_add(this.xSize, this.ySize,
 							currentLearnrate, sigmaAct);
 				}
-				// grabaTMP();
+
 			}
 
 			if (i == numIterations) {
@@ -988,8 +1010,9 @@ public class LFSGrowingLayer {
 
 	}
 
+	// Map data in batch training
 	private void almacenaBatch(LFSData data, int numIterations, int i,
-			int iteraControl, LFSSOMProperties trainingProps) {
+			LFSSOMProperties trainingProps) {
 
 		LFSInputDatum currentInput = data.getRandomInputDatum();
 		LFSUnit winner = getWinner(currentInput);
@@ -1009,6 +1032,7 @@ public class LFSGrowingLayer {
 		}
 	}
 
+	// Applies modifications according to mapped data
 	private void finalBatch(LFSData data, int i, LFSSOMProperties trainingProps) {
 
 		for (int z = 0; z < ySize; z++) {
@@ -1020,12 +1044,12 @@ public class LFSGrowingLayer {
 
 	}
 
-	private void trainFinalOnline(int i, int numIterations, int iteraControl,
-			double expParam, LFSSOMProperties trainingProps) {
+	// Train on-line mode.
+	private void trainFinalOnline(int i, int numIterations, double expParam,
+			LFSSOMProperties trainingProps) {
 		// get new input
 		LFSInputDatum currentInput = data.getRandomInputDatum();
 
-		// grabaTMP();
 		// get winner & update weight vectors
 		final LFSUnit winner = getWinner(currentInput);
 
@@ -1038,32 +1062,26 @@ public class LFSGrowingLayer {
 
 	}
 
-	private void compruebaErr(LFSUnit U) {
-		double err = U.getQError();
-
-		if (err >= this.maxQe) {
-			this.maxQe = err;
-			this.unitmaxQe = U;
-		}
-
-	}
-
+	// Verify err of all units
 	private void compruebaErrUnits() {
-
 		this.maxQe = 0;
 		this.unitmaxQe = units[0][0];
 		for (int j = 0; j < ySize; j++) {
 			for (int l = 0; l < xSize; l++) {
-				compruebaErr(units[l][j]);
+				double err = units[l][j].getQError();
 
+				if (err >= this.maxQe) {
+					this.maxQe = err;
+					this.unitmaxQe = units[l][j];
+				}
 			}
 		}
 	}
 
+	// Common steps for Growing and Hierarchical
 	private void growAndHier(int i, int numIterations,
 			LFSSOMProperties trainingProps) {
-		// Pasos comunes que se siguen en el caso de growing y en el de
-		// jerarquico
+
 		mapSomeDataAfterTraining(data, data.numVectors() / 20);
 		this.calcQualityQError(data);
 		QError = this.getQError();// ualityMeasure("QError");
@@ -1074,7 +1092,6 @@ public class LFSGrowingLayer {
 			qualityReached = errActualQuan < compru;
 
 		} catch (LFSException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -1085,59 +1102,14 @@ public class LFSGrowingLayer {
 	 * datum and the according winner unit.
 	 * 
 	 * @param winner
-	 *            the winner unit.
 	 * @param input
-	 *            the input datum.
-	 * @param learnrate
-	 *            the learnrate.
-	 * @param sigma
-	 *            the width of the Gaussian determining the neighborhood radius.
+	 * @param rango
 	 */
 	private void updateUnits(LFSUnit winner, LFSInputDatum input, int rango) {
 		double[] inputVector = input.getVector().toArray();
 
 		updateUnitsInArea(winner, inputVector, 0, xSize, 0, ySize, rango);
 
-	}
-
-	private double getHCI(double distancia, double learnrate, double opt1,
-			int rango) {
-		double hci = 0;
-		float neigh = neighbourWidth - rango * neighbourWidth / nRangos;
-		try {
-
-			switch (neighbourFunc) {
-			case NEIGH_GAUSS:
-				hci = learnrate * Math.exp(-1 * distancia / opt1);
-				break;
-			case NEIGH_CUTGAUSS:
-				if (distancia <= neigh) {
-					hci = learnrate * Math.exp(-1 * distancia / opt1);
-				} else {
-					hci = 0;
-				}
-				break;
-			case NEIGH_BUBBLE:
-				if (distancia <= neigh) {
-					hci = learnrate;
-				} else {
-					hci = 0;
-				}
-				break;
-			case NEIGH_EP:
-				if (distancia <= neigh) {
-					hci = learnrate * (1 - distancia) / (opt1 / 2);
-				} else {
-					hci = 0;
-				}
-
-				break;
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return hci;
 	}
 
 	private void updateUnitsInArea(LFSUnit winner, double[] inputVector,
@@ -1172,24 +1144,13 @@ public class LFSGrowingLayer {
 
 	/**
 	 * Get direct neighbours of the given unit. Direct neighbours are neighbours
-	 * in the same column or row of the SOM, thus this method returns at most
-	 * six neighbours (two for each of the x, y and z dimensions).
+	 * at a distance of 1 of the SOM
 	 */
 	private ArrayList<LFSUnit> getNeighbouringUnits(LFSUnit u)
 			throws LFSException {
 		return getNeighbouringUnits(u.getXPos(), u.getYPos(), 1.0);
 	}
 
-	/**
-	 * Convenience method for
-	 * {@link #getNeighbouringUnits(int, int, int, double)}
-	 */
-
-	/**
-	 * Gets neighbours within a certain radius; uses
-	 * {@link #getMapDistance(int, int, int, int, int, int)} for map distance
-	 * computation
-	 */
 	private ArrayList<LFSUnit> getNeighbouringUnits(int x, int y, double radius)
 			throws LFSException {
 		ArrayList<LFSUnit> neighbourUnits = new ArrayList<LFSUnit>();
@@ -1294,6 +1255,11 @@ public class LFSGrowingLayer {
 		this.gSOM = gSOM;
 	}
 
+	/**
+	 * Get max number of clusters
+	 * 
+	 * @return
+	 */
 	public int getNClusterMax() {
 		int num = 0;
 		int[] labelAgrupados = this.getgSOM().getLabelAgrupados();
@@ -1305,6 +1271,12 @@ public class LFSGrowingLayer {
 		return num;
 	}
 
+	/**
+	 * Get number of row data mapped to units of a cluster
+	 * 
+	 * @param i
+	 * @return
+	 */
 	public int getNDatosCluster(int i) {
 		int ndatos = 0;
 
@@ -1316,6 +1288,12 @@ public class LFSGrowingLayer {
 		return ndatos;
 	}
 
+	/**
+	 * Get the units belonging to a cluster
+	 * 
+	 * @param r
+	 * @return
+	 */
 	private ArrayList<LFSUnit> getUnitsCluster(int r) {
 
 		ArrayList<Integer> listaCells = getLabelCluster(r);
@@ -1335,6 +1313,12 @@ public class LFSGrowingLayer {
 		return ExpUnits;
 	}
 
+	/**
+	 * Get list of indexes of units belonging to a cluster
+	 * 
+	 * @param z
+	 * @return
+	 */
 	public ArrayList<Integer> getLabelCluster(int z) {
 
 		ArrayList<Integer> arrl = new ArrayList<Integer>();
@@ -1349,6 +1333,12 @@ public class LFSGrowingLayer {
 		return HexMap.traspon(arrl);
 	}
 
+	/**
+	 * Get mean quantization error of a cluster
+	 * 
+	 * @param z
+	 * @return
+	 */
 	public Double getMqeCluster(int z) {
 
 		Double mquality = (double) 0;
