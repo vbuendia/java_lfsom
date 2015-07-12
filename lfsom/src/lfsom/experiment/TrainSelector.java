@@ -57,7 +57,7 @@ public class TrainSelector {
 	/**
 	 * Version to show in client-side
 	 */
-	private String versionprog = "v1.0.2";
+	private String versionprog = "v1.0.3";
 
 	/**
 	 * Progress
@@ -106,7 +106,7 @@ public class TrainSelector {
 	private int indiceResul = 0;
 
 	public static String[] labelsTrain = new String[] { "Err.Topo", "Err.Quan",
-			"Kaski and Lagus", "LearnRate", "0=online/1=batch",
+			"Kaski and Lagus", "LearnRate", "0=online/1=batch", "Sigma",
 			"Init (10=Rand 20=Interval 30=Vector 40=PCA)",
 			"Neigh. Func. (10=Gauss 20=Bubble 30=Cut Gauss)", "Neigh. Width",
 			"Growing" };

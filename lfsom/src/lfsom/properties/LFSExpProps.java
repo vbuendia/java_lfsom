@@ -1079,7 +1079,7 @@ public class LFSExpProps {
 		return this.strBuclePcNeighWidth;
 	}
 
-	LFSSOMProperties[] generateLFSSOMProperties() {
+	public LFSSOMProperties[] generateLFSSOMProperties() {
 
 		// Parameter loading
 
