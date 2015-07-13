@@ -1,6 +1,8 @@
 package lfsom.test;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 import lfsom.data.LFSData;
@@ -90,16 +92,20 @@ public class TestTrainSelector {
 		// Now, read results.csv to see if there are results for all the nets
 		File fich = new File(dataPath + "results.csv");
 		Assert.assertTrue("Generated results file", fich.exists());
-		/**
-		 * TODO: read file an compare
-		 */
-		/*
-		 * int nLines = 0; if (fich.exists()) { try (BufferedReader br = new
-		 * BufferedReader(new FileReader(dataPath + "results.csv"))) { String
-		 * line = br.readLine(); while (line != null) { nLines++; } } }
-		 * Assert.assertEquals(nLines, listaProps.length * expProps.getNumRepe()
-		 * + 1);
-		 */
+
+		int nLines = 0;
+		if (fich.exists()) {
+			try (BufferedReader br = new BufferedReader(new FileReader(dataPath
+					+ "results.csv"))) {
+				String line = br.readLine();
+				while (line != null) {
+					line = br.readLine();
+					nLines++;
+				}
+			}
+		}
+		Assert.assertEquals(nLines - 1,
+				listaProps.length * expProps.getNumRepe());
 
 	}
 }
