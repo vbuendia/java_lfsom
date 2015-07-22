@@ -47,7 +47,13 @@ import lfsom.util.LFSPCA;
 import org.math.array.StatisticSample;
 
 import weka.core.Instances;
+import weka.core.converters.AbstractFileLoader;
+import weka.core.converters.ArffLoader;
+import weka.core.converters.C45Loader;
 import weka.core.converters.CSVLoader;
+import weka.core.converters.JSONLoader;
+import weka.core.converters.MatlabLoader;
+import weka.core.converters.XRFFLoader;
 import cern.colt.Sorting;
 import cern.colt.function.IntComparator;
 import cern.colt.matrix.DoubleMatrix1D;
@@ -120,9 +126,31 @@ public class LFSData {
 	 */
 
 	public LFSData(String fileName) {
+		Class claseCargador = CSVLoader.class;
 
-		CSVLoader cargador = new CSVLoader();
+		if (fileName.endsWith(ArffLoader.FILE_EXTENSION)) {
+			claseCargador = ArffLoader.class;
+		} else {
+			if (fileName.endsWith(JSONLoader.FILE_EXTENSION)) {
+				claseCargador = JSONLoader.class;
+			} else {
+				if (fileName.endsWith(MatlabLoader.FILE_EXTENSION)) {
+					claseCargador = MatlabLoader.class;
+				} else {
+					if (fileName.endsWith(XRFFLoader.FILE_EXTENSION)) {
+						claseCargador = XRFFLoader.class;
+					} else {
+						if (fileName.endsWith(C45Loader.FILE_EXTENSION)) {
+							claseCargador = C45Loader.class;
+						}
+					}
+				}
+			}
+		}
+
 		try {
+			AbstractFileLoader cargador = (AbstractFileLoader) claseCargador
+					.getConstructor().newInstance();
 			boolean cambio_col = false;
 
 			cargador.setSource(new File(fileName));
