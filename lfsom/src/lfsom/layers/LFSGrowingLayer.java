@@ -127,12 +127,23 @@ public class LFSGrowingLayer {
 	// Control to avoid growing always rows, or always cols
 	private boolean ultFilas = false;
 
-	// Link to SOM it belongs
+	// Link to SOM this belongs to
 	private LFSGrowingSOM gSOM;
 
 	// Data to train
 	private LFSData data;
 
+	/**
+	 * Constructor gets data sample, properties of a concrete SOM, a list of
+	 * precalculated units and an index to the SOM it belongs
+	 * 
+	 * 
+	 * @param normalized
+	 * @param data
+	 * @param props
+	 * @param units
+	 * @param growSOM
+	 */
 	public LFSGrowingLayer(boolean normalized, LFSData data,
 			LFSSOMProperties props, LFSUnit[][] units, LFSGrowingSOM growSOM) {
 
@@ -215,6 +226,14 @@ public class LFSGrowingLayer {
 
 	}
 
+	/**
+	 * A simple LFSGrowingLayer creator
+	 * 
+	 * @param xSize
+	 * @param ySize
+	 * @param seed
+	 * @param growSOM
+	 */
 	private LFSGrowingLayer(int xSize, int ySize, long seed,
 			LFSGrowingSOM growSOM) {
 
@@ -225,6 +244,24 @@ public class LFSGrowingLayer {
 		this.setgSOM(growSOM);
 	}
 
+	/**
+	 * A constructor with parameters instead of getting a properties class
+	 * 
+	 * @param xSize
+	 * @param ySize
+	 * @param metricName
+	 * @param normalized
+	 * @param usePCA
+	 * @param seed
+	 * @param data
+	 * @param initialisationMode
+	 * @param neighFunc
+	 * @param pcNeighWidth
+	 * @param learnrate
+	 * @param sigma
+	 * @param unitsAssign
+	 * @param growSOM
+	 */
 	private LFSGrowingLayer(int xSize, int ySize, String metricName,
 			boolean normalized, boolean usePCA, long seed, LFSData data,
 			int initialisationMode, int neighFunc, float pcNeighWidth,
@@ -282,7 +319,7 @@ public class LFSGrowingLayer {
 	}
 
 	/**
-	 * Load a list of values into weightvector of a unit
+	 * Load a list of values into weightvectors of a units list
 	 * 
 	 * @param dimen
 	 * @param pesos
@@ -314,9 +351,6 @@ public class LFSGrowingLayer {
 		for (int j = 0; j < ySize; j++) {
 			for (int i = 0; i < xSize; i++) {
 				units[i][j].clearMappedInput();
-				if (units[i][j].getMappedSOM() != null) {
-					units[i][j].getMappedSOM().getLayer().clearMappedInput();
-				}
 			}
 		}
 	}
@@ -330,7 +364,9 @@ public class LFSGrowingLayer {
 	}
 
 	/**
-	 * Calculates distances among units in a hexagonal grid
+	 * Calculates distances among units in a hexagonal grid. Updates a class
+	 * containing these calculated distances
+	 * 
 	 * 
 	 * @param xSize
 	 * @param ySize
@@ -396,7 +432,15 @@ public class LFSGrowingLayer {
 
 	}
 
-	// Neighbour function applying
+	/**
+	 * Neighbour function applying
+	 * 
+	 * @param distancia
+	 * @param learnrate
+	 * @param opt1
+	 * @param rango
+	 * @return
+	 */
 	private double getHCI(double distancia, double learnrate, double opt1,
 			int rango) {
 		double hci = 0;
@@ -476,6 +520,12 @@ public class LFSGrowingLayer {
 		}
 	}
 
+	/**
+	 * Get a quality measure
+	 * 
+	 * @param medida
+	 * @return
+	 */
 	public LFSQualityMeasure getQualityMeasure(String medida) {
 		if (medida.equals("QError")) {
 			return getQError();
@@ -489,6 +539,15 @@ public class LFSGrowingLayer {
 
 		return getQError();
 	}
+
+	/**
+	 * Get unit
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 * @throws LFSException
+	 */
 
 	public LFSUnit getUnit(int x, int y) throws LFSException {
 		try {
@@ -727,6 +786,12 @@ public class LFSGrowingLayer {
 		mapCompleteDataAfterTraining(data, false);
 	}
 
+	/**
+	 * Maps all sample InputDatum into cells
+	 * 
+	 * @param data
+	 * @param Calc
+	 */
 	private void mapCompleteDataAfterTraining(LFSData data, boolean Calc) {
 
 		LFSInputDatum datum = null;
@@ -749,7 +814,12 @@ public class LFSGrowingLayer {
 		}
 	}
 
-	// Only with a sample to save time
+	/**
+	 * Only maps a portion of sample to save time
+	 * 
+	 * @param data
+	 * @param n
+	 */
 	private void mapSomeDataAfterTraining(LFSData data, int n) {
 		LFSInputDatum datum = null;
 		LFSUnit winner = null;
@@ -772,10 +842,15 @@ public class LFSGrowingLayer {
 
 	}
 
+	/**
+	 * Calculate quantization error
+	 * 
+	 * @param data
+	 * @return
+	 */
 	private double calcQualityQError(LFSData data) {
 		double QErr;
 
-		// calc QualityMeasure
 		try {
 			this.setQError(new LFSQuantizationError(this, data));
 			QErr = this.getQError().getMapQuality("mqe");
@@ -791,8 +866,13 @@ public class LFSGrowingLayer {
 
 	}
 
+	/**
+	 * Calculate the three quality measures
+	 * 
+	 * @param data
+	 */
 	public void calcQuality(LFSData data) {
-		// calc QualityMeasure
+
 		try {
 			this.setQError(new LFSQuantizationError(this, data));
 			this.setTError(new LFSTopographicError(this, data));
@@ -805,8 +885,18 @@ public class LFSGrowingLayer {
 		}
 	}
 
-	// Get a list of units which have to generate new nets according to a given
-	// quality
+	/**
+	 * Get a list of units which have to generate new nets according to a given
+	 * quality
+	 * 
+	 * @param qm
+	 * @param qmName
+	 * @param fraction
+	 * @param totalQuality
+	 * @param minDatosExp
+	 * @param numTotalDat
+	 * @return
+	 */
 	public ArrayList<LFSUnit> getExpandedUnits(LFSQualityMeasure qm,
 			String qmName, double fraction, double totalQuality,
 			int minDatosExp, long numTotalDat) {
@@ -836,8 +926,17 @@ public class LFSGrowingLayer {
 		return ExpUnits;
 	}
 
-	// Growing control. Gets the unit with worst error and inserts a row or a
-	// column between it and its most dissimilar unit
+	/**
+	 * Growing control. Gets the unit with worst error and inserts a row or a
+	 * column between it and its most dissimilar unit
+	 * 
+	 * @param props
+	 * @param datos1
+	 * @param i
+	 * @param numIterations
+	 * @return
+	 */
+
 	private boolean controlTamanyo(LFSSOMProperties props, LFSData datos1,
 			int i, int numIterations) {
 
@@ -891,7 +990,16 @@ public class LFSGrowingLayer {
 		return okCalc;
 	}
 
-	// Training bucle.
+	/**
+	 * Main training bucle.
+	 * 
+	 * @param data
+	 * @param nIterations
+	 * @param startIteration
+	 * @param trainingProps
+	 * @param initialLearnrate
+	 * @param initialSigma
+	 */
 	public void trainNormal(LFSData data, int nIterations, int startIteration,
 			LFSSOMProperties trainingProps, double initialLearnrate,
 			double initialSigma) {

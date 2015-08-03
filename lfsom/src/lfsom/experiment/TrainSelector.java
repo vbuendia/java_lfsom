@@ -507,6 +507,14 @@ public class TrainSelector {
 		LanzaExperimento(datos1, exprops);
 	}
 
+	/**
+	 * Gets a sample and an object containing the properties of the experiment
+	 * and generates desired SOMs.
+	 * 
+	 * @param datos1
+	 * @param exprops
+	 */
+
 	public void LanzaExperimento(LFSData datos1, LFSExpProps exprops) {
 
 		// Parameter loading
@@ -528,7 +536,6 @@ public class TrainSelector {
 		widthSOM = dimSOM[0];
 		heightSOM = dimSOM[1];
 
-		// int nClusters = exprops.getnClusters();
 		int numRepe = exprops.getNumRepe();
 		int numCPUs = exprops.getNumCPUs();
 		double[] bucleLearnRate = exprops.getBucleLearnRate();
@@ -605,7 +612,7 @@ public class TrainSelector {
 			unitsPCA = calculaUnitsPCA(datos1, widthSOM, heightSOM);
 			calculaInitLayers(datos1, widthSOM, heightSOM);
 
-			// Number of nets to train
+			// Calculate number of nets to train
 			int numItera = 0;
 			for (int element : bucleNeighFunc) {
 				if (element == LFSGrowingLayer.NEIGH_GAUSS) { // GAUSS doesn't
@@ -813,7 +820,7 @@ public class TrainSelector {
 
 	}
 
-	// Prepares a new experiment with data of clusters
+	// Prepares a new experiment with data from clusters
 	private void lanza_experimento_clusters(double tau, LFSGrowingLayer mMejor,
 			String dataPath, String rootPath, LFSData datos1, Double mqeRef) {
 
@@ -898,7 +905,7 @@ public class TrainSelector {
 	}
 
 	/**
-	 * @return Returns the progreso.
+	 * @return Returns the progress.
 	 */
 	public int getProgreso() {
 		return Progreso;
@@ -913,7 +920,7 @@ public class TrainSelector {
 	}
 
 	/**
-	 * @return Returns the calculando.
+	 * @return To know if it's executing.
 	 */
 	public boolean isCalculando() {
 		return Calculando;
@@ -945,7 +952,7 @@ public class TrainSelector {
 	}
 
 	/**
-	 * @return Returns the expName.
+	 * @return Returns the name of the experiment.
 	 */
 	public String getExpName() {
 		return expName;
@@ -960,7 +967,7 @@ public class TrainSelector {
 	}
 
 	/**
-	 * @return Returns the numIter.
+	 * @return Returns the number of iterations of train.
 	 */
 	public int getNumIter() {
 		return numIter;

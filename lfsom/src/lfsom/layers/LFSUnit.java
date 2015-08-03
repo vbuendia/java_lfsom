@@ -46,10 +46,8 @@ import java.util.logging.Logger;
 import lfsom.data.LFSData;
 import lfsom.data.LFSInputDatum;
 import lfsom.layers.metrics.LFSL2Metric;
-import lfsom.models.LFSGrowingSOM;
 import lfsom.util.LFSException;
 import at.tuwien.ifs.somtoolbox.layers.InputContainer;
-import at.tuwien.ifs.somtoolbox.layers.Label;
 import at.tuwien.ifs.somtoolbox.util.VectorTools;
 
 public class LFSUnit extends InputContainer {
@@ -64,29 +62,11 @@ public class LFSUnit extends InputContainer {
 
 	private int dim = 0;
 
-	// TODO: find a more generic way for labelling
-	private Label[] labels = null; // LabelSOM labels
-
-	private Label[] kaskiGateLabels = null; //
-
-	private Label[] kaskiLabels = null;
-
-	private Label[] gateWeights = null;
-
-	private Label[] bestcontextWeights = null;
-
-	private Label[] contextGateLabels = null;
-
 	private LFSGrowingLayer layer = null;
-
-	private LFSGrowingSOM mappedSOM = null; // TODO: Should be NetworkModel or
-											// similar in the future
 
 	private double quantizationError = 0;
 
 	private double[] weightVector = null;
-
-	private double[] featureWeights = null;
 
 	private int xPos = -1;
 
@@ -120,8 +100,7 @@ public class LFSUnit extends InputContainer {
 		if (vec != null) {
 			dim = vec.length;
 		}
-		// FIXME: don't initialise this here - if we don't use the batchmode, we
-		// just waste memory...
+
 		batchSomNeighbourhood = new ArrayList<LFSInputDatum>();
 		batchPonderaciones = new ArrayList<Double>();
 	}
@@ -154,10 +133,7 @@ public class LFSUnit extends InputContainer {
 			double r = rand.nextDouble();
 			int index = (int) (data.numVectors() * r);
 			weightVector = data.getInputDatum(index).getVector().toArray();
-			// System.out.println("Initialised " + x + "/" + y + "as:" +
-			// VectorTools.printVector(weightVector));
-		} else if (initialisationMode == INIT_PCA) {
-			// TODO: do PCA
+
 		}
 		if (norm) {
 			VectorTools.normaliseVectorToUnitLength(weightVector);
@@ -190,10 +166,7 @@ public class LFSUnit extends InputContainer {
 			int index = (int) (((LFSGrowingLayer) l).getData().numVectors() * r);
 			weightVector = ((LFSGrowingLayer) l).getData().getInputDatum(index)
 					.getVector().toArray();
-			// System.out.println("Initialised " + x + "/" + y + "as:" +
-			// VectorTools.printVector(weightVector));
-		} else if (initialisationMode == INIT_PCA) {
-			// TODO: do PCA
+
 		}
 		if (norm) {
 			VectorTools.normaliseVectorToUnitLength(weightVector);
@@ -266,30 +239,6 @@ public class LFSUnit extends InputContainer {
 		quantizationError = 0;
 	}
 
-	public Label[] getLabels() {
-		return labels;
-	}
-
-	public Label[] getKaskiGateLabels() {
-		return kaskiGateLabels;
-	}
-
-	public Label[] getKaskiLabels() {
-		return kaskiLabels;
-	}
-
-	public Label[] getGateWeights() {
-		return gateWeights;
-	}
-
-	public Label[] getBestContextWeights() {
-		return bestcontextWeights;
-	}
-
-	public Label[] getContextGateLabels() {
-		return contextGateLabels;
-	}
-
 	/**
 	 * Returns the layer of units this unit is part of.
 	 * 
@@ -297,25 +246,6 @@ public class LFSUnit extends InputContainer {
 	 */
 	public LFSGrowingLayer getLayer() {
 		return layer;
-	}
-
-	/**
-	 * Returns the map assigned to this unit or <code>null</code> otherwise.
-	 * 
-	 * @return the map assigned to this unit or <code>null</code> otherwise.
-	 */
-	public LFSGrowingSOM getMappedSOM() {
-		return mappedSOM;
-	}
-
-	/**
-	 * Assigns a map to this unit.
-	 * 
-	 * @param mappedSOM
-	 *            a map to be assigned to this unit.
-	 */
-	public void setMappedSOM(LFSGrowingSOM mappedSOM) {
-		this.mappedSOM = mappedSOM;
 	}
 
 	/**
@@ -415,24 +345,6 @@ public class LFSUnit extends InputContainer {
 	}
 
 	/**
-	 * Assigns labels to this unit.
-	 * 
-	 * @param labels
-	 *            array of labels to be assigned to this unit.
-	 */
-	public void setLabels(Label[] labels) {
-		this.labels = labels;
-	}
-
-	public void setKaskiGateLabels(Label[] kaski_gate_labels) {
-		this.kaskiGateLabels = kaski_gate_labels;
-	}
-
-	public void setContextGateLabels(Label[] context_gate_labels) {
-		this.contextGateLabels = context_gate_labels;
-	}
-
-	/**
 	 * Sets the coordinates of this unit on the map, if they have changed. This
 	 * happens in architectures with growing map sizes during training.
 	 * 
@@ -508,32 +420,8 @@ public class LFSUnit extends InputContainer {
 		return xPos + "/" + yPos;
 	}
 
-	public double[] getFeatureWeights() {
-		return featureWeights;
-	}
-
-	public void setFeatureWeights(double[] featureWeights) {
-		this.featureWeights = featureWeights;
-	}
-
 	public int getDim() {
 		return dim;
-	}
-
-	public String getUnitLabels() {
-		StringBuffer label = new StringBuffer();
-		if (labels != null) {
-			for (int i = 0; i < labels.length; i++) {
-				if (i > 0) {
-					label.append(", ");
-				}
-				label.append(labels[i].getName());
-			}
-		}
-		if (labels == null || labels.length == 0) {
-			label.append("&lt;no labels available&gt;");
-		}
-		return label.toString();
 	}
 
 	public boolean isTopLeftUnit() {

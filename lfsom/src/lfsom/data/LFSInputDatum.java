@@ -58,7 +58,8 @@ public class LFSInputDatum {
 	private int dim;
 
 	/**
-	 * Constructs a new InputDatum.
+	 * Constructs a new InputDatum. Let's consider an InputDatum as a record of
+	 * a sample.
 	 * 
 	 * @param label
 	 *            The label of the input datum. Basically this should be a sort

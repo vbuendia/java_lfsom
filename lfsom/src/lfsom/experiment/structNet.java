@@ -17,6 +17,10 @@ package lfsom.experiment;
 /**
  * @author vicente
  * @version $Id: $
+ * 
+ *          A global net, containing information about its location in disk, net
+ *          from which it belongs (father) and cells from its father from which
+ *          it has been trained. Useful for hierarchical nets.
  */
 public class structNet {
 

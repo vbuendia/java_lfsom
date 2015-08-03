@@ -36,6 +36,9 @@ import org.w3c.dom.NodeList;
  */
 public class treeSOM {
 
+	/**
+	 * It maintains a list of nets, each with indexes to its father.
+	 */
 	private ArrayList<structNet> listaNets;
 
 	public int size() {
@@ -46,10 +49,22 @@ public class treeSOM {
 		return listaNets;
 	}
 
+	/**
+	 * Gets the net indexed by i
+	 * 
+	 * @param i
+	 * @return
+	 */
 	public structNet get(int i) {
 		return listaNets.get(i);
 	}
 
+	/**
+	 * Returns a string list containing only a field: "campo" of all the nets
+	 * 
+	 * @param campo
+	 * @return
+	 */
 	public String[] lista(String campo) {
 		String[] salida = new String[listaNets.size()];
 		try {
@@ -64,13 +79,30 @@ public class treeSOM {
 		return salida;
 	}
 
+	/**
+	 * Returns a list containing all the net names.
+	 * 
+	 * @return
+	 */
 	public String[] lista_nombres() {
 		return lista("netName");
 	}
 
+	/**
+	 * Returns a list containing all the folders of the nets
+	 * 
+	 * @return
+	 */
+
 	public String[] lista_folders() {
 		return lista("netFolder");
 	}
+
+	/**
+	 * Gives a list of indexes referencing each father, for each net.
+	 * 
+	 * @return
+	 */
 
 	public int[] lista_father() {
 		String[] listaNum = lista("netFatherNumber");
@@ -81,6 +113,11 @@ public class treeSOM {
 		return listaF;
 	}
 
+	/**
+	 * Returns a list of all nets which don't have a father (root nets).
+	 * 
+	 * @return
+	 */
 	public ArrayList<structNet> redesIniciales() {
 
 		ArrayList<structNet> sRedes = new ArrayList<structNet>();
@@ -94,6 +131,12 @@ public class treeSOM {
 		return sRedes;
 	}
 
+	/**
+	 * Gives a list of all the nets whose father is "k"
+	 * 
+	 * @param k
+	 * @return
+	 */
 	public ArrayList<structNet> subredesFrom(int k) {
 
 		ArrayList<structNet> sRedes = new ArrayList<structNet>();
@@ -107,11 +150,33 @@ public class treeSOM {
 		return sRedes;
 	}
 
+	/**
+	 * 
+	 * Returns a net whose father is this and trained from sX, sY neuron
+	 * 
+	 * @param actualSOM
+	 * @param xmlActual
+	 * @param pos
+	 * @param sY
+	 * @param sX
+	 * @return
+	 */
 	public int subRedFromPos(int actualSOM, String xmlActual, int pos, int sY,
 			int sX) {
 		int[] layerSubnets = layerSubRedesFrom(actualSOM, xmlActual, sY, sX);
 		return layerSubnets[pos];
 	}
+
+	/**
+	 * Returns an entire layer whose neuron colors indicate different sons, to
+	 * be able to navigate to sons
+	 * 
+	 * @param actualSOM
+	 * @param xmlActual
+	 * @param sY
+	 * @param sX
+	 * @return
+	 */
 
 	public int[] layerSubRedesFrom(int actualSOM, String xmlActual, int sY,
 			int sX) {
@@ -120,8 +185,8 @@ public class treeSOM {
 			layer[k] = 0;
 		}
 
-		// Ahora se saca una lista con todas las subredes y se pinta con un
-		// color diferente para cada subred
+		// Now it gets a list with all subnets and every subnet is painted with
+		// a different color
 
 		ArrayList<structNet> sFrom = subredesFrom(actualSOM, xmlActual);
 		for (int k = 0; k < sFrom.size(); k++) {
@@ -135,6 +200,16 @@ public class treeSOM {
 		return layer;
 	}
 
+	/**
+	 * Returns an entire layer whose neuron colors indicate different sons, to
+	 * be able to navigate to sons
+	 * 
+	 * @param actualSOM
+	 * @param xmlActual
+	 * @param sY
+	 * @param sX
+	 * @return
+	 */
 	public float[] layerDibuSubRedesFrom(int actualSOM, String xmlActual,
 			int sY, int sX) {
 		float[] layer = new float[sY * sX];
@@ -170,6 +245,14 @@ public class treeSOM {
 
 		return sRedes;
 	}
+
+	/**
+	 * Runs over all the folders structure to insert the nets saved into memory.
+	 * 
+	 * @param direc
+	 * @param padre
+	 * @param padreFolder
+	 */
 
 	public void recorre(String direc, int padre, String padreFolder) {
 
@@ -252,6 +335,13 @@ public class treeSOM {
 		}
 
 	}
+
+	/**
+	 * When inited, runs all folder structure and gets a list with all nets,
+	 * containing information of fathers and cells
+	 * 
+	 * @param dataPath
+	 */
 
 	public treeSOM(String dataPath) {
 
