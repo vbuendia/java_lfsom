@@ -52,6 +52,7 @@ import at.tuwien.ifs.somtoolbox.util.VectorTools;
 
 public class LFSUnit extends InputContainer {
 
+	// Allowed initializations
 	public static final int INIT_RANDOM = 10;
 
 	public static final int INIT_INTERVAL_INTERPOLATE = 20;
@@ -60,40 +61,39 @@ public class LFSUnit extends InputContainer {
 
 	public static final int INIT_PCA = 40;
 
+	// Dimmension of weightVector
 	private int dim = 0;
 
-	private LFSGrowingLayer layer = null;
-
-	private double quantizationError = 0;
-
+	// Weightvector
 	private double[] weightVector = null;
 
+	// QuantizationError, as it's used for many checks
+	private double quantizationError = 0;
+
+	// Position x,y
 	private int xPos = -1;
 
 	private int yPos = -1;
 
+	// Neighbour cells, and the weight the have
 	private ArrayList<LFSInputDatum> batchSomNeighbourhood;
 
 	private ArrayList<Double> batchPonderaciones;
 
 	/**
-	 * Constructs a <code>Unit</code> on <code>Layer</code> specified by
-	 * argument <code>layer</code> at position <code>x</code>/<code>y</code>
+	 * Constructs a <code>Unit</code> at position <code>x</code>/<code>y</code>
 	 * with a given weight vector <code>vec</code>.
 	 * 
-	 * @param l
-	 *            the layer that contains this <code>Unit</code>.
 	 * @param x
 	 *            the horizontal position on the <code>layer</code>.
 	 * @param y
 	 *            the vertical position on the <code>layer</code>.
-	 * @param z
-	 *            the depth position on the <code>layer</code>.
+	 * 
 	 * @param vec
 	 *            the weight vector.
 	 */
-	public LFSUnit(LFSGrowingLayer l, int x, int y, double[] vec) {
-		layer = l;
+	public LFSUnit(int x, int y, double[] vec) {
+
 		xPos = x;
 		yPos = y;
 		weightVector = vec;
@@ -105,67 +105,43 @@ public class LFSUnit extends InputContainer {
 		batchPonderaciones = new ArrayList<Double>();
 	}
 
-	public double getQError() {
-		return quantizationError;
-	}
-
+	/**
+	 * Constructs a Unit at position x,y. The unit will have its weights
+	 * depending on the initialization mode
+	 * 
+	 * @param data
+	 * @param x
+	 * @param y
+	 * @param d
+	 *            dimension
+	 * @param rand
+	 * @param norm
+	 * @param initializationMode
+	 */
 	public LFSUnit(LFSData data, int x, int y, int d, Random rand,
-			boolean norm, int initialisationMode) {
-		layer = null;
+			boolean norm, int initializationMode) {
+
 		xPos = x;
 		yPos = y;
 		dim = d;
 		batchSomNeighbourhood = new ArrayList<LFSInputDatum>();
 		batchPonderaciones = new ArrayList<Double>();
 		weightVector = new double[dim];
-		if (initialisationMode == INIT_RANDOM) {
+		if (initializationMode == INIT_RANDOM) {
 			for (int i = 0; i < dim; i++) {
 				weightVector[i] = rand.nextDouble();
 			}
-		} else if (initialisationMode == INIT_INTERVAL_INTERPOLATE) {
+		} else if (initializationMode == INIT_INTERVAL_INTERPOLATE) {
 			for (int i = 0; i < dim; i++) {
 				double r = rand.nextDouble();
 				double[][] intervals = data.getDataIntervals();
 				weightVector[i] = intervals[i][0]
 						+ (intervals[i][1] - intervals[i][0]) * r;
 			}
-		} else if (initialisationMode == INIT_VECTOR) {
+		} else if (initializationMode == INIT_VECTOR) {
 			double r = rand.nextDouble();
 			int index = (int) (data.numVectors() * r);
 			weightVector = data.getInputDatum(index).getVector().toArray();
-
-		}
-		if (norm) {
-			VectorTools.normaliseVectorToUnitLength(weightVector);
-		}
-	}
-
-	LFSUnit(LFSGrowingLayer l, int x, int y, int d, Random rand, boolean norm,
-			int initialisationMode) {
-		layer = l;
-		xPos = x;
-		yPos = y;
-		dim = d;
-		batchSomNeighbourhood = new ArrayList<LFSInputDatum>();
-		batchPonderaciones = new ArrayList<Double>();
-		weightVector = new double[dim];
-		if (initialisationMode == INIT_RANDOM) {
-			for (int i = 0; i < dim; i++) {
-				weightVector[i] = rand.nextDouble();
-			}
-		} else if (initialisationMode == INIT_INTERVAL_INTERPOLATE) {
-			for (int i = 0; i < dim; i++) {
-				double r = rand.nextDouble();
-				double[][] intervals = ((LFSGrowingLayer) l).getData()
-						.getDataIntervals();
-				weightVector[i] = intervals[i][0]
-						+ (intervals[i][1] - intervals[i][0]) * r;
-			}
-		} else if (initialisationMode == INIT_VECTOR) {
-			double r = rand.nextDouble();
-			int index = (int) (((LFSGrowingLayer) l).getData().numVectors() * r);
-			weightVector = ((LFSGrowingLayer) l).getData().getInputDatum(index)
-					.getVector().toArray();
 
 		}
 		if (norm) {
@@ -214,12 +190,6 @@ public class LFSUnit extends InputContainer {
 		}
 	}
 
-	@Override
-	public void removeMappedInput(String label) {
-		super.removeMappedInput(label);
-		calculateQuantizationError();
-	}
-
 	/**
 	 * Recalculates the quantization error for this unit.
 	 */
@@ -238,55 +208,6 @@ public class LFSUnit extends InputContainer {
 		super.clearMappedInputs();
 		quantizationError = 0;
 	}
-
-	/**
-	 * Returns the layer of units this unit is part of.
-	 * 
-	 * @return the layer of units this unit is part of.
-	 */
-	public LFSGrowingLayer getLayer() {
-		return layer;
-	}
-
-	/**
-	 * Returns the width of this unit's map.
-	 * 
-	 * @return the width of this unit's map.
-	 */
-	public int getMapXSize() {
-		return layer.getXSize();
-	}
-
-	/**
-	 * Returns the height of this unit's map.
-	 * 
-	 * @return the height of this unit's map.
-	 */
-	public int getMapYSize() {
-		return layer.getYSize();
-	}
-
-	/**
-	 * Calculates and returns the mean quantization error of this unit. This is
-	 * 0, if no input is mapped onto this unit.
-	 * 
-	 * @return the mean quantization error for this unit.
-	 */
-	/*
-	 * public double getMeanQuantizationError() { if
-	 * (mappedInputs.getNumberOfMappedInputs()>0) { return
-	 * (quantizationError/mappedInputs.getNumberOfMappedInputs()); } else {
-	 * return 0; } }
-	 */
-
-	/**
-	 * Returns the quantization error of this unit.
-	 * 
-	 * @return the quantization error of this unit.
-	 */
-	/*
-	 * public double getQuantizationError() { return quantizationError; }
-	 */
 
 	/**
 	 * Returns the weight vector of this unit.
@@ -352,14 +273,18 @@ public class LFSUnit extends InputContainer {
 	 *            the horizontal position on the map.
 	 * @param y
 	 *            the vertical position on the map.
-	 * @param z
-	 *            the height position on the map.
 	 */
 	void updatePosition(int x, int y) {
 		xPos = x;
 		yPos = y;
 	}
 
+	/**
+	 * Adds a weighted value for batch calculations
+	 * 
+	 * @param d
+	 * @param ponderacion
+	 */
 	void addBatchSomNeighbour(LFSInputDatum d, double ponderacion) {
 		if (ponderacion > 0) {
 			batchSomNeighbourhood.add(d);
@@ -372,11 +297,14 @@ public class LFSUnit extends InputContainer {
 		batchPonderaciones.clear();
 	}
 
+	/**
+	 * Get a weightvector as a weighted sum of all batch neoghbors
+	 */
 	void getWeightVectorFromBatchSomNeighbourhood() {
 
 		double acum = 0;
 
-		// Primero se mira si tiene ponderaciones
+		// First of all, let's see if there're weighted values
 		for (int j = 0; j < batchSomNeighbourhood.size(); j++) {
 
 			Double ponder = batchPonderaciones.get(j);
@@ -411,21 +339,8 @@ public class LFSUnit extends InputContainer {
 
 	}
 
-	@Override
-	public String toString() {
-		return "Unit[" + printCoordinates() + "]";
-	}
-
-	private String printCoordinates() {
-		return xPos + "/" + yPos;
-	}
-
-	public int getDim() {
-		return dim;
-	}
-
-	public boolean isTopLeftUnit() {
-		return xPos == 0 && yPos == 0;
+	public double getQError() {
+		return quantizationError;
 	}
 
 }

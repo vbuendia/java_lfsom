@@ -77,7 +77,7 @@ public class LFSKLDistance implements LFSQualityMeasure {
 
 		/** *********Summand 2: Dist BMU 2ndBMU ueber den shortest path */
 
-		HexMapDistancer distan = new HexMapDistancer(xSize1, ySize1);
+		HexMapDistancer distan = new HexMapDistancer(xSize1, ySize1, true);
 		int[][][][] distancias = distan.map();
 
 		int samplecount = data.numVectors();

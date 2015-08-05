@@ -336,7 +336,7 @@ public class TrainSelector {
 					closesPointVec[l] = dataArray[closestPointIndex][l];
 				}
 
-				uPCA[i][j] = new LFSUnit(null, i, j, closesPointVec);
+				uPCA[i][j] = new LFSUnit(i, j, closesPointVec);
 			}
 		}
 
@@ -592,7 +592,7 @@ public class TrainSelector {
 					LFSGrowingSOM mapa1Celda = new LFSGrowingSOM(
 							props.getExpName());
 					LFSUnit[][] units1Celda = new LFSUnit[1][1];
-					units1Celda[0][0] = new LFSUnit(null, 0, 0, datos1
+					units1Celda[0][0] = new LFSUnit(0, 0, datos1
 							.getMeanVector().toArray());
 					mapa1Celda.initLayer(true, props, datos1, units1Celda);
 					mapa1Celda.getLayer().mapCompleteDataAfterTraining(datos1);

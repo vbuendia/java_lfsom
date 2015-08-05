@@ -302,7 +302,7 @@ public class LFSGrowingLayer {
 		if (unitsAssign != null) {
 			for (int j = 0; j < this.ySize; j++) {
 				for (int i = 0; i < this.xSize; i++) {
-					units[i][j] = new LFSUnit(this, i, j,
+					units[i][j] = new LFSUnit(i, j,
 							unitsAssign[i][j].getWeightVectorVal());
 				}
 			}
@@ -310,7 +310,7 @@ public class LFSGrowingLayer {
 
 			for (int j = 0; j < this.ySize; j++) {
 				for (int i = 0; i < this.xSize; i++) {
-					units[i][j] = new LFSUnit(this, i, j, data.dim(), rand,
+					units[i][j] = new LFSUnit(data, i, j, data.dim(), rand,
 							normalized, initialisationMode);
 				}
 			}
@@ -718,7 +718,7 @@ public class LFSGrowingLayer {
 						newUnits[i][j] = units[i][j];
 					} else if (i == insertPos) {
 						try {
-							newUnits[i][j] = new LFSUnit(this, i, j,
+							newUnits[i][j] = new LFSUnit(i, j,
 									LFSL2Metric.meanVector(
 											units[i - 1][j].getWeightVector(),
 											units[i][j].getWeightVector()));
@@ -751,7 +751,7 @@ public class LFSGrowingLayer {
 						newUnits[i][j] = units[i][j];
 					} else if (j == insertPos) {
 						try {
-							newUnits[i][j] = new LFSUnit(this, i, j,
+							newUnits[i][j] = new LFSUnit(i, j,
 									LFSL2Metric.meanVector(
 											units[i][j - 1].getWeightVector(),
 											units[i][j].getWeightVector()));
@@ -1300,7 +1300,7 @@ public class LFSGrowingLayer {
 		newLayer.units = new LFSUnit[this.xSize][this.ySize];
 		for (int x = 0; x < this.xSize; x++) {
 			for (int y = 0; y < this.ySize; y++) {
-				newLayer.units[x][y] = new LFSUnit(newLayer, x, y,
+				newLayer.units[x][y] = new LFSUnit(x, y,
 						this.units[x][y].getWeightVector());
 			}
 		}
@@ -1437,7 +1437,7 @@ public class LFSGrowingLayer {
 			}
 		}
 		HexMapDistancer HexMap = new HexMapDistancer(this.getYSize(),
-				this.getXSize());
+				this.getXSize(), true);
 		return HexMap.traspon(arrl);
 	}
 

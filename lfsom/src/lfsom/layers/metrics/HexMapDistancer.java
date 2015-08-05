@@ -18,8 +18,11 @@ package lfsom.layers.metrics;
 
 import java.util.ArrayList;
 
-/* @author vicente
- * @version $Id: $
+/**
+ * Implementation of distances for hexagonal maps.
+ * 
+ * @author vicente
+ * 
  */
 public class HexMapDistancer {
 
@@ -43,12 +46,24 @@ public class HexMapDistancer {
 
 	private ArrayList<Integer[]> lista;
 
+	/**
+	 * 
+	 * Constructor gets size, and creates a class which contains a calculation
+	 * of distances among cells. If "simple" parameter is false, it also
+	 * calculates the shared edges among cells, useful for visualization
+	 * 
+	 * @param xSiz
+	 * @param ySiz
+	 * @param simple
+	 */
 	public HexMapDistancer(int xSiz, int ySiz, boolean simple) {
 
 		xSize = xSiz;
 		ySize = ySiz;
 
 		distancesHex = new int[xSize][ySize][xSize][ySize];
+		if (!simple)
+			AristasComp = new int[xSize * ySize][6];
 
 		int[] increm = new int[ySize];
 		increm[0] = 0;
@@ -65,55 +80,12 @@ public class HexMapDistancer {
 
 		for (int x1 = 0; x1 < xSize; x1++) {
 			for (int y1 = 0; y1 < ySize; y1++) {
-
-				for (int x2 = 0; x2 < xSize; x2++) {
-					for (int y2 = 0; y2 < ySize; y2++) {
-						int dx = x2 + increm[y2] - x1 - increm[y1];
-						int dist = Math.abs(dx);
-						int dy = y2 - y1;
-						int dif = Math.abs(dy - dx);
-						if (Math.abs(dy) > dist) {
-							dist = Math.abs(dy);
-						}
-						if (dif > dist) {
-							dist = dif;
-						}
-						// Stefano MacGregor
-						distancesHex[x1][y1][x2][y2] = dist;
-
+				if (!simple) {
+					for (int k = 0; k < 6; k++) {
+						AristasComp[x1 + y1 * xSize][k] = -1;
 					}
 				}
-			}
-		}
 
-	}
-
-	public HexMapDistancer(int xSiz, int ySiz) {
-
-		xSize = xSiz;
-		ySize = ySiz;
-
-		distancesHex = new int[xSize][ySize][xSize][ySize];
-		AristasComp = new int[xSize * ySize][6];
-
-		int[] increm = new int[ySize];
-		increm[0] = 0;
-		for (int i = 1; i < ySize; i++) {
-			if (i % 2 != 0) {
-				increm[i] = increm[i - 1] + 1;
-
-			} else {
-				increm[i] = increm[i - 1];
-			}
-		}
-		// Tenemos en cuenta que se hace un offset de las pares
-		// Tomamos como distancia la unidad y como offset el seno del ángulo 60
-
-		for (int x1 = 0; x1 < xSize; x1++) {
-			for (int y1 = 0; y1 < ySize; y1++) {
-				for (int k = 0; k < 6; k++) {
-					AristasComp[x1 + y1 * xSize][k] = -1;
-				}
 				for (int x2 = 0; x2 < xSize; x2++) {
 					for (int y2 = 0; y2 < ySize; y2++) {
 						int dx = x2 + increm[y2] - x1 - increm[y1];
@@ -129,7 +101,7 @@ public class HexMapDistancer {
 						// Stefano MacGregor
 						distancesHex[x1][y1][x2][y2] = dist;
 
-						if (dist == 1) {
+						if (dist == 1 && !simple) {
 							int ind1 = x1 + y1 * xSize;
 							int ind2 = x2 + y2 * xSize;
 							int aris = -1;
@@ -186,6 +158,10 @@ public class HexMapDistancer {
 			}
 		}
 
+	}
+
+	public HexMapDistancer(int xSiz, int ySiz) {
+		this(xSiz, ySiz, false);
 	}
 
 	public int[][][][] map() {

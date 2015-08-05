@@ -76,7 +76,7 @@ public class LFSTopographicError implements LFSQualityMeasure {
 			numVectors = 6000;
 		}
 
-		HexMapDistancer distan = new HexMapDistancer(xSize, ySize);
+		HexMapDistancer distan = new HexMapDistancer(xSize, ySize, true);
 		int[][][][] distancias = distan.map();
 
 		for (int d = 0; d < numVectors; d++) {
