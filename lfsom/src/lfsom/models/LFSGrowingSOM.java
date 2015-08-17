@@ -229,15 +229,6 @@ public class LFSGrowingSOM {
 
 	}
 
-	public void EscribeXMLsimple(String output) {
-		try {
-			XMLOutputter salida = new XMLOutputter();
-			salida.createXMLsimple(this, output);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	public void EscribeXML(String output) {
 		try {
 			XMLOutputter salida = new XMLOutputter();

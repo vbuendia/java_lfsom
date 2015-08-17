@@ -43,52 +43,67 @@ import org.xml.sax.SAXException;
  */
 public class LFSExpProps {
 
-	// 1
+	/**
+	 * The options selected by the user to generate an experiment are saved into
+	 * this class. An instantiation of this class with the data are sent to the
+	 * SOM trainer.
+	 * 
+	 * It merges options selected by the user with the same options ready to be
+	 * understood by the SOM trainer.
+	 * 
+	 * As each training parameter can have different options, the SOM trainer
+	 * will load an instance of LFSExpProps and will generate different
+	 * combinations of the parameters. Each combination will be saved into a
+	 * LFSSOMProperties, used to train a SOM.
+	 */
+
+	// Learn Rate, by default with a single option (0.2)
 	private double[] bucleLearnRate = { 0.2 };
 
 	private String strLearnRate = "0.2";
 
-	// 2
-
-	// private boolean[] bucleUseBatch = { true, false };
-
+	// Option on-line selected
 	private boolean useOnline = true;
 
+	// Option batch selected
 	private boolean useBatch = true;
 
-	// 3
+	// Sigma
 	private int[] bucleSigma = { 3 };
 
 	private String strBucleSigma = "3";
 
-	// 4
+	// Dimensions
 	private int widthSOM = 0;
 
 	private int heightSOM = 0;
 
-	// 5
+	// Number of CPUs
 	private int numCPUs = 8;
 
-	// 6
+	// Number of desired clusters
 	private int nClusters = 5;
 
+	// Initial Error for hierarchical purposes
 	private double mqeIni = -1;
 
-	// 7
+	// File containing the data
 	private String ficheroEntrada = "(Select a CSV file to train)";
 
+	// Path folders
 	private String dataPath = "";
 
 	private String rootPath = "";
 
-	// 9
+	// Number of iterations with each parameter combination
 	private int numRepe = 10;
 
-	// 10
+	// Initialization Mode. By default, 4 different initializations selected.
 	private int[] bucleInitializationMode = { LFSUnit.INIT_PCA,
 			LFSUnit.INIT_INTERVAL_INTERPOLATE, LFSUnit.INIT_RANDOM,
 			LFSUnit.INIT_VECTOR };
 
+	// Options of initializations (user interface purpose)
 	private int[] initPCA = { 1, LFSUnit.INIT_PCA };
 
 	private int[] initInterval = { 1, LFSUnit.INIT_INTERVAL_INTERPOLATE };
@@ -97,10 +112,11 @@ public class LFSExpProps {
 
 	private int[] initVector = { 1, LFSUnit.INIT_VECTOR };
 
-	// 11
+	// Neighbour functions
 	private int[] bucleNeighFunc = { LFSGrowingLayer.NEIGH_GAUSS,
 			LFSGrowingLayer.NEIGH_CUTGAUSS, LFSGrowingLayer.NEIGH_BUBBLE };
 
+	// Options of neighbour functions (user interface purpose)
 	private int[] bucleNeighWidth = { 8 };
 
 	private float[] buclePcNeighWidth = { 0.5f };
@@ -111,27 +127,43 @@ public class LFSExpProps {
 
 	private int[] neighBobble = { 1, LFSGrowingLayer.NEIGH_BUBBLE };
 
-	// 12
+	// Option of automatic size calculation
 	private boolean sizeAut = true;
 
+	// Option of growing SOM
 	private boolean growing = false;
 
+	// Option of hierarchical SOM
 	private boolean hier = false;
 
+	// Option of hierarchical-cluster growing SOM
 	private boolean gchsom = false;
 
+	// Name of the experiment
 	private String expName = "SOM";
 
+	// Name of calculated SOMs (the experiment generates 3 SOMs, each with best
+	// of 3 quality indexes)
 	private ArrayList<String> netNames = new ArrayList<String>();
 
+	// Name of files containing calculated SOMs
 	private ArrayList<String> netFiles = new ArrayList<String>();
 
+	// Origin, for hierarchical purposes
 	private ArrayList<Integer> subRedOrigen = new ArrayList<Integer>();
 
+	// is it a subnet?
 	private boolean isSubred = false;
 
+	// Data of the father
 	private String fPadre = "-", fDatosPadre = "-";
 
+	// Neigbour width, in absolute and percent values
+	private String strBucleNeighWidth = "8";
+
+	private String strBuclePcNeighWidth = "0.5";
+
+	// Methods to set and get variables, to serialize
 	private String[] variables = { "setBucleLearnRate", "setBucleUseBatch",
 			"setSigma", "setXYSOM", "setNumCPUs", "setnClusters",
 			"setFicheroEntrada", "setNumRepe", "setBucleInitializationMode",
@@ -149,10 +181,6 @@ public class LFSExpProps {
 			"isStrGrowing", "getStrIsSubred", "getStrSubredOrigen",
 			"getFPadre", "getFDatosPadre", "getRootPath", "isStrHier",
 			"getStrGCHSOM", "getStrBuclePcNeighWidth" };
-
-	private String strBucleNeighWidth = "8";
-
-	private String strBuclePcNeighWidth = "0.5";
 
 	/**
 	 * @return Returns the bucleLearnRate.
@@ -184,12 +212,23 @@ public class LFSExpProps {
 
 	}
 
+	/**
+	 * Loads from file
+	 * 
+	 * @param fName
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 */
 	public LFSExpProps(String fName) throws ParserConfigurationException,
 			SAXException, IOException, IllegalAccessException,
 			IllegalArgumentException, InvocationTargetException,
 			NoSuchMethodException, SecurityException {
-		// propi = this();
-		// ExpProps propi = new ExpProps();
 
 		File fXmlFile = new File(fName);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();

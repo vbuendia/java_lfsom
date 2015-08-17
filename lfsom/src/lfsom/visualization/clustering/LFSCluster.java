@@ -50,22 +50,14 @@ public class LFSCluster {
 
 	private double[] centroid;
 
-	private LFSL2Metric distanceFunction;
-
 	public LFSCluster() {
 		indices = new Vector<Integer>();
-		// defaulting to Euclidean distance.
-		distanceFunction = new LFSL2Metric();
+
 	}
 
 	LFSCluster(double[] centroid) {
 		this();
 		this.centroid = centroid;
-	}
-
-	LFSCluster(double[] centroid, LFSL2Metric distanceFunction) {
-		this(centroid);
-		this.distanceFunction = distanceFunction;
 	}
 
 	/**
@@ -154,7 +146,7 @@ public class LFSCluster {
 		double sse = 0d;
 		for (int i = 0; i < indices.size(); i++) {
 			try {
-				sse += distanceFunction.distance(data[indices.elementAt(i)],
+				sse += LFSL2Metric.distance(data[indices.elementAt(i)],
 						centroid);
 			} catch (LFSException e) {
 				e.printStackTrace();
@@ -172,7 +164,7 @@ public class LFSCluster {
 	 */
 	double getDistanceToCentroid(double[] instance) {
 		try {
-			return distanceFunction.distance(centroid, instance);
+			return LFSL2Metric.distance(centroid, instance);
 		} catch (LFSException e) {
 			e.printStackTrace();
 		}
@@ -190,8 +182,8 @@ public class LFSCluster {
 
 		for (int i = 0; i < indices.size(); i++) {
 			try {
-				currentSSE = distanceFunction.distance(
-						data[indices.elementAt(i)], centroid);
+				currentSSE = LFSL2Metric.distance(data[indices.elementAt(i)],
+						centroid);
 
 				if (currentSSE > maxSSE) {
 					maxSSE = currentSSE;

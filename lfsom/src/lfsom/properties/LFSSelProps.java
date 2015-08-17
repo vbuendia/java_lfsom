@@ -40,6 +40,8 @@ import org.xml.sax.SAXException;
  */
 public class LFSSelProps {
 
+	// Properties selected by the user, help to interface
+
 	private boolean EnableCell = true;
 
 	private boolean SelRadius = true;

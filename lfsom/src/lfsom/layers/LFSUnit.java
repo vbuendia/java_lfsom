@@ -161,7 +161,7 @@ public class LFSUnit extends InputContainer {
 	 */
 	void addMappedInput(LFSInputDatum datum, boolean calcQE) {
 		try {
-			double dist = LFSL2Metric.distance(datum.getVector(),
+			double dist = LFSL2Metric.distance(datum.getVector().toArray(),
 					this.weightVector);
 			addMappedInput(datum.getLabel(), dist, calcQE);
 		} catch (LFSException e) {

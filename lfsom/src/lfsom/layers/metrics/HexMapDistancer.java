@@ -26,24 +26,34 @@ import java.util.ArrayList;
  */
 public class HexMapDistancer {
 
+	// Array of calculated distances
 	private int[][][][] distancesHex = null;
 
+	// AristasComp[i,z]=1 if "i" and "z" cells are adjacent
 	private int[][] AristasComp = null;
 
+	// Bidimensional array which contains the number of cluster the cells belong
+	// to
 	private int[][] clusters = null;
 
+	// Bidimensional array which contains the number of subnet which hangs from
+	// the cells
 	private int[][] subnets = null;
 
+	// A calculated list of cells
 	private ArrayList<Integer> incluidos = null;
 
+	// Dimensions
 	private int xSize = 0;
 
+	private int ySize = 0;
+
+	// To know if its loading data
 	private boolean cargandoCluster = false;
 
 	private boolean cargandoSubnet = false;
 
-	private int ySize = 0;
-
+	// Generic list of cells
 	private ArrayList<Integer[]> lista;
 
 	/**
@@ -75,8 +85,6 @@ public class HexMapDistancer {
 				increm[i] = increm[i - 1];
 			}
 		}
-		// Tenemos en cuenta que se hace un offset de las pares
-		// Tomamos como distancia la unidad y como offset el seno del ángulo 60
 
 		for (int x1 = 0; x1 < xSize; x1++) {
 			for (int y1 = 0; y1 < ySize; y1++) {
@@ -160,10 +168,21 @@ public class HexMapDistancer {
 
 	}
 
+	/**
+	 * By default, generates a HexMaxDistancer
+	 * 
+	 * @param xSiz
+	 * @param ySiz
+	 */
 	public HexMapDistancer(int xSiz, int ySiz) {
 		this(xSiz, ySiz, false);
 	}
 
+	/**
+	 * Returns an array containing all the calculated distances
+	 * 
+	 * @return
+	 */
 	public int[][][][] map() {
 		return distancesHex;
 	}
@@ -194,9 +213,14 @@ public class HexMapDistancer {
 		cargandoCluster = false;
 	}
 
+	/**
+	 * Calculate limits of a group of cells. Marks all arists which have to be
+	 * shown
+	 * 
+	 * @return
+	 */
 	private ArrayList<Integer[]> calcLimites() {
 
-		// Se marcan a 1 todas las aristas que no estan compartidas
 		lista = new ArrayList<Integer[]>();
 		for (int incluido : incluidos) {
 			Integer[] display = new Integer[7];
@@ -214,40 +238,75 @@ public class HexMapDistancer {
 		return lista;
 	}
 
+	/**
+	 * Calculates a list of cells within a distance "radio" of one cell and
+	 * their adjacencies
+	 * 
+	 * @param id
+	 * @param radio
+	 * @return
+	 */
 	public ArrayList<Integer[]> listaProximos_display(int id, int radio) {
 		listaProximos(id, radio);
 		calcLimites();
 		return lista;
 	}
 
+	/**
+	 * Returns a list of cells which generate a subnet identified by "id" and
+	 * calculates adjacencies
+	 * 
+	 * @param id
+	 * @return
+	 */
 	public ArrayList<Integer[]> listaSubnet_display(int id) {
-		// System.out.println("Inicio display");
 		listaSubnet(id);
-		// System.out.println("Calc lista");
 		calcLimites();
-		// System.out.println("A return");
 		return lista;
 	}
 
+	/**
+	 * Returns a list of cells which belong to cluster "id" and calculates
+	 * adjacencies
+	 * 
+	 * @param id
+	 * @return
+	 */
 	public ArrayList<Integer[]> listaCluster_display(int id) {
-		// System.out.println("Inicio display");
 		listaCluster(id);
-		// System.out.println("Calc lista");
 		calcLimites();
-		// System.out.println("A return");
 		return lista;
 	}
 
+	/**
+	 * Calculates adjacencies from a custom list of cells, to help show a
+	 * bounding figure
+	 * 
+	 * @param listaC
+	 * @return
+	 */
 	public ArrayList<Integer[]> listaCustom_display(ArrayList<Integer> listaC) {
 		listaCustom(listaC);
 		calcLimites();
 		return lista;
 	}
 
+	/**
+	 * Return list of cells This list could have been previously calculated of
+	 * given
+	 * 
+	 * @return
+	 */
 	public ArrayList<Integer> getIncluidos() {
 		return incluidos;
 	}
 
+	/**
+	 * Transpose
+	 * 
+	 * @param lista
+	 * @return
+	 */
 	public ArrayList<Integer> traspon(ArrayList<Integer> lista) {
 		ArrayList<Integer> traspu = new ArrayList<Integer>();
 		int vacio = 0;
@@ -281,6 +340,11 @@ public class HexMapDistancer {
 		return traspu;
 	}
 
+	/**
+	 * Returns a list of cells which belongs to a defined cluster
+	 * 
+	 * @param id
+	 */
 	public void listaCluster(int id) {
 		int filaac = id / xSize;
 		int colac = id % xSize;
@@ -302,7 +366,12 @@ public class HexMapDistancer {
 
 	}
 
-	public void listaSubnet(int id) {
+	/**
+	 * Returns a list of cells which generate a subnet identified by "id"
+	 * 
+	 * @param id
+	 */
+	private void listaSubnet(int id) {
 		int filaac = id / xSize;
 		int colac = id % xSize;
 		incluidos = new ArrayList<Integer>();
@@ -323,12 +392,19 @@ public class HexMapDistancer {
 
 	}
 
-	public void listaCustom(ArrayList<Integer> listaC) {
+	// Saves a given list
+	private void listaCustom(ArrayList<Integer> listaC) {
 
 		incluidos = listaC;
 	}
 
-	public void listaProximos(int id, int radio) {
+	/**
+	 * Gives a list of cells within "radio" distance from one cell
+	 * 
+	 * @param id
+	 * @param radio
+	 */
+	private void listaProximos(int id, int radio) {
 		int filaac = id / xSize;
 		int colac = id % xSize;
 		incluidos = new ArrayList<Integer>();
@@ -344,10 +420,5 @@ public class HexMapDistancer {
 		}
 
 	}
-
-	/**
-	 * @param incluidos2
-	 * @return
-	 */
 
 }

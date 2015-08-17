@@ -40,12 +40,10 @@
 package lfsom.properties;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -70,9 +68,10 @@ import org.xml.sax.SAXException;
  * @version $Id: SOMProperties.java 4252 2012-01-25 11:29:28Z mayer $
  */
 public class LFSSOMProperties extends Properties {
-	private enum SelectedClassMode {
-		NORMAL, EXCEPT, FAVOUR
-	}
+
+	/**
+	 * Properties of a single SOM
+	 */
 
 	private boolean growing = false;
 
@@ -81,8 +80,6 @@ public class LFSSOMProperties extends Properties {
 	private String expName = "SOM";
 
 	private ArrayList<Integer> subRedOrigen = new ArrayList<Integer>();
-
-	private static final long serialVersionUID = 1L;
 
 	// 14
 	private boolean batchSom = false;
@@ -105,9 +102,6 @@ public class LFSSOMProperties extends Properties {
 	// 18
 	private String metricName = null;
 
-	// 19
-	private String growthQualityMeasureName = null;
-
 	// 20
 	private int numCycles = 0;
 
@@ -115,28 +109,21 @@ public class LFSSOMProperties extends Properties {
 	private int numIterations = 0;
 
 	// 22
-	/** TODO: move to {@link LFSFileProperties} */
-	private int dumpEvery = -1;
 
-	private String[] variables = { "setXYZSize", "setInitializationMode",
-			"setUsePCA", "setBatchSom", "setNeighbourWidth",
-			"setNeighbourFunc", "setLearnrate", "setMetricName",
-			"setNumCycles", "setNumIterations", "setRandomSeed", "setSigma",
-			"setTau", "setExpName", "setQRef", "setGrowing", "setHier",
-			"setIsSubred", "setSubredOrigen", "setGCHSOM",
-			"setPcNeighbourWidth" };
+	private String[] variables = { "setInitializationMode", "setUsePCA",
+			"setBatchSom", "setNeighbourWidth", "setNeighbourFunc",
+			"setLearnrate", "setMetricName", "setNumCycles",
+			"setNumIterations", "setRandomSeed", "setSigma", "setTau",
+			"setExpName", "setQRef", "setGrowing", "setHier", "setIsSubred",
+			"setSubredOrigen", "setGCHSOM", "setPcNeighbourWidth" };
 
-	private String[] variablesval = { "getStrXYZSize",
-			"getStrInitializationMode", "getStrUsePCA", "getStrBatchSom",
-			"getStrNeighbourWidth", "getStrNeighbourFunc", "getStrLearnrate",
-			"getStrMetricName", "getStrNumCycles", "getStrNumIterations",
-			"getStrRandomSeed", "getStrSigma", "getStrTau", "getExpName",
-			"getStrQRef", "getStrGrowing", "getStrHier", "getStrIsSubred",
+	private String[] variablesval = { "getStrInitializationMode",
+			"getStrUsePCA", "getStrBatchSom", "getStrNeighbourWidth",
+			"getStrNeighbourFunc", "getStrLearnrate", "getStrMetricName",
+			"getStrNumCycles", "getStrNumIterations", "getStrRandomSeed",
+			"getStrSigma", "getStrTau", "getExpName", "getStrQRef",
+			"getStrGrowing", "getStrHier", "getStrIsSubred",
 			"getStrSubredOrigen", "getStrGCHSOM", "getStrPcNeighbourWidth" };
-
-	public int getDumpEvery() {
-		return dumpEvery;
-	}
 
 	// 23
 	private long randomSeed = -1;
@@ -156,28 +143,18 @@ public class LFSSOMProperties extends Properties {
 	// 2
 	private int ySize = 0;
 
-	// 3
-	private int zSize = 0;
-
 	// 6
 	private boolean usePCA = false;
 
-	// 8
-	/* Angela: training exceptions */
-	private ArrayList<String> selectedClasses = null;
-
-	// 10
-	private SelectedClassMode selectedClassMode = SelectedClassMode.NORMAL;
-
-	// 11
-	private int minimumFeatureDensity = -1;
-
-	// 12
-	private double[] adaptiveCoordinatesThreshold;
-
 	private String dataPath;
 
-	public double qRef; // Referencia de calidad para el growing
+	// Quality reference for growing
+	public double qRef;
+
+	/**
+	 * Although we made our self serialization method
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public void setNumIterations(int iterations) {
 		this.numIterations = iterations;
@@ -192,7 +169,7 @@ public class LFSSOMProperties extends Properties {
 			boolean isSub, boolean hiera, boolean gchs) throws LFSException {
 		this(xSize, ySize, seed, trainingCycles, trainingIterations, lernrate,
 				sigma, tau, metric, usePCA);
-		this.zSize = zSize;
+
 		this.batchSom = usebatch;
 		this.setExpName(expName);
 		this.initializationMode = initializationMode;
@@ -217,7 +194,7 @@ public class LFSSOMProperties extends Properties {
 			int numIterations, double learnrate, double sigma, double tau,
 			String metricName, boolean usePCA) throws LFSException {
 		this(xSize, ySize, numIterations, learnrate);
-		this.zSize = 1;
+
 		this.tau = tau;
 		this.metricName = metricName;
 		this.numCycles = numCycles;
@@ -315,20 +292,6 @@ public class LFSSOMProperties extends Properties {
 	}
 
 	/**
-	 * Returns an ArrayList of Strings containing the class names which should
-	 * be excluded from training.
-	 * 
-	 * @return classes to be excluded from the training
-	 */
-	public ArrayList<String> getSelectedClasses() {
-		return this.selectedClasses;
-	}
-
-	public SelectedClassMode getSelectedClassMode() {
-		return selectedClassMode;
-	}
-
-	/**
 	 * Returns the batch_som status.
 	 * 
 	 * @return the batch_som status.
@@ -344,12 +307,6 @@ public class LFSSOMProperties extends Properties {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void cargaXML(String fname) throws InvalidPropertiesFormatException,
-			IOException {
-		FileInputStream os = new FileInputStream(new File(fname));
-		this.loadFromXML(os);
 	}
 
 	public LFSSOMProperties copia() {
@@ -451,15 +408,6 @@ public class LFSSOMProperties extends Properties {
 	}
 
 	/**
-	 * Returns the name of the used quality measure.
-	 * 
-	 * @return the name of the used quality measure.
-	 */
-	public String growthQualityMeasureName() {
-		return growthQualityMeasureName;
-	}
-
-	/**
 	 * Returns the number of training cycles.
 	 * 
 	 * @return the number of training cycles.
@@ -519,25 +467,8 @@ public class LFSSOMProperties extends Properties {
 		return getySize();
 	}
 
-	/**
-	 * Returns the number of units in z-direction. Default is 1
-	 * 
-	 * @return the number of units in z-direction. Default is 1
-	 */
-	public int zSize() {
-		return zSize;
-	}
-
-	public int getMinimumFeatureDensity() {
-		return minimumFeatureDensity;
-	}
-
 	public boolean pca() {
 		return usePCA;
-	}
-
-	public double[] adaptiveCoordinatesTreshold() {
-		return adaptiveCoordinatesThreshold;
 	}
 
 	/**
@@ -568,21 +499,6 @@ public class LFSSOMProperties extends Properties {
 	 */
 	public void setNeighbourFunc(int neighbourFunc) {
 		this.neighbourFunc = neighbourFunc;
-	}
-
-	public void setXYZSize(String tam) {
-		String[] strbl = tam.split(",");
-		this.setxSize(Integer.parseInt(strbl[0]));
-		this.setySize(Integer.parseInt(strbl[1]));
-		this.zSize = Integer.parseInt(strbl[2]);
-
-	}
-
-	public String getStrXYZSize() {
-		String tam = String.valueOf(this.getxSize()) + ","
-				+ String.valueOf(this.getySize()) + ","
-				+ String.valueOf(this.zSize);
-		return tam;
 	}
 
 	public void setUsePCA(String usa) {

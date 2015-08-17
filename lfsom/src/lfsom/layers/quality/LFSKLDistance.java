@@ -50,32 +50,40 @@ import lfsom.util.LFSException;
  * 
  * @author Gerd Platzgummer
  * @version $Id: IntrinsicDistance.java 3883 2010-11-02 17:13:23Z frank $
+ * 
+ *          Modified for LFS by Vicente Buendia
  */
 public class LFSKLDistance implements LFSQualityMeasure {
 
-	private double[][] Unit_ID;
+	// Whole map quality
+	private double Map_Q = 0.0;
 
-	private double Map_ID = 0.0;
-
+	// Quality previously assigned
 	public LFSKLDistance(LFSGrowingLayer layer, String nmap) {
-		Map_ID = Double.valueOf(nmap);
+		Map_Q = Double.valueOf(nmap);
 	}
 
+	/**
+	 * Calculate KL Index
+	 * 
+	 * @param layer
+	 * @param data
+	 */
 	public LFSKLDistance(LFSGrowingLayer layer, LFSData data) {
 
 		int xSize1 = layer.getXSize();
 		int ySize1 = layer.getYSize();
 
-		/** *********Summand 1: Aequivalent zum (einfachen) Quantization Error */
+		/** *********Sum1: Quantization Error */
 
 		try {
-			Map_ID = new LFSQuantizationError(layer, data).getMapQuality("mqe");
+			Map_Q = new LFSQuantizationError(layer, data).getMapQuality("mqe");
 		} catch (LFSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		/** *********Summand 2: Dist BMU 2ndBMU ueber den shortest path */
+		/** *********Sum 2: Shortest path between BMU2 and BMU2 */
 
 		HexMapDistancer distan = new HexMapDistancer(xSize1, ySize1, true);
 		int[][][][] distancias = distan.map();
@@ -89,44 +97,36 @@ public class LFSKLDistance implements LFSQualityMeasure {
 			LFSUnit bmu = winners[0];
 			LFSUnit sbmu = winners[1];
 
-			Map_ID += distancias[bmu.getXPos()][bmu.getYPos()][sbmu.getXPos()][sbmu
+			Map_Q += distancias[bmu.getXPos()][bmu.getYPos()][sbmu.getXPos()][sbmu
 					.getYPos()];
 
 		}
 
-		Map_ID = Map_ID / samplecount; // oder nonEmpty: Units mit assoziierten
-										// Samples
+		Map_Q = Map_Q / samplecount;
 
 	}
 
 	/**
-	 * *************************************************************************
-	 * **********************************
-	 */
-	/*
-	 * Ausgabe: ID_Sample-(nicht ID_Unit!)- Werte, Durchschnitt
+	 * Get map quality
 	 */
 
 	public double getMapQuality(String name) throws LFSException {
 		if (name.equals("ID_Map")) {
-			return Map_ID;
+			return Map_Q;
 		} else {
 			throw new LFSException("Quality measure with name " + name
 					+ " not found.");
 		}
 	}
 
-	/*
-	 * Ausgabe: ID_Sample- Werte, Mapping auf die entsprechende Unit
+	/**
+	 * Compatibility function
 	 */
 
 	public double[][] getUnitQualities(String name) throws LFSException {
-		if (name.equals("ID_Unit")) {
-			return Unit_ID;
-		} else {
-			throw new LFSException("Quality measure with name " + name
-					+ " not found.");
-		}
+
+		throw new LFSException("UnitQualities not implemented for KLDistance.");
+
 	}
 
 }

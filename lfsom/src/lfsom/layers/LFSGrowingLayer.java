@@ -626,7 +626,7 @@ public class LFSGrowingLayer {
 				double distance = 0;
 				try {
 					distance = LFSL2Metric.distance(
-							units[i][j].getWeightVector(), vec);
+							units[i][j].getWeightVector(), vec.toArray());
 				} catch (LFSException e) {
 					Logger.getLogger("at.tuwien.ifs.somtoolbox").severe(
 							e.getMessage());

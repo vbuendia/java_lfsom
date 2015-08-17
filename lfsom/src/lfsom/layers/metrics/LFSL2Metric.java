@@ -40,7 +40,6 @@
 package lfsom.layers.metrics;
 
 import lfsom.util.LFSException;
-import cern.colt.matrix.DoubleMatrix1D;
 
 /**
  * Implements the L2 or Euclidean metric. Though this class could us
@@ -53,10 +52,13 @@ import cern.colt.matrix.DoubleMatrix1D;
 public class LFSL2Metric {
 
 	/**
-	 * @see at.tuwien.ifs.somtoolbox.layers.metrics.DistanceMetric#distance(double[],
-	 *      double[])
+	 * Returns L2 distance between vector1 and vector2
+	 * 
+	 * @param vector1
+	 * @param vector2
+	 * @return
+	 * @throws LFSException
 	 */
-
 	public static double distance(double[] vector1, double[] vector2)
 			throws LFSException {
 		checkDimensions(vector1, vector2);
@@ -70,42 +72,6 @@ public class LFSL2Metric {
 	@Override
 	public String toString() {
 		return "L2";
-	}
-
-	/**
-	 * Instantiates a certain distance metric class specified by argument
-	 * <code>mName</code>.<br/>
-	 * Note: for backwards compatibility, if the metric name contains the
-	 * package <code>prefix at.ec3.somtoolbox</code>, this will be replaced by
-	 * <code>at.tuwien.ifs.somtoolbox</code>.
-	 * 
-	 * @param mName
-	 *            the name of the metric.
-	 * @return a distance metric object of class <code>mName</code>.
-	 * @throws ClassNotFoundException
-	 *             if class denoted by argument <code>mName</code> is not found.
-	 * @throws InstantiationException
-	 *             if if this Class represents an abstract class, an interface,
-	 *             an array class, a primitive type, or void; or if the class
-	 *             has no nullary constructor; or if the instantiation fails for
-	 *             some other reason.
-	 * @throws IllegalAccessException
-	 *             if the class or its nullary constructor is not accessible.
-	 */
-
-	/**
-	 * Can be used to do some performance testing to compare colt vs. direct
-	 * distance implementations.
-	 */
-
-	/**
-	 * @see at.tuwien.ifs.somtoolbox.layers.metrics.DistanceMetric#distance(double[],
-	 *      cern.colt.matrix.DoubleMatrix1D)
-	 */
-
-	public static double distance(double[] vector1, DoubleMatrix1D vector2)
-			throws LFSException {
-		return distance(vector1, vector2.toArray());
 	}
 
 	/**
@@ -131,16 +97,6 @@ public class LFSL2Metric {
 			meanVector[ve] = (vector1[ve] + vector2[ve]) / 2;
 		}
 		return meanVector;
-	}
-
-	/**
-	 * @see at.tuwien.ifs.somtoolbox.layers.metrics.DistanceMetric#distance(cern.colt.matrix.DoubleMatrix1D,
-	 *      double[])
-	 */
-
-	public static double distance(DoubleMatrix1D vector1, double[] vector2)
-			throws LFSException {
-		return distance(vector1.toArray(), vector2);
 	}
 
 	/**

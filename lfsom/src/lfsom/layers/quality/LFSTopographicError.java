@@ -44,12 +44,9 @@ import lfsom.layers.LFSGrowingLayer;
 import lfsom.layers.LFSUnit;
 import lfsom.layers.metrics.HexMapDistancer;
 import lfsom.util.LFSException;
-import at.tuwien.ifs.somtoolbox.input.SOMLibDataWinnerMapping;
 
 /**
  * Implementation of Topographic Error Quality Measure.<br>
- * TODO: can maybe be optimised using data winner mapping file (
- * {@link SOMLibDataWinnerMapping}).
  * 
  * @author Gerd Platzgummer
  * @version $Id: TopographicError.java 3883 2010-11-02 17:13:23Z frank $
@@ -58,19 +55,26 @@ public class LFSTopographicError implements LFSQualityMeasure {
 
 	private double averageError = 0.0;
 
+	// Error of each unit
 	private double[][] unitError;
 
-	public LFSTopographicError(LFSGrowingLayer layer, String nmap) {
-		this.averageError = Double.valueOf(nmap);
+	// Set error
+	public LFSTopographicError(LFSGrowingLayer layer, String errorInit) {
+		this.averageError = Double.valueOf(errorInit);
 	}
 
+	/**
+	 * Calculate topographic error
+	 * 
+	 * @param layer
+	 * @param data
+	 */
 	public LFSTopographicError(LFSGrowingLayer layer, LFSData data) {
 
 		int xSize = layer.getXSize();
 		int ySize = layer.getYSize();
 
 		int numVectors = data.numVectors();
-		int nVectorsOrig = numVectors;
 		double sum = 0.0;
 		if (numVectors > 6000) {
 			numVectors = 6000;
@@ -91,15 +95,11 @@ public class LFSTopographicError implements LFSQualityMeasure {
 				sum++;
 			}
 
-			// progress.progress();
 		}
 		averageError = sum / numVectors;
 
 	}
 
-	/**
-	 * @see at.tuwien.ifs.somtoolbox.layers.quality.QualityMeasure#getMapQuality(java.lang.String)
-	 */
 	@Override
 	public double getMapQuality(String name) throws LFSException {
 		if (name.equals("TE_Map")) {
@@ -110,9 +110,6 @@ public class LFSTopographicError implements LFSQualityMeasure {
 		}
 	}
 
-	/**
-	 * @see at.tuwien.ifs.somtoolbox.layers.quality.QualityMeasure#getUnitQualities(java.lang.String)
-	 */
 	@Override
 	public double[][] getUnitQualities(String name) throws LFSException {
 		if (name.equals("TE_Unit")) {

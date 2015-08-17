@@ -121,19 +121,19 @@ public class LFSKMeans {
 
 		switch (initialisation) {
 		case LINEAR:
-			initClustersLinearly(distanceFunction);
+			initClustersLinearly();
 			break;
 		case LINEAR_INSTANCE:
-			initClustersLinearlyOnInstances(distanceFunction);
+			initClustersLinearlyOnInstances();
 			break;
 		case RANDOM:
-			initClustersRandomly(distanceFunction);
+			initClustersRandomly();
 			break;
 		case RANDOM_INSTANCE:
-			initClustersRandomlyOnInstances(distanceFunction);
+			initClustersRandomlyOnInstances();
 			break;
 		case EQUAL_NUMBERS:
-			initClustersEqualNumbers(distanceFunction);
+			initClustersEqualNumbers();
 			break;
 		default:
 			break;
@@ -287,7 +287,7 @@ public class LFSKMeans {
 	/**
 	 * Calculate random centroids for each cluster.
 	 */
-	private void initClustersRandomly(LFSL2Metric distanceFunction) {
+	private void initClustersRandomly() {
 		RandomGenerator rg = new JDKRandomGenerator();
 		// FIXME: this is for testing purposes only
 		rg.setSeed(RANDOM_SEED);
@@ -299,7 +299,7 @@ public class LFSKMeans {
 				centroid[attributeIndex] = differences[attributeIndex]
 						* rg.nextDouble() + minValues[attributeIndex];
 			}
-			clusters[clusterIndex] = new LFSCluster(centroid, distanceFunction);
+			clusters[clusterIndex] = new LFSCluster(centroid);
 		}
 		System.out.println("initial centroids: ");
 		// printCentroids();
@@ -311,7 +311,7 @@ public class LFSKMeans {
 	 * each cluster and calculate its centre from these (the last cluster might
 	 * be larger if numInstances mod k < 0)
 	 */
-	private void initClustersEqualNumbers(LFSL2Metric distanceFunction) {
+	private void initClustersEqualNumbers() {
 		HashSet<Integer> usedIndices = new HashSet<Integer>();
 		int limit = numberOfInstances / k;
 		// FIXME: Test clustering with new permutation generator!
@@ -336,15 +336,13 @@ public class LFSKMeans {
 			// System.out.println();
 			c.calculateCentroid(data);
 			// clusters[clusterIndex] = c;
-			clusters[clusterIndex] = new LFSCluster(c.getCentroid(),
-					distanceFunction);
-			// System.out.println("setting cluster: " + clusterIndex + " / " +
-			// c.getNumberOfInstances());
+			clusters[clusterIndex] = new LFSCluster(c.getCentroid());
+
 		}
 	}
 
 	/** Take random points from the input data as centroids. */
-	private void initClustersRandomlyOnInstances(LFSL2Metric distanceFunction) {
+	private void initClustersRandomlyOnInstances() {
 		ArrayList<double[]> usedInstances = new ArrayList<double[]>();
 		RandomGenerator rg = new JDKRandomGenerator();
 		// FIXME: this is for testing purposes only
@@ -357,7 +355,7 @@ public class LFSKMeans {
 				centroid = data[rg.nextInt(data.length - 1)].clone();
 			}
 			usedInstances.add(centroid);
-			clusters[clusterIndex] = new LFSCluster(centroid, distanceFunction);
+			clusters[clusterIndex] = new LFSCluster(centroid);
 		}
 	}
 
@@ -365,7 +363,7 @@ public class LFSKMeans {
 	 * This one does linear initialisation. In the two dimensional space it will
 	 * place the cluster centres on a diagonal line of a square.
 	 */
-	private void initClustersLinearly(LFSL2Metric distanceFunction) {
+	private void initClustersLinearly() {
 		for (int clusterIndex = 0; clusterIndex < k; clusterIndex++) {
 			double[] centroid = new double[numberOfAttributes];
 			for (int attributeIndex = 0; attributeIndex < numberOfAttributes; attributeIndex++) {
@@ -374,7 +372,7 @@ public class LFSKMeans {
 						* (clusterIndex + 1)
 						+ minValues[attributeIndex];
 			}
-			clusters[clusterIndex] = new LFSCluster(centroid, distanceFunction);
+			clusters[clusterIndex] = new LFSCluster(centroid);
 		}
 	}
 
@@ -383,7 +381,7 @@ public class LFSKMeans {
 	 * the exact linear point, rather finds & uses the closest instance from the
 	 * data set as centroid.
 	 */
-	private void initClustersLinearlyOnInstances(LFSL2Metric distanceFunction) {
+	private void initClustersLinearlyOnInstances() {
 		ArrayList<double[]> usedInstances = new ArrayList<double[]>(); // to
 																		// store
 																		// which
@@ -403,11 +401,11 @@ public class LFSKMeans {
 				double[] minData = null;
 				try {
 					for (int i = 0; i < data.length; i++) {
-						if (distanceFunction.distance(centroid, data[i]) < minDistance
+						if (LFSL2Metric.distance(centroid, data[i]) < minDistance
 								&& !usedInstances.contains(data[i])
 								|| i == data.length - 1) {
 							minData = data[i];
-							minDistance = distanceFunction.distance(centroid,
+							minDistance = LFSL2Metric.distance(centroid,
 									data[i]);
 						}
 					}
@@ -417,7 +415,7 @@ public class LFSKMeans {
 					e.printStackTrace();
 				}
 			}
-			clusters[clusterIndex] = new LFSCluster(centroid, distanceFunction);
+			clusters[clusterIndex] = new LFSCluster(centroid);
 		}
 	}
 

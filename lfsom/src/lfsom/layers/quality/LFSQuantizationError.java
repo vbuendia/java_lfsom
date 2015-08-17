@@ -45,7 +45,7 @@ import lfsom.layers.LFSUnit;
 import lfsom.util.LFSException;
 
 /**
- * Calculates the <i>Quantisation Error</i>, defined as the average distance
+ * Calculates the <i>Quantization Error</i>, defined as the average distance
  * between and input data vector and the weight-vector of its
  * best-matching-unit.<br>
  * Calculates the following values:
@@ -75,6 +75,7 @@ import lfsom.util.LFSException;
  * @version $Id: QuantizationError.java 3883 2010-11-02 17:13:23Z frank $
  */
 public class LFSQuantizationError implements LFSQualityMeasure {
+
 	private double mmqe;
 
 	private double mqe;
@@ -83,11 +84,17 @@ public class LFSQuantizationError implements LFSQualityMeasure {
 
 	private double[][] unitQe;
 
-	public LFSQuantizationError(LFSGrowingLayer layer, String nmap) {
+	public LFSQuantizationError(LFSGrowingLayer layer, String errorInit) {
 
-		mqe = Double.valueOf(nmap);
+		mqe = Double.valueOf(errorInit);
 	}
 
+	/**
+	 * Calculates mqe and mmqe
+	 * 
+	 * @param layer
+	 * @param data
+	 */
 	public LFSQuantizationError(LFSGrowingLayer layer, LFSData data) {
 
 		int xSize = layer.getXSize();
