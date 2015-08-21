@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<descriptions version="1.0">
+
+  <description shortName="PCA" longName="Principal Component Analysis">Principal component analysis is a vector space
+    transform often used to reduce multidimensional data sets to lower dimensions for analysis.
+    Depending on the field of application, it is also named the discrete Karhunen-Loeve transform,
+    the Hotelling transform or proper orthogonal decomposition (POD). PCA is mathematically defined
+    as an orthogonal linear transformation that transforms the data to a new coordinate system such
+    that the greatest variance by any projection of the data comes to lie on the first coordinate
+    (called the first principal component), the second greatest variance on the second coordinate,
+    and so on. PCA is theoretically the optimum transform for a given data in least square terms.
+    PCA can be used for dimensionality reduction in a data set by retaining those characteristics of
+    the data set that contribute most to its variance, by keeping lower-order principal components
+    and ignoring higher-order ones. Such low-order components often contain the most important
+    aspects of the data. However, depending on the application this may not always be the case.
+  </description>
+
+  <description shortName="SDH" longName="Smoothed Data Histograms">Smoothed Data Histograms are similar to Hit
+    Histograms but computed by increasing the counter of the Best Matching Unit bin for each sample,
+    and increasing the counter of up to k best matching units to a lesser degree. The binned values
+    can be calculated in various ways. One is to increment the counter by 1/k for each sample for
+    the k-th matching unit. SDHs require a spread parameter s which serves as an upper limit to k.
+    Setting s to higher values increases the smoothing effect.Lower smoothing ranges have a similar
+    appearance as the hit histogram, while increasing s has a blurring effect on the visualisation,
+    such that similar nodes in feature space share the same hit v-alue. TheSDH Visualisation is
+    suitable for visualising clusters.
+  </description>
+
+  <description longName="U-Matrix">The unified distance matrix is calculated as the distance in feature
+    space between prototype vectors, for which the map units in output space are adjacent. The
+    U-Matrix can be depicted in two ways: either by showing inter-node distances, or by showing only
+    the average values. The former method requires insertion of additional patches to the map
+    lattice between nodes, and the original positions of the nodes assigned the average values. The
+    gradient of colourised units gives an overview on how similar the prototype vectors are. High
+    differences in Colour show high dissimilarities, whereas small differences show similar Prototype
+    vectors. The U-Matrix is suitable to identify possible interpolating units and outliers, as well
+    as dense regions, where inter-node-distances arelow.The U-Matrix explains much of the clustering
+    structure of the SOM,especially in the case when the number of nodes is smaller than the number
+    of training data samples. However if the prototype vectors outnumber the training samples, the
+    U-Matrix shows artifacts around the position where the data samples are mapped, which overshadow
+    the actual cluster boundaries.
+  </description>
+
+  <description longName="Quantisation Error">The Quantisation Error is the most widely used and most basic
+    technique for assessing the vector quantisation properties of the map.It can be computed as the
+    average distance between each sample and its closest codebook vector. The Quantisation Error can
+    be lowered simply by increasing the number of k prototype vectors, in which case the size of the
+    codebook increases. The tradeoff between codebook size and quantisation error has to be
+    determined in the context of the application domain. The total error resembles, to a certain
+    degree the hit histogram, as a higher number of hit increases the sum of the error. The
+    quantisation error can also be used to test whether the original training data set and a
+    different data set have followed roughly the same distribution by calculation quantisation
+    errors and visually inspecting the resulting visualisations, testing whether the values are
+    spread evenly across the lattice.
+  </description>
+
+  <description longName="Topographic Error">The topographic Error is a simple error measure that assesses the
+    quality of the vector projection, disregarding its quantisation properties. It is defined as the
+    percentage of data samples for which the best matching unit is not adjacent to the second-best
+    matching unit.The Topographic Error is normalised to a range between zero and one, where small
+    values indicate few topology violations. Usually, the topographic error is lower the more map
+    units are used. The topographic Error should be reasonably low for a SOM, otherwise the training
+    process has probably been interrupted prematurely. The topographic error can be visualised by
+    counting the number of violations that occur at each map unit that is the best matching unit.
+  </description>
+
+  <description longName="Sammon Measure">Sammon's Mapping (Sammon's Projection) [Sam69] ist eine nichtlineare
+    Projektionsmethode und liefert speziell bei hochdimensionalen und nichtkorrelierten Daten gute
+    Ergebnisse. Im Vergleich zu PCA ist Sammon's Projection jedoch anfällig gegenüber Ausreißern in
+    den Datenbeständen. Die Methode baut auf MDS auf und kann ebenfalls durch eine Energiefunktion
+    beschrieben werden.</description>
+
+  <description longName="Trustworthyness">Trustworthiness und Neighborhood Preservation basieren auf dem
+    Ansatz, Distanzen in Ein- und Ausgaberaum (Input- bzw. Outputspace) mit einer Rangfolge zu
+    versehen (ranking) und basierend auf diesen Rangfolgen die Topologieerhaltung zu errechnen 1.
+    Ein beiden Verfahren gemeinsamer Ansatz ist die Definition von Nachbarschaftsbeziehungen von
+    Datenvektoren als Satz jener Vektoren, welche die k nächsten2 bezüglich des beobachteten Vektors
+    sind, weiters die unmittelbar darauf aufbauende Beschreibung einer Rangordnung dieser k
+    Nachbarn, beschrieben durch die Norm und aufsteigenden Distanzen. Die Sortierung der Distanzen,
+    welche dieser Rangordnung zu Grund liegt, stellt bei großen Datenmengen einen Performancefaktor
+    dar und sollte deshalb über einen performanten Sortieralgorithmus wie z.B. Quicksort
+    erfolgen.Die Berechnung erfolgt nach Bestimmung jenes k, für welches die Qualitätsbeurteilung
+    der Karte durchgeführt werden soll. Für beide Messungen ist Kenntnis über die der Karte zugrunde
+    liegenden Datensets vonnöten. Trustworthiness nimmt die Untersuchung, ob projizierte,
+    benachbarte Punkte im Outputpace A auch im Input Space V nahe beieinander liegen, vor und
+    beziffert auch die Intensität der Abweichung. Dies ist insofern ein außergewöhnlicher Ansatz,
+    als dass die meisten Qualitätsmaße zur Topologieerhaltung die Nachbarschaftserhaltung bei
+    Abbildung vom Input- in den Outputspace (also umgekehrt) messen.
+  </description>
+
+  <description longName="Mean Quantisation Error">EMQE bildet das Mittel der Distanzen aller w einem Prototypen m(xi)
+    zugeordneten Samplevektoren xi zu ebendiesem Prototypen. Der Gesamtwert ergibt sich wiederum aus
+    der Berechnung des Mittels dieser |M| Einzelwerte (M = N), welche einzeln auch als "Fehlerwerte
+    pro Karteneinheit" interpretiert werden können
+  </description>
+
+  <description longName="Entropy Error">Die Qualität einer SOM kann über die Projektion der Information aus
+    dem Eingangsraum in den Ausgangsraum bewertet werden (Hulle, 2000). Hierbei betrachten wir die
+    Neuronenaktivierungsentropie des Ausgangsraumes.Eine Gleichverteilung der Wahrscheinlichkeit der
+    Aktivierung der Neuronen über dem gesamten Ausgangsraum entspricht einem Maximum der
+    Aktivierungsentropie. Ein Maximum der Aktivierungsentropie der Neuronen entspricht einer
+    optimalen Quantisierung des Eingangsraumes. Eine Aussage über die Entropie einer SOM ist von
+    rein informationstheoretischer Natur. Das Entropiemaß macht keine direkte Aussage über die
+    Topologieerhaltung der SOM. Das Entropiemaß misst die Verteilung der Wahrscheinlichkeiten der
+    Aktivierung der Neuronen. Es führt zu einem hohen Wert, wenn die Wahrscheinlichkeit der
+    Aktivierung über die einzelnen Neuronen gleichmäßig verteilt ist. Dies bedeutet, dass die
+    Neuronen über den Eingangsraum gleichmäßig verteilt sind. Die Anzahl der Neuronen wird nur
+    indirekt, durch die resultierenden partikulären Wahrscheinlichkeitswerte, in die Berechnung
+    miteinbezogen. Der berechnete Wert wird jedoch nicht direkt mit der Anzahl der Neuronen
+    skaliert, wodurch sich SOMs ungleicher Größe nur bedingt vergleichen lassen. Dies könnte
+    möglicherweise durch eine direkte Skalierung des berechneten Wertes, mit der Anzahl der
+    Neuronen, verbessert werden, jedoch ist dies eine unbewiesene Vermutung. Beim Entropiemaß ist
+    anzumerken, dass ein Maximalwert für dieses Maß angegeben werden kann. Es ist der
+    10er-Logarithmus der Anzahl der benutzten Trainingsvektoren. Dieses Maximum wird, wie bereits
+    erwähnt, bei einer uniformen Aktivierungswahrscheinlichkeitsverteilung erreicht. Dies kann nur
+    der Fall sein, wenn die SOM über mehr Neuronen verfügt, als Trainingsvektoren benutzt wurden,
+    bzw. wenn ein ganzes Vielfaches der Neuronenanzahl an Trainingsvektoren benutzt wurde.
+  </description>
+
+  <description longName="Silhouette Value">The Silhouette value is mostly used to find the right setting for
+    the number of clus- ters . The ideal value of the Silhouette is close to 1, hence ai being close
+    to 0. The Silhouette coefficient de- scribes the level of data separation using both intra- and
+    inter-cluster distances and can for instance be of great help in finding the optimal number of
+    clusters (k) in the k-Means algorithm. Both intra-cluster and inter-cluster measures are used to
+    compute the Silhouette value, as shown si=(bi - ai) / MAX(bi,ai) , Where i is an index over all
+    data vectors, ai the average distance of i to all other vectors of that cluster, bi the average
+    distance of i to all data vectors in the closest cluster. Herein the closest cluster is defined
+    by the minimum distance between clusters' prototype vectors. The value resides between -1 and 1.
+  </description>
+
+  <description longName="Intrinsic Distance">Die Intrinsic Distance verwendet Komponenten von
+    Quantisierungsfehler und Topographic Error. Die Analyse erfolgt unter Zuhilfenahme sowohl der
+    Karte als auch der dieser zu Grunde liegenden Datensamples. Es wird zu jedem Datensample die BMU
+    und die 2ndBMU ermittelt. Der Fehlerwert "Intrinsic Distance" für jedes Sample wird aus zwei
+    Summanden gebildet: Der erste Summand besteht aus der Distanz zwischen dem jeweils betrachteten
+    Datensample xi und dem Prototyp seiner BMU mc(x) (äquivalent zum Quantisierungsfehler). Der
+    zweite Summand stellt die Distanz zwischen BMU und 2ndBMU, gebildet als Summe der
+    Einzeldistanzen über den kürzesten Pfad zwischen diesen Units bzw. den Prototypvektoren als
+    Repräsentanten dieser Units, dar. Der kürzeste Pfad auf einem Kartengitter kann beispielsweise
+    über den in seiner Originalform für Graphen vorgesehenen shortest path algorithm von Dijkstra
+    [Dij59] berechnet werden. Als Dijkstras Knoten n können hierbei Units bzw. die Repräsentanten
+    der Units, als Dijkstras Kanten m die Distanzen zwischen jeweils zwei adjazenten Repr äsentanten
+    interpretiert werden. Die Verbindung der Knoten wird über die Nachbarschaftsbeziehungen
+    derselben definiert, in unserem Kartengitter in City Block Metrik. Für n Knoten und m Kanten
+    benötigt Dijkstra O (n+m), was den Algorithmus in seiner Performanz auszeichnet.
+  </description>
+
+  <description longName="Distortion Values">Die SOM Distortion Measure gibt Auskunft über sowohl
+    Quantisierungsals auch Projektionseigenschaften einer Selbstorganisierenden Karte. Für ein
+    diskretes Datenset und einen konstanten Neighborhood kernel ist die SOM Distortion Measure eine
+    Kostenfunktion, welche die SOM optimiert. Noch einmal sei auf die Nachbarschaftsfunktion
+    hingewiesen, welche verschiedenen Funktionskurven entsprechen kann.
+  </description>
+
+  <description longName="Topographic Product">Topographic Product TP stellt einen Versuch dar, die
+    Topologieerhaltung einer SOM ohne Zuhilfenahme des der Karte zugrunde liegenden Datensets zu
+    quantifizieren. Die Berechnung des Maßes benötigt Kenntnis der Codebookvektoren, nicht jedoch
+    der Datensamples. Die Ermittlung des Qualitätsmaßes erfolgt über die Quantifizierung von
+    Nachbarschaftsbeziehungen in Ein- und Ausgabeschicht der trainierten SOM, wobei mit
+    Eingabeschicht die Ebene der Codebookvektoren gemeint ist. Eine mögliche Aussage aufgrund dieses
+    Einzelwertes TP einer Karte ist zum Beispiel, wie geeignet die aktuell gewählte Kartendimension
+    ist, um die Daten topologieerhaltend darstellen zu können.
+  </description>
+
+</descriptions>

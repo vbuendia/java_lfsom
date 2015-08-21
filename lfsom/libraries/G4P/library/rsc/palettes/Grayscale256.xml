@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE palette SYSTEM "somtoolboxPalette.dtd">
+
+<!-- Color-Palette for SOMViewer -->
+<palette version="1.0" group="Single Color">
+  <shortName>Grayscale256</shortName>
+  <longName>GrayScale, 256 Gradient</longName>
+  <description>Grayscale palette well suited for b/w screenshots</description>
+  <colors colorCount="256">
+    <color>
+      <gradientPoint>0.0</gradientPoint>
+      <red>254</red>
+      <green>254</green>
+      <blue>254</blue>
+    </color>
+    <color>
+      <gradientPoint>1.0</gradientPoint>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+    </color>
+  </colors>
+</palette>
+

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE palette SYSTEM "somtoolboxPalette.dtd">
+
+<!-- Color-Palette for SOMViewer -->
+<palette version="1.0" group="Cartography">
+  <shortName>GIS</shortName>
+  <longName>GIS colours</longName>
+  <description />
+  <colors>
+    <color>
+      <red>55</red>
+      <green>165</green>
+      <blue>75</blue>
+    </color>
+    <color>
+      <red>115</red>
+      <green>195</green>
+      <blue>125</blue>
+    </color>
+    <color>
+      <red>140</red>
+      <green>205</green>
+      <blue>145</blue>
+    </color>
+    <color>
+      <red>170</red>
+      <green>160</green>
+      <blue>100</blue>
+    </color>
+    <color>
+      <red>195</red>
+      <green>185</green>
+      <blue>130</blue>
+    </color>
+    <color>
+      <red>235</red>
+      <green>225</green>
+      <blue>165</blue>
+    </color>
+    <color>
+      <red>200</red>
+      <green>155</green>
+      <blue>100</blue>
+    </color>
+    <color>
+      <red>180</red>
+      <green>120</green>
+      <blue>70</blue>
+    </color>
+    <color>
+      <red>185</red>
+      <green>90</green>
+      <blue>35</blue>
+    </color>
+  </colors>
+</palette>
+

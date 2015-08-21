@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE palette SYSTEM "somtoolboxPalette.dtd">
+
+<!-- Color-Palette for SOMViewer -->
+<palette version="1.0" hidden="true">
+  <shortName>TuxTerrain</shortName>
+  <longName>Tuxracer Terrain Palette</longName>
+  <description>The Palette for the TuxRacer Terrains</description>
+  <colors>
+    <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+    </color>
+    <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+    </color>
+    <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+    </color>
+    <color>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+    </color>
+    <color>
+      <red>127</red>
+      <green>127</green>
+      <blue>127</blue>
+    </color>
+    <color>
+      <red>127</red>
+      <green>127</green>
+      <blue>127</blue>
+    </color>
+    <color>
+      <red>127</red>
+      <green>127</green>
+      <blue>127</blue>
+    </color>
+    <color>
+      <red>127</red>
+      <green>127</green>
+      <blue>127</blue>
+    </color>
+    <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+    </color>
+    <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+    </color>
+  </colors>
+</palette>
+

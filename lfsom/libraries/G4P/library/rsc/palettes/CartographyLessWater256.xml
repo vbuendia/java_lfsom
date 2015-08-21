@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE palette SYSTEM "somtoolboxPalette.dtd">
+
+<!-- Color-Palette for SOMViewer -->
+<palette version="1.0" group="Cartography">
+  <shortName>CartographyLessWater256</shortName>
+  <longName>Cartography Color, 256 Gradient, less water</longName>
+  <description />
+  <colors colorCount="256">
+    <color>
+      <gradientPoint>0.0</gradientPoint>
+      <red>0</red>
+      <green>0</green>
+      <blue>128</blue>
+    </color>
+    <color>
+      <gradientPoint>0.15</gradientPoint>
+      <red>0</red>
+      <green>0</green>
+      <blue>255</blue>
+    </color>
+    <color>
+      <gradientPoint>0.35</gradientPoint>
+      <red>0</red>
+      <green>128</green>
+      <blue>255</blue>
+    </color>
+    <color>
+      <gradientPoint>0.47</gradientPoint>
+      <red>240</red>
+      <green>240</green>
+      <blue>64</blue>
+    </color>
+    <color>
+      <gradientPoint>0.57</gradientPoint>
+      <red>32</red>
+      <green>160</green>
+      <blue>0</blue>
+    </color>
+    <color>
+      <gradientPoint>0.7</gradientPoint>
+      <red>224</red>
+      <green>224</green>
+      <blue>0</blue>
+    </color>
+    <color>
+      <gradientPoint>0.9</gradientPoint>
+      <red>128</red>
+      <green>128</green>
+      <blue>128</blue>
+    </color>
+    <color>
+      <gradientPoint>1.0</gradientPoint>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+    </color>
+  </colors>
+</palette>
+

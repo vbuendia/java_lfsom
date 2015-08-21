@@ -1,0 +1,61 @@
+#classInfoDiv {
+	display: none;
+	position: absolute;
+	border: 1px solid #000000;
+	background: #ffffff;
+	width: 4em;
+}
+
+#inputInfoDiv {
+	display: none;
+	position: absolute;
+	border: 2px solid orange;
+	background: #ffffff;
+	padding: 0.2em 0.3em 0.2em 0.3em;
+	z-index: 1;
+}
+
+body {
+	font-family: Georgia, Verdana, Arial;
+	padding-left: 2em;
+	padding-right: 2em;
+}
+
+h1 {
+	text-align: center;
+}
+
+.infoBlock {
+	margin-left: 2em;
+	margin-bottom: 1.3em;
+}
+
+.header {
+	font-weight: bold;
+}
+
+.header2 {
+	font-style: italic;
+}
+
+th {
+	font-weight: normal;
+	font-style: italic;
+	/*border-left: 1px solid black;
+	border-right: 1px solid black;*/
+	padding-left: 0.3em;
+	padding-right: 0.3em;
+}
+
+td {
+	padding-left: 0.3em;
+	padding-right: 0.3em;
+}
+
+.middleText {
+	text-align: center;
+}
+
+.classTableTD {
+	vertical-align: top;
+}

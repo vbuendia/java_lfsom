@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE palette SYSTEM "somtoolboxPalette.dtd">
+
+<!-- Color-Palette for SOMViewer -->
+<palette version="1.0" group="Sky">
+  <shortName>SkyYellow</shortName>
+  <longName>Sky with Galaxies - Yellow</longName>
+  <description>A night view of galaxies on the sky</description>
+  <colors colorCount="256">
+    <color>
+      <gradientPoint>0.0</gradientPoint>
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+    </color>
+    <color>
+      <gradientPoint>0.6</gradientPoint>
+      <red>32</red>
+      <green>32</green>
+      <blue>32</blue>
+    </color>
+    <color>
+      <gradientPoint>0.8</gradientPoint>
+      <red>96</red>
+      <green>96</green>
+      <blue>96</blue>
+    </color>
+    <color>
+      <gradientPoint>0.89</gradientPoint>
+      <red>153</red>
+      <green>153</green>
+      <blue>153</blue>
+    </color>
+    <color>
+      <gradientPoint>0.92</gradientPoint>
+      <red>204</red>
+      <green>204</green>
+      <blue>204</blue>
+    </color>
+    <color>
+      <gradientPoint>0.96</gradientPoint>
+      <red>255</red>
+      <green>244</green>
+      <blue>164</blue>
+    </color>
+    <color>
+      <gradientPoint>1.0</gradientPoint>
+      <red>255</red>
+      <green>255</green>
+      <blue>209</blue>
+    </color>
+  </colors>
+</palette>
+

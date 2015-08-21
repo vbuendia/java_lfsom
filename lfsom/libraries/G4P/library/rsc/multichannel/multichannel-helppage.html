@@ -1,0 +1,106 @@
+<html>
+<head>
+<STYLE TYPE="text/css">
+<!--
+h1, h2, h3, p, li, ul {font-size: 10px; font-family: Arial; margin-top:5px;
+   margin-bottom:3px;color: #443333}
+div.credits p {font-size:9px;font-weight:bold}
+h1 {font-size: 14px;margin-top:10px;}
+h2 {font-size: 12px;margin-top:10px;}
+h3 {font-size: 10px;margin-top:10px;}
+ul {margin-left:10px}
+/*li {margin-left:20px}*/
+body {background-color:white}
+-->
+</STYLE>
+</head>
+
+<body>
+
+<h1>Manual</h1>
+<p>This plug-in allows you to play the contents of your SOM on multiple
+speakers simultaniously using stereo soundcards installed on your system.</p>
+<p>Please follow the instructions below.</p>
+
+<h2>0 Command line parameters</h2>
+
+<p>Make sure that you have set the parameters <b>p_decode</b> and <b>decodeDir</b> to
+the desired values.</p>
+
+<h2>1 Layout and position of speakers</h2>
+
+<p>You have to fill in the position of each speaker into the <STRONG>
+layout table</STRONG>.</p>
+
+<ul>
+  <li>Enter the desired number of columns and rows into the text fields.</li>
+<li>Press <STRONG>Gen!</STRONG> to generate the layout table.</li>
+<li>For each cell: enter the string identifying the speaker at this positon.<BR>
+Examples:</li>
+  <ul>
+  <li>Left speaker of the output line #2 (as shown in the list):<BR> 
+    <STRONG>2L</STRONG></li>   
+  <li>Right speaker of line #0: <STRONG>0R</STRONG></li>
+
+  <li>The string is case insensitive (<STRONG>0r</STRONG> would be valid too.)</li>
+  </ul>
+  <li>You can use the buttons <STRONG>Find me (loop)</STRONG> and
+<STRONG>Find me</STRONG> to play soundclips so that you easily can identify
+which speaker belongs to which output line.</li>
+</ul>
+
+<h2>2 Assignment of SOM units</h2>
+
+<p>Next you assign one or more SOM units to each cell of the layout table.</p>
+
+<p>Optionally you can make the application do the assignment 
+automatically. To do so, hit <STRONG>Automatic assignment</STRONG>.
+If you prefer to do this manually or if you want to correct an automatic
+assignment, follow these steps:</p>
+
+<ul>
+<li>Select one or more cells of the layout table.</li>
+<li>Select one or more units in the SOMPane.</li>
+</ul>
+
+<p>If you select a layout table cell the units assigned to it will be 
+highlighted. If you select a range of cells the union of the assigned units
+will be highlighted.</p>
+
+<h2>3 Save / load assignment</h2>
+
+<p>You can save your current speaker layout and assignment 
+to a file which you can load at a later
+point of time. Use buttons <STRONG>Save</STRONG> and <STRONG>Load</STRONG>,
+respectively.</p>
+
+<!--p>The position of the speakers (0L, 1R, ...) will not be saved because
+their order is not robust. That is, it might happen that after a 
+restart of your computer the speakers changed their order. 
+Also if you disconnect a (usb-)speaker and reconnect it later this may be
+the case.</p-->
+
+<p>Note that the order of the speaker in the list might change if
+you restart your computer or if you dis- and re-connect a (usb-)speaker.
+</p>
+
+<h2>4 Playback</h2>
+
+<p>If you are sure that the layout table, the assignment of
+the SOM units and the preferences have been set correctly, 
+start playback by pressing <STRONG>
+Start playback</STRONG></p>
+
+<p>&nbsp;</p>
+
+<hr noshade size="1">
+
+<div class="credits">
+
+<p>Written by Ewald Peiszer in 2006<BR>
+Voice: Angelika Schneider
+</p>
+
+</div>
+</body>
+</html>

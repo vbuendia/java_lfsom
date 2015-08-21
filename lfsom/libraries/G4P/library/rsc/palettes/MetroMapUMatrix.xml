@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE palette SYSTEM "somtoolboxPalette.dtd">
+
+<!-- Color-Palette for SOMViewer -->
+<palette version="1.0" hidden="true">
+  <shortName>MetroMap</shortName>
+  <longName>Metro Map UMatrix 'River'</longName>
+  <description />
+  <colors>
+    <color>
+      <gradientPoint>0.0</gradientPoint>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+    </color>
+    <color>
+      <gradientPoint>0.25</gradientPoint>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+    </color>
+    <color>
+      <gradientPoint>0.3</gradientPoint>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+    </color>
+    <color>
+      <gradientPoint>0.31</gradientPoint>
+      <red>122</red>
+      <green>122</green>
+      <blue>255</blue>
+    </color>
+    <color>
+      <gradientPoint>1.0</gradientPoint>
+      <red>0</red>
+      <green>0</green>
+      <blue>255</blue>
+    </color>
+  </colors>
+</palette>
+

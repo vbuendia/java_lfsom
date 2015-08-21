@@ -1,0 +1,35 @@
+/* $Id: style.css 1655 2008-02-04 16:42:19Z lidy $  */
+
+@CHARSET "UTF-8";
+
+html,body {
+  height: 100%;
+}
+
+body {
+	background-color: #f8f8e0;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+/* Visualisation selection links */
+.visualisationLink {
+	font-variant: normal;
+	font-weight: bold;
+	font-size: smaller;
+	padding-top: 1px;
+	padding-bottom: 1px;
+  	padding-right: 3px;
+	padding-left: 3px;
+	/*  color: #00FFFF; */
+}
+
+a.visualisationLink {
+	color: #900e24;
+  	background-color: #FFCC66;
+	text-transform: none;
+	text-decoration: none;
+}
+
+a.visualisationLink:hover {
+	background-color: #FFCC66;
+}

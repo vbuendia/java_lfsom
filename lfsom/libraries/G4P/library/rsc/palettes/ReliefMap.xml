@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE palette SYSTEM "somtoolboxPalette.dtd">
+
+<!-- Color-Palette for SOMViewer -->
+<palette version="1.0" group="Cartography">
+  <shortName>Relief</shortName>
+  <longName>Relief map colours</longName>
+  <description>Relief map colours as in http://www.ir-facility.org/IRFS2007Presentations/11A_Blanchard_Handling%20search%20results.pps</description>
+  <colors>
+    <color>
+      <red>171</red>
+      <green>205</green>
+      <blue>214</blue>
+    </color>
+    <color>
+      <red>143</red>
+      <green>149</green>
+      <blue>150</blue>
+    </color>
+    <color>
+      <red>143</red>
+      <green>152</green>
+      <blue>152</blue>
+    </color>
+    <color>
+      <red>159</red>
+      <green>187</green>
+      <blue>155</blue>
+    </color>
+    <color>
+      <red>145</red>
+      <green>178</green>
+      <blue>147</blue>
+    </color>
+    <color>
+      <red>130</red>
+      <green>164</green>
+      <blue>131</blue>
+    </color>
+    <color>
+      <red>132</red>
+      <green>150</green>
+      <blue>132</blue>
+    </color>
+    <color>
+      <red>163</red>
+      <green>157</green>
+      <blue>148</blue>
+    </color>
+    <color>
+      <red>144</red>
+      <green>138</green>
+      <blue>133</blue>
+    </color>
+    <color>
+      <red>214</red>
+      <green>214</green>
+      <blue>214</blue>
+    </color>
+  </colors>
+</palette>

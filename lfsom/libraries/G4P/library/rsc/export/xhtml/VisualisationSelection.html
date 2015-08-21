@@ -1,0 +1,34 @@
+<!-- $Id: VisualisationSelection.html 602 2006-04-12 16:45:21Z mayer $ -->
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Available Visulations</title>
+<link rel="StyleSheet" href="style.css" type="text/css" media="all" />
+</head>
+<body class="background">
+<div align="center" class="navigationLink">
+<span class="visualisationLink">Show Visualisation: </span>  
+PLACE_HOLDER_VISUALISATION_LINKS
+</div>
+
+<script type="text/javascript">
+<!--
+  //document.getElementById("PLACE_HOLDER_DEFAULT_VIS").style.backgroundColor = "#FFFFCC";
+  document.getElementById("PLACE_HOLDER_DEFAULT_VIS").style.backgroundColor = "#FF9933";
+  function selectVis(visID) {
+    links = document.getElementsByName("visLink");
+    for(i=0; i<links.length; i++) {
+      links[i].style.backgroundColor = "";
+      //links[i].style.backgroundColor = "#FFCC66";
+    }
+    //document.getElementById(visID).style.backgroundColor = "#FFFFCC";
+    document.getElementById(visID).style.backgroundColor = "#FF9933";
+ }  
+//-->
+</script>
+
+</body>
+</html>

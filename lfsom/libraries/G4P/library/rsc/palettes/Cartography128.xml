@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE palette SYSTEM "somtoolboxPalette.dtd">
+
+<!-- Color-Palette for SOMViewer -->
+<palette version="1.0" group="Cartography">
+  <shortName>Cartography128</shortName>
+  <longName>Cartography Color, 128 Gradient (SOMToolbox 0.4.x)</longName>
+  <description>The original palette from SOMToolbox 0.4.x; might need to reverse it to get the original look&amp;feel</description>
+  <colors colorCount="128">
+    <color>
+      <gradientPoint>0.0</gradientPoint>
+      <red>4</red>
+      <green>4</green>
+      <blue>251</blue>
+    </color>
+    <color>
+      <gradientPoint>0.4921875</gradientPoint>
+      <red>255</red>
+      <green>255</green>
+      <blue>0</blue>
+    </color>
+    <color>
+      <gradientPoint>1</gradientPoint>
+      <red>0</red>
+      <green>255</green>
+      <blue>0</blue>
+    </color>
+  </colors>
+</palette>
+

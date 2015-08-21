@@ -1,0 +1,63 @@
+<html>
+<head>
+<title>$MAP_NAME on $SERVER</title>
+</head>
+<body>
+<h1>About $MAP_NAME</h1>
+<p>Size: $MAP_SIZE</p>
+<h2>Files</h2>
+<table border="1">
+	<tr>
+		<th>PlaySOM Files</th>
+		<th>Path</th>
+	</tr>
+	<tr>
+		<td>VEC_FILE</td>
+		<td><a href="$VEC_FILE?download&file=vec">$VEC_PATH</a></td>
+	</tr>
+	<tr>
+		<td>UNIT_FILE</td>
+		<td><a href="$UNIT_FILE?download&file=unit">$UNIT_PATH</a></td>
+	</tr>
+	<tr>
+		<td>WGT_FILE</td>
+		<td><a href="$WGT_FILE?download&file=wgt">$WGT_PATH</a></td>
+	</tr>
+	<tr>
+		<td>DWM_FILE</td>
+		<td><a href="$DWM_FILE?download&file=dwm">$DWM_PATH</a></td>
+	</tr>
+	<tr>
+		<td>TV_FILE</td>
+		<td><a href="$TV_FILE?download&file=tv">$TV_PATH</a></td>
+	</tr>
+	<tr>
+		<td>CLS_FILE</td>
+		<td><a href="$CLS_FILE?download&file=cls">$CLS_PATH</a></td>
+	</tr>
+	<tr>
+		<td>MAP_FILE</td>
+		<td><a href="$MAP_FILE?download&file=map">$MAP_PATH</a></td>
+	</tr>
+	<tr>
+		<th>PocketSOM Files</th>
+		<th>&nbsp;</th>
+	</tr>
+	<tr>
+		<td>PSOM</td>
+		<td><a href="$PSOM">PSOM-File</a></td>
+	</tr>
+	<tr>
+		<td>MAPPING</td>
+		<td><a href="$PSOM_MAPPING">$PSOM_MAPPING</a></td>
+	</tr>
+	<tr>
+		<td>IMAGE</td>
+		<td><a href="$VISUALISATION">$PSOM_VISUALISATION</a></td>
+	</tr>
+</table>
+<h2>Visualisation</h2>
+<!-- <p><a href="map.html"><img alt="VISUALISATION" src="$VISUALISATION" border="0"></a></p> -->
+$MAP_TABLE
+</body>
+</html>

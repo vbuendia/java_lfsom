@@ -1,0 +1,22 @@
+<!ELEMENT bundles (bundle+)>
+<!ELEMENT bundle (shortName, longName?, description?, palette+)>
+
+<!ELEMENT palette (shortName, longName, description?, colors)>
+<!ATTLIST palette version CDATA "1.0">
+<!ATTLIST palette hidden (true|false) "false">
+<!ATTLIST palette group CDATA "">
+
+<!ELEMENT shortName (#PCDATA)>
+<!ELEMENT longName (#PCDATA)>
+<!ELEMENT description (#PCDATA)>
+
+<!ELEMENT colors (color, color+)>
+<!ATTLIST colors colorCount CDATA #IMPLIED>
+<!ATTLIST colors representation CDATA #IMPLIED>
+
+<!ELEMENT color (gradientPoint?, red, green, blue)>
+<!ELEMENT gradientPoint (#PCDATA)>
+<!ELEMENT red (#PCDATA)>
+<!ELEMENT green (#PCDATA)>
+<!ELEMENT blue (#PCDATA)>
+

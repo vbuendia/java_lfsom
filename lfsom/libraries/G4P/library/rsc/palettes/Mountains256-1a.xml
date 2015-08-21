@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE palette SYSTEM "somtoolboxPalette.dtd">
+
+<!-- Color-Palette for SOMViewer -->
+<palette version="1.0" group="Cartography">
+  <shortName>Mountains256-1a</shortName>
+  <longName>Cartography Color, Mountains 1a, 256 Gradient</longName>
+  <description />
+  <colors colorCount="256">
+    <color>
+      <gradientPoint>0.0</gradientPoint>
+      <red>0</red>
+      <green>100</green>
+      <blue>0</blue>
+    </color>
+    <color>
+      <gradientPoint>0.31</gradientPoint>
+      <red>200</red>
+      <green>200</green>
+      <blue>100</blue>
+    </color>
+    <color>
+      <gradientPoint>0.68</gradientPoint>
+      <red>150</red>
+      <green>0</green>
+      <blue>0</blue>
+    </color>
+    <color>
+      <gradientPoint>0.92</gradientPoint>
+      <red>150</red>
+      <green>150</green>
+      <blue>150</blue>
+    </color>
+    <color>
+      <gradientPoint>1.0</gradientPoint>
+      <red>255</red>
+      <green>255</green>
+      <blue>255</blue>
+    </color>
+  </colors>
+</palette>
+
