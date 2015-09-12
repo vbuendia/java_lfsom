@@ -276,14 +276,21 @@ public class LFSGrowingLayer {
 		this.neighbourWidth = (int) (maxSiz * pcNeighWidth);
 
 		// Heuristic of size calculation
+		int ySizeCalc = 0;
+		int xSizeCalc = 0;
+
+		// if (unitsAssign == null) {
 		double numceldas = Math.pow(data.getData().length, 0.54321);
 
 		double ratio = Math.sqrt(data.getPCA().getFirstAxisIndex()
 				/ data.getPCA().getSecondAxisIndex());
-		int ySizeCalc = (int) Math.min(numceldas,
+		ySizeCalc = (int) Math.min(numceldas,
 				Math.round(Math.sqrt(numceldas / ratio)));
-		int xSizeCalc = (int) (numceldas / ySizeCalc);
-
+		xSizeCalc = (int) (numceldas / ySizeCalc);
+		/*
+		 * } else { ySizeCalc = unitsAssign[0].length; xSizeCalc =
+		 * unitsAssign.length; }
+		 */
 		// Max size to grow
 		maxYSize = 2 * ySizeCalc;
 		maxXSize = 3 * xSizeCalc;

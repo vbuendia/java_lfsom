@@ -837,11 +837,9 @@ public class LFSExpProps {
 	 *            The widthSOM to set.
 	 */
 	public void setWidthSOM(int widthSOM) {
-		if (!this.isSizeAut()) {
-			this.widthSOM = widthSOM;
-		} else {
-			this.widthSOM = 0;
-		}
+
+		this.widthSOM = widthSOM;
+
 	}
 
 	/**
@@ -856,11 +854,7 @@ public class LFSExpProps {
 	 *            The heightSOM to set.
 	 */
 	public void setHeightSOM(int heightSOM) {
-		if (!this.isSizeAut()) {
-			this.heightSOM = heightSOM;
-		} else {
-			this.heightSOM = 0;
-		}
+		this.heightSOM = heightSOM;
 	}
 
 	/**

@@ -57,7 +57,7 @@ public class TrainSelector {
 	/**
 	 * Version to show in client-side
 	 */
-	private String versionprog = "v1.0.3";
+	private String versionprog = "v1.3.1";
 
 	/**
 	 * Progress
@@ -519,16 +519,22 @@ public class TrainSelector {
 
 		// Parameter loading
 
-		int widthSOM = exprops.getWidthSOM();
-		int heightSOM = exprops.getHeightSOM();
-		boolean isHier = exprops.isHier();
 		boolean isGCHSOM = exprops.isGCHSOM();
-		boolean isGrowing = exprops.isGrowing() || isGCHSOM;
+		boolean isHier = exprops.isHier() && !exprops.isGCHSOM();
+		boolean isGrowing = (exprops.isGrowing() || isGCHSOM)
+				&& !exprops.isHier();
 
 		int[] dimSOM = null;
-		if (exprops.getWidthSOM() == 0 || exprops.getHeightSOM() == 0) {
-			dimSOM = calculaDimen(datos1, widthSOM, heightSOM, isHier
-					|| isGrowing, false, 0);
+
+		if (isGrowing) { // Los growing y hier tienen size automatico
+			exprops.setWidthSOM(0);
+			exprops.setHeightSOM(0);
+		}
+		int widthSOM = exprops.getWidthSOM();
+		int heightSOM = exprops.getHeightSOM();
+
+		if (widthSOM == 0 || heightSOM == 0) {
+			dimSOM = calculaDimen(datos1, widthSOM, heightSOM, isHier, false, 0);
 		} else {
 			dimSOM = new int[] { exprops.getWidthSOM(), exprops.getHeightSOM() };
 		}
@@ -768,9 +774,9 @@ public class TrainSelector {
 				exprops.setFPadre(fPadre);
 
 				// Best nets
-				exprops.addNet("Best Kaski - Lagus Index", "kaski.xml");
-				exprops.addNet("Best Quantization Error", "quan.xml");
-				exprops.addNet("Best Topographic Error", "topo.xml");
+				exprops.addNet("Kaski - Lagus", "kaski.xml");
+				exprops.addNet("Quantization Err.", "quan.xml");
+				exprops.addNet("Topographic Err.", "topo.xml");
 
 				exprops.EscribeXML(dataPath + "/ExpProps.xml");
 

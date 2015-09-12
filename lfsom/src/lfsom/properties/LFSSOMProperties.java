@@ -115,7 +115,7 @@ public class LFSSOMProperties extends Properties {
 			"setLearnrate", "setMetricName", "setNumCycles",
 			"setNumIterations", "setRandomSeed", "setSigma", "setTau",
 			"setExpName", "setQRef", "setGrowing", "setHier", "setIsSubred",
-			"setSubredOrigen", "setGCHSOM", "setPcNeighbourWidth" };
+			"setSubredOrigen", "setGCHSOM", "setPcNeighbourWidth", "setXYSize" };
 
 	private String[] variablesval = { "getStrInitializationMode",
 			"getStrUsePCA", "getStrBatchSom", "getStrNeighbourWidth",
@@ -123,7 +123,8 @@ public class LFSSOMProperties extends Properties {
 			"getStrNumCycles", "getStrNumIterations", "getStrRandomSeed",
 			"getStrSigma", "getStrTau", "getExpName", "getStrQRef",
 			"getStrGrowing", "getStrHier", "getStrIsSubred",
-			"getStrSubredOrigen", "getStrGCHSOM", "getStrPcNeighbourWidth" };
+			"getStrSubredOrigen", "getStrGCHSOM", "getStrPcNeighbourWidth",
+			"getStrXYSize" };
 
 	// 23
 	private long randomSeed = -1;
@@ -447,6 +448,17 @@ public class LFSSOMProperties extends Properties {
 	public void setXYSize(int x, int y) {
 		this.setxSize(x);
 		this.setySize(y);
+	}
+
+	public void setXYSize(String xy) {
+		String[] strbl = xy.split(",");
+		xSize = Integer.parseInt(strbl[0]);
+		ySize = Integer.parseInt(strbl[1]);
+
+	}
+
+	public String getStrXYSize() {
+		return "" + xSize + "," + ySize;
 	}
 
 	/**
