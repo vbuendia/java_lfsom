@@ -15,14 +15,12 @@ import lfsom.data.LFSData;
 import lfsom.layers.metrics.HexMapDistancer;
 import lfsom.models.LFSGrowingSOM;
 
+import processing.pdf.*;
+
 //*** FUNCIONES DE DESPLAZAMIENTO
 
 public void keyReleased() {
- if (key == 'P'&&!PDFtotal) {
-   PDFtotal=true;  
-   fPDFOutput = G4P.selectOutput("PDF output");
-   PDFtotal=(fPDFOutput!=null && !fPDFOutput.equals(""));
- }
+ 
  
   if (key == 'W') {
     clusterSelec();
@@ -397,6 +395,7 @@ if (indexfiles.length>=3) {
  prepara_panelArr();
  savedTime = millis();
  versionProg = new TrainSelector().getVersionprog();
+ println(versionProg);
 }
 
 
