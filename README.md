@@ -1,6 +1,7 @@
 # lfsom
 
-A SOM engine calculator provided with a rich client side
+A SOM engine calculator provided with a rich client side.
+Visit http://www.livingforsom.com for API reference and videos.
 
 
 The easiest way to use the software is to download the latest release and run it. If you wish to look at the source code, modify the code, or if there is no compiled version for your computer system, the steps are:
