@@ -398,13 +398,21 @@ public class LFSGrowingLayer {
 
 		int diagonal = distancesHex[0][0][xSize][ySize];
 		distNeigh = new double[nRangos][diagonal];
-
-		// Se calculan las distancias segun Neighbourfunc
-		for (int ran = 0; ran < nRangos; ran++) {
-			for (int x = 0; x < diagonal; x++) {
-				distNeigh[ran][x] = getHCI(x, learnrate, sigma / (ran + 1), ran);
+		// long startTime = System.currentTimeMillis();
+		// long calc = 0;
+		for (int w = 1; w <= 1000; w++)
+			// Se calculan las distancias segun Neighbourfunc
+			for (int ran = 0; ran < nRangos; ran++) {
+				for (int x = 0; x < diagonal; x++) {
+					distNeigh[ran][x] = getHCI(x, learnrate, sigma / (ran + 1),
+							ran);
+					// calc++;
+				}
 			}
-		}
+
+		// long endTime = System.currentTimeMillis();
+		// long totalTime = endTime - startTime;
+		// System.out.println(totalTime + " " + calc);
 
 	}
 

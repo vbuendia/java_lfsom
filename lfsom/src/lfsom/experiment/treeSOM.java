@@ -15,7 +15,10 @@
  */
 package lfsom.experiment;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
@@ -24,8 +27,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import at.tuwien.ifs.somtoolbox.util.FileUtils;
 
 /**
  * Reads folders structure and generates an object which contains all nets
@@ -316,6 +322,30 @@ public class treeSOM {
 				newNet.netFatherNumber = String.valueOf(padre);
 				newNet.netFatherFolder = padreFolder;
 
+				// Se cargan los datos del kaski
+
+				fXmlFile = new File(direc + "/" + "kaski.xml");
+				dbFactory = DocumentBuilderFactory.newInstance();
+
+				dBuilder = dbFactory.newDocumentBuilder();
+
+				docu = dBuilder.parse(fXmlFile);
+				docu.getDocumentElement().normalize();
+
+				nList = docu.getElementsByTagName("struct");
+				NamedNodeMap atri = nList.item(0).getAttributes();
+				String qErr = atri.getNamedItem("QError").getNodeValue()
+						.toString();
+				String topoly = atri.getNamedItem("topoly").getNodeValue()
+						.toString();
+				String topolx = atri.getNamedItem("topolx").getNodeValue()
+						.toString();
+				int dimen = Integer.valueOf(topoly) * Integer.valueOf(topolx);
+
+				newNet.mQ = String.valueOf(Double.valueOf(qErr));
+				newNet.numCells = dimen;
+				// ///////
+
 				int pos = listaNets.size();
 				newNet.indice = pos;
 				listaNets.add(newNet);
@@ -354,7 +384,106 @@ public class treeSOM {
 				recorre(element.getAbsolutePath(), -1, "");
 			}
 		}
+		// escribeDatos();
 
 	}
 
+	public void escribeDatos() {
+		// Escribe todos los datos en un fichero
+		PrintWriter writer;
+		try {
+			writer = FileUtils.openFileForWriting("CVS", "comparacsv.csv",
+					false);
+
+			writer.print("nombre" + ";" + "Indice" + ";" + "padre" + ";"
+					+ "Nro. neuronas" + ";" + "Err");
+			writer.println();
+			for (int i = 0; i < listaNets.size(); i++) {
+				structNet tS = listaNets.get(i);
+				String cad = tS.netName + ";" + tS.indice + ";"
+						+ tS.netFatherNumber + ";" + tS.numCells + ";" + tS.mQ
+						+ ";" + tS.netFolder;
+				writer.print(cad);
+				writer.println();
+			}
+
+			writer.close();
+
+			writer = FileUtils.openFileForWriting("CVS", "capas.csv", false);
+
+			// Ahora calcula un poco mejor...
+			int etapa = -1;
+			boolean fin = false;
+
+			ArrayList<Integer> listSig = new ArrayList<Integer>();
+			ArrayList<Integer> listAct = new ArrayList<Integer>();
+			listAct.add(-1);
+			writer.print("Etapa" + ";" + "Num Capas" + ";" + "Num Neuro" + ";"
+					+ "MQErr" + ";" + "Num Datos");
+			writer.println();
+			while (!fin) {
+
+				// Se recorre toda la red y se aumenta la etapa
+				fin = true;
+				etapa++;
+
+				int nRedes = 0;
+				int nCells = 0;
+				double qErr = 0;
+				int nDatos = 0;
+
+				for (int i = 0; i < listaNets.size(); i++) {
+					structNet tS = listaNets.get(i);
+					if (listAct.contains(Integer.valueOf(tS.netFatherNumber))) {
+						fin = false;
+						nRedes++;
+						qErr += Double.valueOf(tS.mQ);
+						nCells += Integer.valueOf(tS.numCells);
+						listSig.add(tS.indice);
+
+						// Se accede a su carpeta, a data.csv y se comprueba el
+						// nro. de lineas
+
+						BufferedReader lector = FileUtils.openFile("CSV",
+								tS.getNetFolder() + "/data.csv");
+						String sCurrentLine;
+						int tmpNDatos = -1;
+						while ((sCurrentLine = lector.readLine()) != null) {
+							tmpNDatos++;
+						}
+						nDatos += tmpNDatos;
+
+					}
+
+				}
+
+				if (!fin) { // Si no ha terminado, que ponga resultados
+					Double MQErr = qErr / nRedes;
+
+					// Termina de procesar una capa. Se escribe y se actualiza
+					// la
+					// lista de indices de la siguiente capa
+					writer.print(String.valueOf(etapa) + ";"
+							+ String.valueOf(nRedes) + ";"
+							+ String.valueOf(nCells) + ";"
+							+ String.valueOf(MQErr).replace(".", ",") + ";"
+							+ String.valueOf(nDatos));
+					writer.println();
+
+					// Actualiza las listas.
+					listAct.clear();
+					for (int i = 0; i < listSig.size(); i++)
+						listAct.add(listSig.get(i));
+					listSig.clear();
+				}
+
+			}
+			writer.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 }

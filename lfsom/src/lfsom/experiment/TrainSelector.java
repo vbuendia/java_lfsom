@@ -800,7 +800,7 @@ public class TrainSelector {
 					mqeRef = mMejor.getQualityMeasure("QError").getMapQuality(
 							"mqe");
 					if (isGCHSOM) {
-						lanza_experimento_clusters(tau, mMejor, dataPath,
+						lanza_experimento_clusters(tau2, mMejor, dataPath,
 								rootPath, datos1, mqeRef);
 					} else if (isHier) {
 						lanza_experimento_units(tau2, mMejor, dataPath,
@@ -827,8 +827,9 @@ public class TrainSelector {
 	}
 
 	// Prepares a new experiment with data from clusters
-	private void lanza_experimento_clusters(double tau, LFSGrowingLayer mMejor,
-			String dataPath, String rootPath, LFSData datos1, Double mqeRef) {
+	private void lanza_experimento_clusters(double tau2,
+			LFSGrowingLayer mMejor, String dataPath, String rootPath,
+			LFSData datos1, Double mqeRef) {
 
 		// Se calcula el numero de clusters que hay
 
@@ -842,7 +843,7 @@ public class TrainSelector {
 				ArrayList<Integer> arrInc = mMejor.getLabelCluster(z);
 				double quality = mMejor.getMqeCluster(z);
 
-				if (quality > tau * mqeRef) {
+				if (quality > tau2 * mqeRef) {
 					// No cumple, se envia a entrenar el cluster completo
 					generaExp(mMejor, dataPath, rootPath, mqeRef, datos1,
 							arrInc, iteini, z);
@@ -885,7 +886,7 @@ public class TrainSelector {
 			String dataPath, String rootPath, LFSData datos1, Double mqeRef) {
 
 		ArrayList<LFSUnit> ExpUnits = mMejor.getExpandedUnits(
-				mMejor.getQualityMeasure("QError"), "qe", tau2, mqeRef,
+				mMejor.getQualityMeasure("QError"), "mqe", tau2, mqeRef,
 				minDatosExp, datos1.numVectors());
 
 		// Se lanza un experimento para cada uno de ellos

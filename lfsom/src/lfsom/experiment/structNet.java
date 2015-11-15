@@ -38,6 +38,12 @@ public class structNet {
 
 	int indice;
 
+	// Se le anyaden:
+	// Nro. neuronas
+	// Err quant medio kaski
+	int numCells;
+	String mQ;
+
 	public String getNetFolder() {
 		return netFolder;
 	}
