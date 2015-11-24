@@ -265,6 +265,10 @@ public class LFSUnit extends InputContainer {
 		return yPos;
 	}
 
+	public int getPos(int xSize) {
+		return xPos + yPos * (xSize);
+	}
+
 	/**
 	 * Sets the coordinates of this unit on the map, if they have changed. This
 	 * happens in architectures with growing map sizes during training.

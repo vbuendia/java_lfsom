@@ -39,10 +39,13 @@
  */
 package lfsom.layers.quality;
 
+import java.util.ArrayList;
+
 import lfsom.data.LFSData;
 import lfsom.layers.LFSGrowingLayer;
 import lfsom.layers.LFSUnit;
 import lfsom.layers.metrics.HexMapDistancer;
+import lfsom.layers.metrics.LFSL2Metric;
 import lfsom.util.LFSException;
 
 /**
@@ -63,13 +66,142 @@ public class LFSKLDistance implements LFSQualityMeasure {
 		Map_Q = Double.valueOf(nmap);
 	}
 
+	private double[] iniciaDijkstra(int size) {
+		double[] dDijkstra = new double[size];
+
+		for (int x0 = 0; x0 < size; x0++)
+			dDijkstra[x0] = Double.POSITIVE_INFINITY;
+		return dDijkstra;
+	}
+
+	private boolean[] iniciaVisto(int size) {
+		boolean[] visto = new boolean[size];
+		for (int x0 = 0; x0 < size; x0++)
+			visto[x0] = false;
+		return visto;
+	}
+
+	private boolean todoVisto(boolean[] visto) {
+		boolean estaVisto = false;
+
+		for (int y = 0; y < visto.length && !estaVisto; y++)
+			if (visto[y])
+				estaVisto = true;
+		return estaVisto;
+	}
+
+	// Returns index of min Dij map
+	private int minDij(ArrayList<Integer> cola, double[] dDijkstra) {
+		int mini = -1;
+		if (cola.size() > 0) {
+			int minimo = 0;
+			double minDist = dDijkstra[cola.get(0)];
+
+			int act = 1;
+			while (act < cola.size()) {
+				if (minDist > dDijkstra[cola.get(act)]) {
+					minimo = act;
+					minDist = dDijkstra[cola.get(act)];
+				}
+				act++;
+			}
+
+			mini = cola.get(minimo);
+			cola.remove(minimo);
+		}
+		return mini;
+	}
+
+	private int[] iniciaPadre(int tam) {
+		int[] pa = new int[tam];
+		for (int k = 0; k < tam; k++)
+			pa[k] = -1;
+		return pa;
+	}
+
+	public LFSKLDistance(LFSGrowingLayer layer, LFSData data) {
+
+		double cam = 0;
+		int xSize = layer.getXSize();
+		int ySize = layer.getYSize();
+
+		HexMapDistancer distan = new HexMapDistancer(xSize, ySize, true);
+
+		double[] dDijkstra = new double[xSize * ySize];// Array which will
+														// store Dijkstra
+														// distances
+		boolean[] visto = new boolean[xSize * ySize];
+		int padre[] = new int[xSize * ySize];
+
+		int samplecount = data.numVectors();
+		try {
+			for (int s = 0; s < samplecount; s++) {
+
+				dDijkstra = iniciaDijkstra(xSize * ySize);
+				padre = iniciaPadre(xSize * ySize);
+				visto = iniciaVisto(xSize * ySize);
+
+				LFSUnit[] winners = ((LFSGrowingLayer) layer).getWinners(
+						data.getInputDatum(s), 2);
+
+				LFSUnit bmu = winners[0];
+				LFSUnit sbmu = winners[1];
+
+				dDijkstra[bmu.getPos(xSize)] = 0;
+
+				ArrayList<Integer> cola = new ArrayList<Integer>();
+
+				cola.add(bmu.getPos(xSize));
+				// Ahora se calcula el coste de la ruta entre bmu y sbmu
+				while (cola.size() > 0 && !visto[sbmu.getPos(xSize)]) {
+					int minim = minDij(cola, dDijkstra);
+					visto[minim] = true;
+					// Del minimo se toman sus vecinos, se calculan las
+					// distancias y
+					// se incluyen en la cola
+					distan.listaProximos(minim, 1);
+					ArrayList<Integer> verTratar = distan.getIncluidos();
+					for (int k = 0; k < verTratar.size(); k++) {
+						int uActual = verTratar.get(k);
+						if (!visto[uActual] && uActual != minim) {
+
+							double[] vec1 = layer.getUnit(uActual)
+									.getWeightVector();
+							double[] vec2 = layer.getUnit(minim)
+									.getWeightVector();
+							double distancia = LFSL2Metric.distance(vec1, vec2);
+
+							if (dDijkstra[uActual] > dDijkstra[minim]
+									+ distancia) {
+								dDijkstra[uActual] = dDijkstra[minim]
+										+ distancia;
+								cola.add(uActual);
+								padre[uActual] = minim;
+							}
+						}
+					}
+				}
+
+				cam += dDijkstra[sbmu.getPos(xSize)]
+						+ LFSL2Metric.distance(bmu.getWeightVector(), data
+								.getInputDatum(s).getVector().toArray());
+			}
+
+		} catch (LFSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Map_Q = cam / samplecount;
+	}
+
 	/**
 	 * Calculate KL Index
 	 * 
 	 * @param layer
 	 * @param data
 	 */
-	public LFSKLDistance(LFSGrowingLayer layer, LFSData data) {
+	public void LFSKLDistance_ant(LFSGrowingLayer layer, LFSData data) {
 
 		int xSize1 = layer.getXSize();
 		int ySize1 = layer.getYSize();

@@ -404,7 +404,7 @@ public class HexMapDistancer {
 	 * @param id
 	 * @param radio
 	 */
-	private void listaProximos(int id, int radio) {
+	public void listaProximos(int id, int radio) {
 		int filaac = id / xSize;
 		int colac = id % xSize;
 		incluidos = new ArrayList<Integer>();

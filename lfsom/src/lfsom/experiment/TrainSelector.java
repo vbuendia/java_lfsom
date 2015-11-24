@@ -572,7 +572,7 @@ public class TrainSelector {
 			Progreso = 0;
 
 			double tau = 0.001;
-			double tau2 = 0.1;
+			double tau2 = 0.01;
 
 			long seed = 1;
 			int trainingCycles = 0;

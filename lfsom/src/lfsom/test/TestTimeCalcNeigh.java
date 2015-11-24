@@ -22,9 +22,9 @@ public class TestTimeCalcNeigh {
 		double result = 0;
 		double a = 0;
 		long startTime = System.currentTimeMillis();
-		for (int k = 1; k < 4898; k++) {
+		for (int k = 1; k < 32000 * 400; k++) {
 			result = learnrate * Math.exp(-1 * distancia / (opt1 + 1 / k));
-			System.out.println(result);
+			// System.out.println(result);
 			a += result / k;
 		}
 		long endTime = System.currentTimeMillis();

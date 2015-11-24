@@ -287,10 +287,12 @@ public class LFSGrowingLayer {
 		ySizeCalc = (int) Math.min(numceldas,
 				Math.round(Math.sqrt(numceldas / ratio)));
 		xSizeCalc = (int) (numceldas / ySizeCalc);
-		/*
-		 * } else { ySizeCalc = unitsAssign[0].length; xSizeCalc =
-		 * unitsAssign.length; }
-		 */
+
+		if (xSizeCalc < xSize)
+			xSizeCalc = xSize;
+		if (ySizeCalc < ySize)
+			ySizeCalc = ySize;
+
 		// Max size to grow
 		maxYSize = 2 * ySizeCalc;
 		maxXSize = 3 * xSizeCalc;
@@ -570,6 +572,16 @@ public class LFSGrowingLayer {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new LFSException("Position " + x + "/" + y
 					+ " is invalid. Map size is " + xSize + "x" + ySize);
+		}
+	}
+
+	public LFSUnit getUnit(int id) throws LFSException {
+		try {
+			return units[id % xSize][(int) (Math.floor(id / xSize))];
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new LFSException("Position " + (int) (id / xSize) + "/"
+					+ (id % xSize) + " is invalid. Map size is " + xSize + "x"
+					+ ySize);
 		}
 	}
 
