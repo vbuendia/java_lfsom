@@ -57,7 +57,7 @@ public class TrainSelector {
 	/**
 	 * Version to show in client-side
 	 */
-	private String versionprog = "v1.3.1";
+	private String versionprog = "v1.3.2";
 
 	/**
 	 * Progress
@@ -575,7 +575,7 @@ public class TrainSelector {
 			double tau2 = 0.01;
 
 			long seed = 1;
-			int trainingCycles = 0;
+			int trainingCycles = 1;
 			int trainingIterations = 1;
 
 			String metric = null;
@@ -750,21 +750,21 @@ public class TrainSelector {
 				int numClusters = isGCHSOM ? 10 : 5;
 
 				mapaMejorTopo.getLayer().mapCompleteDataAfterTraining(datos1);
-				mapaMejorTopo.clusteriza(numClusters);
+				mapaMejorTopo.clusteriza(0);
 
 				fiche = dataPath + "/topo.xml";
 				mapaMejorTopo.EscribeXML(fiche);
 				mapaMejorTopo.escribeProps(fiche + "props");
 
 				mapaMejorQuan.getLayer().mapCompleteDataAfterTraining(datos1);
-				mapaMejorQuan.clusteriza(numClusters);
+				mapaMejorQuan.clusteriza(0);
 				// String fich = getfTopo();
 				fiche = dataPath + "/quan.xml";
 				mapaMejorQuan.EscribeXML(fiche);
 				mapaMejorQuan.escribeProps(fiche + "props");
 
 				mapaMejorKaski.getLayer().mapCompleteDataAfterTraining(datos1);
-				mapaMejorKaski.clusteriza(numClusters);
+				mapaMejorKaski.clusteriza(0);
 				// String fich = getfTopo();
 				fiche = dataPath + "/kaski.xml";
 				mapaMejorKaski.EscribeXML(fiche);

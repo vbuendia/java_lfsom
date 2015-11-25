@@ -57,6 +57,7 @@ import lfsom.output.XMLOutputter;
 import lfsom.properties.LFSSOMProperties;
 import lfsom.util.LFSException;
 import lfsom.visualization.clustering.LFSKMeans;
+import lfsom.visualization.clustering.LFSWEKACluster;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -255,8 +256,13 @@ public class LFSGrowingSOM {
 	}
 
 	public void clusteriza(int nclusters) {
-		LFSKMeans kmedias = new LFSKMeans(nclusters, this.getCodebook());
-		setLabelAgrupados(kmedias.getResultados());
+		if (nclusters > 0) {
+			LFSKMeans kmedias = new LFSKMeans(nclusters, this.getCodebook());
+			setLabelAgrupados(kmedias.getResultados());
+		} else {
+			LFSWEKACluster em = new LFSWEKACluster(this.getCodebook());
+			setLabelAgrupados(em.getResultados());
+		}
 	}
 
 	public void clusterSelec(ArrayList<Integer> lista) {
@@ -370,12 +376,10 @@ public class LFSGrowingSOM {
 			labelAtrib[i] = data.getLabel(i);
 		}
 
-		int iterationsToTrain = 0;
-		if (props.numIterations() > 0) {
-			iterationsToTrain = props.numIterations();
-		} else {
-			iterationsToTrain = props.numCycles() * data.numVectors();
-		}
+		int cycles = props.numCycles();
+		if (cycles < 1)
+			cycles = 1;
+		int iterationsToTrain = cycles * data.numVectors();
 
 		layer.trainNormal(data, iterationsToTrain, 0, props, props.learnrate(),
 				props.sigma());
