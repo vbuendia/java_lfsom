@@ -200,7 +200,8 @@ public class XMLOutputter {
 
 	}
 
-	public void createXML(LFSGrowingSOM gsom, String fName) throws IOException {
+	public void createXML(LFSGrowingSOM gsom, String fName, double[] maxValues,
+			double[] minValues) throws IOException {
 
 		try {
 
@@ -270,7 +271,12 @@ public class XMLOutputter {
 						System.exit(-1);
 					}
 
-					double[] vectorw = u.getWeightVector();
+					double[] vectorw = null;
+					if (maxValues != null)
+						vectorw = u.getWeightDVector(maxValues, minValues);
+					else
+						vectorw = u.getWeightVector();
+
 					// LAYERS
 					// **************************************************************
 					for (int k = 0; k < numLayers; k++) {

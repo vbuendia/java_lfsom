@@ -227,6 +227,15 @@ public class LFSUnit extends InputContainer {
 		return weightVector;
 	}
 
+	public double[] getWeightDVector(double[] maxValues, double[] minValues) {
+		double[] wDVector = new double[weightVector.length];
+
+		for (int k = 0; k < weightVector.length; k++)
+			wDVector[k] = weightVector[k] * (maxValues[k] - minValues[k])
+					+ minValues[k];
+		return wDVector;
+	}
+
 	/**
 	 * Sets the weight vector of this unit.
 	 * 

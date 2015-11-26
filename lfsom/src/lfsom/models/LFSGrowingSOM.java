@@ -233,7 +233,16 @@ public class LFSGrowingSOM {
 	public void EscribeXML(String output) {
 		try {
 			XMLOutputter salida = new XMLOutputter();
-			salida.createXML(this, output);
+			salida.createXML(this, output, null, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void EscribeXML(String output, double[] maxValues, double[] minValues) {
+		try {
+			XMLOutputter salida = new XMLOutputter();
+			salida.createXML(this, output, maxValues, minValues);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -260,7 +269,8 @@ public class LFSGrowingSOM {
 			LFSKMeans kmedias = new LFSKMeans(nclusters, this.getCodebook());
 			setLabelAgrupados(kmedias.getResultados());
 		} else {
-			LFSWEKACluster em = new LFSWEKACluster(this.getCodebook());
+			LFSWEKACluster em = new LFSWEKACluster(nclusters,
+					this.getCodebook());
 			setLabelAgrupados(em.getResultados());
 		}
 	}
@@ -530,14 +540,16 @@ public class LFSGrowingSOM {
 		this.expName = expName;
 	}
 
-	public void grabaTMP() {
-
-		this.clusteriza(5);
-
-		this.EscribeXML("d:/somtmp/fich.xml");
-		this.escribeProps("d:/somtmp/fich.xmlprops");
-
-	}
+	/*
+	 * public void grabaTMP() {
+	 * 
+	 * this.clusteriza(5);
+	 * 
+	 * this.EscribeXML("d:/somtmp/fich.xml");
+	 * this.escribeProps("d:/somtmp/fich.xmlprops");
+	 * 
+	 * }
+	 */
 
 	/**
 	 * @return Returns the labelAgrupados.

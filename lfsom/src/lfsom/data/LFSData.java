@@ -112,6 +112,12 @@ public class LFSData {
 	private double[][] matrix;
 
 	/**
+	 * Stored to normalize and denormalize data
+	 */
+	private double[] maxValues;
+	private double[] minValues;
+
+	/**
 	 * Attribute names
 	 */
 	private String[] labels;
@@ -258,14 +264,17 @@ public class LFSData {
 	 */
 	public void setMatrix(double[][] matrizEntrada) {
 
-		matrix = matrizEntrada;
-		dim = matrix[0].length;
-		numVectors = matrix.length;
+		double[][] matrixD = matrizEntrada;
+		dim = matrixD[0].length;
+		numVectors = matrixD.length;
 
 		dataNames = new String[numVectors];
 		for (int i = 0; i < numVectors; i++) {
 			dataNames[i] = String.valueOf(i);
 		}
+
+		// Se normaliza la matriz
+		matrix = normalize(matrixD);
 
 		meanVector = new DenseDoubleMatrix1D(dim);
 
@@ -287,6 +296,34 @@ public class LFSData {
 			}
 		}
 
+	}
+
+	public double[][] normalize(double[][] matrizD) {
+		double[][] matrizN = new double[matrizD.length][matrizD[0].length];
+		setMaxValues(new double[matrizD[0].length]);
+		setMinValues(new double[matrizD[0].length]);
+
+		// First take max and min values
+		for (int k = 0; k < matrizD[0].length; k++) {
+			getMaxValues()[k] = Double.NEGATIVE_INFINITY;
+			getMinValues()[k] = Double.POSITIVE_INFINITY;
+			for (int r = 0; r < matrizD.length; r++) {
+				getMaxValues()[k] = getMaxValues()[k] < matrizD[r][k] ? matrizD[r][k]
+						: getMaxValues()[k];
+				getMinValues()[k] = getMinValues()[k] > matrizD[r][k] ? matrizD[r][k]
+						: getMinValues()[k];
+			}
+
+		}
+
+		// Then normalize
+		for (int k = 0; k < matrizD[0].length; k++)
+			for (int r = 0; r < matrizD.length; r++) {
+				matrizN[r][k] = (matrizD[r][k] - getMinValues()[k])
+						/ (getMaxValues()[k] - getMinValues()[k]);
+			}
+
+		return matrizN;
 	}
 
 	public double[][] getMatrix() {
@@ -423,6 +460,34 @@ public class LFSData {
 	 */
 	public void setLabels(String[] labels) {
 		this.labels = labels;
+	}
+
+	/**
+	 * @return the maxValues
+	 */
+	public double[] getMaxValues() {
+		return maxValues;
+	}
+
+	/**
+	 * @param maxValues the maxValues to set
+	 */
+	public void setMaxValues(double[] maxValues) {
+		this.maxValues = maxValues;
+	}
+
+	/**
+	 * @return the minValues
+	 */
+	public double[] getMinValues() {
+		return minValues;
+	}
+
+	/**
+	 * @param minValues the minValues to set
+	 */
+	public void setMinValues(double[] minValues) {
+		this.minValues = minValues;
 	}
 
 }

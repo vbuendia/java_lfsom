@@ -747,27 +747,30 @@ public class TrainSelector {
 
 				new File(dataPath).mkdirs();
 				String fiche = null;
-				int numClusters = isGCHSOM ? 10 : 5;
+				int numClusters = isGCHSOM && !exprops.isSubred() ? 4 : 0;
 
 				mapaMejorTopo.getLayer().mapCompleteDataAfterTraining(datos1);
-				mapaMejorTopo.clusteriza(0);
+				mapaMejorTopo.clusteriza(numClusters);
 
 				fiche = dataPath + "/topo.xml";
-				mapaMejorTopo.EscribeXML(fiche);
+				mapaMejorTopo.EscribeXML(fiche, datos1.getMaxValues(),
+						datos1.getMinValues());
 				mapaMejorTopo.escribeProps(fiche + "props");
 
 				mapaMejorQuan.getLayer().mapCompleteDataAfterTraining(datos1);
-				mapaMejorQuan.clusteriza(0);
+				mapaMejorQuan.clusteriza(numClusters);
 				// String fich = getfTopo();
 				fiche = dataPath + "/quan.xml";
-				mapaMejorQuan.EscribeXML(fiche);
+				mapaMejorQuan.EscribeXML(fiche, datos1.getMaxValues(),
+						datos1.getMinValues());
 				mapaMejorQuan.escribeProps(fiche + "props");
 
 				mapaMejorKaski.getLayer().mapCompleteDataAfterTraining(datos1);
-				mapaMejorKaski.clusteriza(0);
+				mapaMejorKaski.clusteriza(numClusters);
 				// String fich = getfTopo();
 				fiche = dataPath + "/kaski.xml";
-				mapaMejorKaski.EscribeXML(fiche);
+				mapaMejorKaski.EscribeXML(fiche, datos1.getMaxValues(),
+						datos1.getMinValues());
 				mapaMejorKaski.escribeProps(fiche + "props");
 
 				exprops.clearNets();

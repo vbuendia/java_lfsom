@@ -60,7 +60,7 @@ public class LFSExpProps {
 	// Learn Rate, by default with a single option (0.2)
 	private double[] bucleLearnRate = { 0.2 };
 
-	private String strLearnRate = "0.2";
+	private String strLearnRate = "0.4";
 
 	// Option on-line selected
 	private boolean useOnline = true;
@@ -71,7 +71,7 @@ public class LFSExpProps {
 	// Sigma
 	private int[] bucleSigma = { 3 };
 
-	private String strBucleSigma = "3";
+	private String strBucleSigma = "5";
 
 	// Dimensions
 	private int widthSOM = 0;
@@ -161,7 +161,7 @@ public class LFSExpProps {
 	// Neigbour width, in absolute and percent values
 	private String strBucleNeighWidth = "8";
 
-	private String strBuclePcNeighWidth = "0.5";
+	private String strBuclePcNeighWidth = "0.3";
 
 	// Methods to set and get variables, to serialize
 	private String[] variables = { "setBucleLearnRate", "setBucleUseBatch",

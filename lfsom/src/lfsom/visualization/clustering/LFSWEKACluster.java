@@ -12,7 +12,7 @@ public class LFSWEKACluster {
 	int numberOfInstances;
 	int[] instancesInClusters;
 
-	public LFSWEKACluster(double[][] data) {
+	public LFSWEKACluster(int k, double[][] data) {
 		// Calcula el cluster empleando la clase de WEKA
 
 		numberOfInstances = data.length;
@@ -30,6 +30,13 @@ public class LFSWEKACluster {
 			data1.add(new DenseInstance(1.0, data[r]));
 
 		try {
+			if (k > 0) {
+				String[] options = new String[2];
+				options[0] = "-N";
+				options[1] = "" + k;
+				clusterer.setOptions(options);
+			}
+
 			clusterer.buildClusterer(data1);
 
 			for (int r = 0; r < numberOfInstances; r++) {
