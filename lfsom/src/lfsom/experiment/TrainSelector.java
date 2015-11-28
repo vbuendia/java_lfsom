@@ -57,7 +57,7 @@ public class TrainSelector {
 	/**
 	 * Version to show in client-side
 	 */
-	private String versionprog = "v1.3.2";
+	private String versionprog = "v1.3.3";
 
 	/**
 	 * Progress
