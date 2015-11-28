@@ -210,7 +210,7 @@ public void createGUIPSelection(){
   
   chSelection = new GCheckbox(this, 5, 30, 220, 40);
   chSelection.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-  chSelection.setText("Enable cell selection (double click to freeze/clear)");
+  chSelection.setText("Enable cell selection (dbl click to freeze/clear)");
   chSelection.setTextBold();
   chSelection.setOpaque(false);
   chSelection.setSelected(selPropi.getEnableCell());
@@ -229,7 +229,7 @@ public void createGUIPSelection(){
   
   OCustom = new GOption(this, 5, 160, 220, 20);
   OCustom.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-  OCustom.setText(" Custom (double click to start/finish)");
+  OCustom.setText(" Custom (dbl click start/finish)");
   OCustom.setOpaque(false);
   
   /*

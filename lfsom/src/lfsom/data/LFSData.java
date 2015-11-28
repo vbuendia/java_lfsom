@@ -286,9 +286,9 @@ public class LFSData {
 																			// mean
 																			// vector
 			}
-			meanVector.assign(Functions.div(getLabels().length)); // calculating
-																	// mean
-																	// vector
+			meanVector.assign(Functions.div(dataNames.length)); // calculating
+																// mean
+																// vector
 
 			// pca = new PCA(matrix);
 			if (matrix.length > 1) {
@@ -470,7 +470,8 @@ public class LFSData {
 	}
 
 	/**
-	 * @param maxValues the maxValues to set
+	 * @param maxValues
+	 *            the maxValues to set
 	 */
 	public void setMaxValues(double[] maxValues) {
 		this.maxValues = maxValues;
@@ -484,7 +485,8 @@ public class LFSData {
 	}
 
 	/**
-	 * @param minValues the minValues to set
+	 * @param minValues
+	 *            the minValues to set
 	 */
 	public void setMinValues(double[] minValues) {
 		this.minValues = minValues;

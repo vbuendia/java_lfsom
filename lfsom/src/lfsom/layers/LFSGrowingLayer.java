@@ -198,6 +198,9 @@ public class LFSGrowingLayer {
 			}
 			writer.println(sb.toString());
 
+			double maxValues[] = datum.getMaxValues();
+			double minValues[] = datum.getMinValues();
+
 			for (int j = 0; j < datum.numVectors(); j++) {
 				for (int i = 0; i < listaCells.size(); i++) {
 					int filaac = (int) Math.floor(listaCells.get(i) / xSize);
@@ -208,7 +211,9 @@ public class LFSGrowingLayer {
 						for (int w = 0; w < datum.dim(); w++) {
 							fuera = fuera
 									+ String.valueOf(datum.getInputDatum(j)
-											.getVector().get(w));
+											.getVector().get(w)
+											* (maxValues[w] - minValues[w])
+											+ minValues[w]);
 							if (w != datum.dim() - 1) {
 								fuera = fuera + ",";
 							}
@@ -333,15 +338,27 @@ public class LFSGrowingLayer {
 	 * @param dimen
 	 * @param pesos
 	 */
-	public void chargeWeights(int dimen, String pesos) {
+	public void chargeWeights(int dimen, String pesos, double[] maxValues,
+			double[] minValues) {
 		String[] strbl = pesos.split(" ");
+
+		double[] normVal = new double[strbl.length];
+
+		for (int j = 0; j < strbl.length; j++) {
+			normVal[j] = Double.valueOf(strbl[j]);
+		}
+		// Then normalize
+		for (int j = 0; j < normVal.length; j++) {
+			normVal[j] = (normVal[j] - minValues[dimen])
+					/ (maxValues[dimen] - minValues[dimen]);
+		}
+
 		int temp = 0;
 		for (int j = 0; j < this.ySize; j++) {
 			for (int i = 0; i < this.xSize; i++) {
 
 				try {
-					this.units[i][j].setWeightVector(dimen,
-							Double.valueOf(strbl[temp++]));
+					this.units[i][j].setWeightVector(dimen, normVal[temp++]);
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
 				} catch (LFSException e) {
@@ -1043,8 +1060,9 @@ public class LFSGrowingLayer {
 		int i = startIteration;
 		int controlI = 400; // Control every controlI iterations
 		int ultControl = i;
+		boolean endQuality = false;
 
-		while (i < numIterations && !qualityReached) {
+		while (i < numIterations && !endQuality) {
 
 			if (trainingProps.batchSom()) {
 				// If it is batch, only map data into units
@@ -1062,84 +1080,93 @@ public class LFSGrowingLayer {
 				if (controlI < this.xSize * this.ySize * 1.2) {
 					controlI = (int) (this.xSize * this.ySize * 1.2);
 				}
+				if (qualityReached)
+					endQuality = true;
 			}
 
-			if (trainingProps.batchSom() && (hazControl || i == numIterations)) {
-				// Applies modifications to units depending on their mapped data
-				finalBatch(data, i, trainingProps);
-			}
+			if (!endQuality) {
 
-			boolean calcNuevoNeigh = false;
-
-			// learnRate modification. Doesn't apply to growing
-			if (hazControl && !trainingProps.isGrowing()) {
-				double nLrate = initialLearnrate
-						* Math.exp(-1.0 * i / expParam);
-				if (nLrate < 0.01) {
-					nLrate = 0.01;
-				}
-				if (Math.round(nLrate * 100.0) != Math
-						.round(currentLearnrate * 100.0)) {
-					currentLearnrate = nLrate; // exponential
-					calcNuevoNeigh = true;
-				}
-			}
-
-			// neighbourwidth decay, except for gauss
-			if (trainingProps.getNeighbourFunc() != LFSGrowingLayer.NEIGH_GAUSS
-					&& hazControl) {
-				int neighDecay = 25;
-				if (trainingProps.isGrowing()) {
-					neighDecay = 1;
+				if (trainingProps.batchSom()
+						&& (hazControl || i == numIterations)) {
+					// Applies modifications to units depending on their mapped
+					// data
+					finalBatch(data, i, trainingProps);
 				}
 
-				float nPcWidthAct = (float) (iniPcNeighWidth * Math.exp(-1.0
-						* i / (numIterations / neighDecay)));
-				int nWidthAct = (int) ((this.xSize > this.ySize ? this.xSize
-						: this.ySize) * nPcWidthAct);
-				if (nWidthAct < 1) {
-					nWidthAct = 1;
+				boolean calcNuevoNeigh = false;
+
+				// learnRate modification. Doesn't apply to growing
+				if (hazControl && !trainingProps.isGrowing()) {
+					double nLrate = initialLearnrate
+							* Math.exp(-1.0 * i / expParam);
+					if (nLrate < 0.01) {
+						nLrate = 0.01;
+					}
+					if (Math.round(nLrate * 100.0) != Math
+							.round(currentLearnrate * 100.0)) {
+						currentLearnrate = nLrate; // exponential
+						calcNuevoNeigh = true;
+					}
 				}
 
-				if (nWidthAct != neighbourWidth) {
-					neighbourWidth = nWidthAct;
-					calcNuevoNeigh = true;
+				// neighbourwidth decay, except for gauss
+				if (trainingProps.getNeighbourFunc() != LFSGrowingLayer.NEIGH_GAUSS
+						&& hazControl) {
+					int neighDecay = 25;
+					if (trainingProps.isGrowing()) {
+						neighDecay = 1;
+					}
+
+					float nPcWidthAct = (float) (iniPcNeighWidth * Math
+							.exp(-1.0 * i / (numIterations / neighDecay)));
+					int nWidthAct = (int) ((this.xSize > this.ySize ? this.xSize
+							: this.ySize) * nPcWidthAct);
+					if (nWidthAct < 1) {
+						nWidthAct = 1;
+					}
+
+					if (nWidthAct != neighbourWidth) {
+						neighbourWidth = nWidthAct;
+						calcNuevoNeigh = true;
+					}
 				}
-			}
 
-			if (calcNuevoNeigh) {
-				// If it have been modifications in parameters, recalculate
-				// kernel
-				calcDistancesNEIGH(this.xSize, this.ySize, currentLearnrate,
-						sigmaAct);
-			}
-
-			// Call to grow and hierarchical
-			if (trainingProps.isHier() && hazControl) {
-				growAndHier(i, numIterations, trainingProps);
-			}
-
-			// Size control for growing.
-			// In batch case, always has to concur with "finalBatch"
-			if (hazControl && !qualityReached
-					&& (trainingProps.isGrowing() || trainingProps.isHier())
-					&& i < 0.85 * numIterations) {
-				compruebaErrUnits();
-				boolean okCalc = controlTamanyo(trainingProps, data, i,
-						numIterations);
-				if (okCalc) {
-					calcDistancesNEIGH_add(this.xSize, this.ySize,
+				if (calcNuevoNeigh) {
+					// If it have been modifications in parameters, recalculate
+					// kernel
+					calcDistancesNEIGH(this.xSize, this.ySize,
 							currentLearnrate, sigmaAct);
 				}
 
+				// Call to grow and hierarchical
+				if (trainingProps.isHier() && hazControl) {
+					growAndHier(i, numIterations, trainingProps);
+				}
+
+				// Size control for growing.
+				// In batch case, always has to concur with "finalBatch"
+				if (hazControl
+						&& !qualityReached
+						&& !endQuality
+						&& (trainingProps.isGrowing() || trainingProps.isHier())
+						&& i < 0.85 * numIterations) {
+					compruebaErrUnits();
+					boolean okCalc = controlTamanyo(trainingProps, data, i,
+							numIterations);
+					if (okCalc) {
+						calcDistancesNEIGH_add(this.xSize, this.ySize,
+								currentLearnrate, sigmaAct);
+					}
+
+				}
+
+				if (i == numIterations) {
+					qualityReached = true;
+				}
+
+				i++;
+
 			}
-
-			if (i == numIterations) {
-				qualityReached = true;
-			}
-
-			i++;
-
 		}
 		clearMappedInput();
 

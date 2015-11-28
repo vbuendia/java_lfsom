@@ -38,6 +38,19 @@ class LayerSom {
    this.minvalor = this.minvalor/100;
    this.mediovalor = this.mediovalor/100;
    
+   if (this.maxvalor == this.minvalor) {
+      this.maxvalor = max(valores);
+      this.minvalor = min(valores);
+      this.mediovalor = (this.maxvalor +this.minvalor)/2;
+      this.maxvalor = (int) (1000*this.maxvalor);
+      this.minvalor = (int) (1000*this.minvalor);
+      this.mediovalor = (int) (1000*this.mediovalor);
+   
+      this.maxvalor = this.maxvalor/1000;
+      this.minvalor = this.minvalor/1000;
+      this.mediovalor = this.mediovalor/1000;
+   }
+   
    this.poscuad = poscua;
 
    this.muestra_cuad = muestra_c;

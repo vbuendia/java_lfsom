@@ -80,6 +80,8 @@ public class LFSQuantizationError implements LFSQualityMeasure {
 
 	private double mqe;
 
+	private double qe;
+
 	private double[][] unitMqe;
 
 	private double[][] unitQe;
@@ -100,6 +102,7 @@ public class LFSQuantizationError implements LFSQualityMeasure {
 		int xSize = layer.getXSize();
 		int ySize = layer.getYSize();
 
+		qe = 0;
 		mqe = 0;
 		mmqe = 0;
 		int nonEmpty = 0;
@@ -124,7 +127,8 @@ public class LFSQuantizationError implements LFSQualityMeasure {
 					}
 					unitQe[x][y] = quantErr;
 					unitMqe[x][y] = quantErr / u.getNumberOfMappedInputs();
-					nonEmpty++;
+					nonEmpty += u.getNumberOfMappedInputs();
+					qe += unitQe[x][y];
 					mqe += unitQe[x][y];
 					mmqe += unitMqe[x][y];
 
@@ -154,6 +158,8 @@ public class LFSQuantizationError implements LFSQualityMeasure {
 	public double getMapQuality(String name) throws LFSException {
 		if (name.equals("mqe")) {
 			return mqe;
+		} else if (name.equals("qe")) {
+			return qe;
 		} else if (name.equals("mmqe")) {
 			return mmqe;
 		} else {

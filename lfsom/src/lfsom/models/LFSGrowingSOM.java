@@ -222,21 +222,13 @@ public class LFSGrowingSOM {
 
 				} else {
 					this.getLayer().chargeWeights(temp,
-							eElement.getTextContent());
+							eElement.getTextContent(), datos1.getMaxValues(),
+							datos1.getMinValues());
 				}
 
 			}
 		}
 
-	}
-
-	public void EscribeXML(String output) {
-		try {
-			XMLOutputter salida = new XMLOutputter();
-			salida.createXML(this, output, null, null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	public void EscribeXML(String output, double[] maxValues, double[] minValues) {
@@ -265,10 +257,12 @@ public class LFSGrowingSOM {
 	}
 
 	public void clusteriza(int nclusters) {
+
 		if (nclusters > 0) {
 			LFSKMeans kmedias = new LFSKMeans(nclusters, this.getCodebook());
 			setLabelAgrupados(kmedias.getResultados());
 		} else {
+
 			LFSWEKACluster em = new LFSWEKACluster(nclusters,
 					this.getCodebook());
 			setLabelAgrupados(em.getResultados());

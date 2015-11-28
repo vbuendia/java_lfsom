@@ -521,6 +521,7 @@ public class TrainSelector {
 
 		boolean isGCHSOM = exprops.isGCHSOM();
 		boolean isHier = exprops.isHier() && !exprops.isGCHSOM();
+		String criterioSu = "mqe";
 		boolean isGrowing = (exprops.isGrowing() || isGCHSOM)
 				&& !exprops.isHier();
 
@@ -571,8 +572,11 @@ public class TrainSelector {
 			cancelado = false;
 			Progreso = 0;
 
-			double tau = 0.001;
-			double tau2 = 0.01;
+			double tau = 0.99;
+			double tau2 = 0.1;
+
+			// if (isHier)
+			// tau2 = 0.001;
 
 			long seed = 1;
 			int trainingCycles = 1;
@@ -583,7 +587,7 @@ public class TrainSelector {
 			long startTime = System.currentTimeMillis();
 			int nThreads = numCPUs;
 
-			double mqeRef = Double.POSITIVE_INFINITY;
+			double qRef = Double.POSITIVE_INFINITY;
 
 			if (isHier || isGCHSOM) {
 				// If it's hierarchical, calculates mqeRef from a 1 cell net
@@ -605,10 +609,10 @@ public class TrainSelector {
 					mapa1Celda.getLayer().setQError(
 							new LFSQuantizationError(mapa1Celda.getLayer(),
 									datos1));
-					mqeRef = mapa1Celda.getLayer().getQualityMeasure("QError")
-							.getMapQuality("mqe");
+					qRef = mapa1Celda.getLayer().getQualityMeasure("QError")
+							.getMapQuality(criterioSu);
 				} else {
-					mqeRef = exprops.getMqeIni();
+					qRef = exprops.getMqeIni();
 				}
 
 			}
@@ -709,7 +713,7 @@ public class TrainSelector {
 												bSigma, tau, metric, usePCA,
 												bBatch, bInitializationMode,
 												bNeighFunc, bNeighWidth,
-												nameExp, isGrowing, mqeRef,
+												nameExp, isGrowing, qRef,
 												isSub, isHier, isGCHSOM);
 										props.setDataPath(dataPath);
 
@@ -800,14 +804,14 @@ public class TrainSelector {
 				if ((isHier || isGCHSOM) && prof < maxProf) {
 
 					LFSGrowingLayer mMejor = mapaMejorKaski.getLayer();
-					mqeRef = mMejor.getQualityMeasure("QError").getMapQuality(
-							"mqe");
+					double qActualRef = mMejor.getQualityMeasure("QError")
+							.getMapQuality(criterioSu);
 					if (isGCHSOM) {
 						lanza_experimento_clusters(tau2, mMejor, dataPath,
-								rootPath, datos1, mqeRef);
+								rootPath, datos1, qRef);
 					} else if (isHier) {
 						lanza_experimento_units(tau2, mMejor, dataPath,
-								rootPath, datos1, mqeRef);
+								rootPath, datos1, qRef, qActualRef);
 					}
 
 				}
@@ -886,10 +890,11 @@ public class TrainSelector {
 
 	// Generates a new experiment with data mapped to a unit
 	private void lanza_experimento_units(double tau2, LFSGrowingLayer mMejor,
-			String dataPath, String rootPath, LFSData datos1, Double mqeRef) {
+			String dataPath, String rootPath, LFSData datos1, Double qRef,
+			Double qActualRef) {
 
 		ArrayList<LFSUnit> ExpUnits = mMejor.getExpandedUnits(
-				mMejor.getQualityMeasure("QError"), "mqe", tau2, mqeRef,
+				mMejor.getQualityMeasure("QError"), "mqe", tau2, qRef,
 				minDatosExp, datos1.numVectors());
 
 		// Se lanza un experimento para cada uno de ellos
@@ -902,8 +907,8 @@ public class TrainSelector {
 
 				arrInc.add(unidad.getYPos() * mMejor.getXSize()
 						+ unidad.getXPos());
-				generaExp(mMejor, dataPath, rootPath, mqeRef, datos1, arrInc,
-						iteini, z);
+				generaExp(mMejor, dataPath, rootPath, qActualRef, datos1,
+						arrInc, iteini, z);
 
 			}
 		} catch (Exception e) {

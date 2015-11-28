@@ -20,7 +20,11 @@ import processing.pdf.*;
 //*** FUNCIONES DE DESPLAZAMIENTO
 
 public void keyReleased() {
- 
+ if (key == 'P'&&!PDFtotal) {
+   PDFtotal=true;  
+   fPDFOutput = G4P.selectOutput("PDF output");
+   PDFtotal=(fPDFOutput!=null && !fPDFOutput.equals(""));
+ }
  
   if (key == 'W') {
     clusterSelec();
@@ -266,7 +270,7 @@ if (f.exists()) {
   if (topolx >= 8) limitSup = 6;
      else {
        limitSup = 10;
-       limitInf = 7;
+       limitInf = 5;
      }
   
 sdnColumn.setLimits(limitInf,limitSup);

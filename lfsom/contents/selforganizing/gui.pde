@@ -99,7 +99,7 @@ public void handleButtonEvents(GButton button, GEvent event) {
   boolean correcto = true;
   
  if (listaHexSel.size()==0) {
-   G4P.showMessage(this, "You must select cells first (double click)", "Selected cells required", G4P.INFO);
+   G4P.showMessage(this, "You must select cells first (dbl click)", "Selected cells required", G4P.INFO);
    correcto = false;
  } 
  
