@@ -411,11 +411,11 @@ public class LFSGrowingLayer {
 		distNeigh = new double[diagonal];
 		// long startTime = System.currentTimeMillis();
 		// long calc = 0;
-		for (int w = 1; w <= 1000; w++)
-			// Se calculan las distancias segun Neighbourfunc
-			for (int x = 0; x < diagonal; x++) {
-				distNeigh[x] = getHCI(x, learnrate, sigma, nPCNeighbourWidth);
-			}
+
+		// Se calculan las distancias segun Neighbourfunc
+		for (int x = 0; x < diagonal; x++) {
+			distNeigh[x] = getHCI(x, learnrate, sigma, nPCNeighbourWidth);
+		}
 
 		// long endTime = System.currentTimeMillis();
 		// long totalTime = endTime - startTime;
@@ -1104,7 +1104,7 @@ public class LFSGrowingLayer {
 			if (hazControl && !trainingProps.isGrowing()) {
 				double nLrate = trainingProps.learnrate()
 						* Math.exp(-1.0
-								* (totIter / i)
+								* (i / totIter)
 								/ (2 * sigmaDecayLearnRate * sigmaDecayLearnRate));
 				if (nLrate < 0.01) {
 					nLrate = 0.01;
@@ -1120,7 +1120,7 @@ public class LFSGrowingLayer {
 			if (hazControl
 					&& trainingProps.getNeighbourFunc() != LFSGrowingLayer.NEIGH_GAUSS) {
 				double nPCNeigh = trainingProps.pcNeighbourWidth()
-						* Math.exp(-1.0 * (totIter / i)
+						* Math.exp(-1.0 * (i / totIter)
 								/ (2 * sigmaDecayNeigh * sigmaDecayNeigh));
 				if (nPCNeigh < 0.01) {
 					nPCNeigh = 0.01;

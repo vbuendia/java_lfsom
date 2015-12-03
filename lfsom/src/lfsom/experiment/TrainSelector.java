@@ -547,7 +547,7 @@ public class TrainSelector {
 		int numCPUs = exprops.getNumCPUs();
 		double[] bucleLearnRate = exprops.getBucleLearnRate();
 		boolean[] bucleUseBatch = exprops.getBucleUseBatch();
-		int[] bucleSigma = exprops.getBucleSigma();
+		float[] bucleSigma = exprops.getBucleSigma();
 		int[] bucleInitializationMode = exprops.getBucleInitializationMode();
 		int[] bucleNeighFunc = exprops.getBucleNeighFunc();
 		float[] buclePcNeighWidth = exprops.getBuclePcNeighWidth();
@@ -572,8 +572,8 @@ public class TrainSelector {
 			cancelado = false;
 			Progreso = 0;
 
-			double tau = 1;
-			double tau2 = 0.001;
+			double tau = exprops.getTau();
+			double tau2 = exprops.getTau2();
 
 			// if (isHier)
 			// tau2 = 0.001;
@@ -588,29 +588,32 @@ public class TrainSelector {
 			int nThreads = numCPUs;
 
 			double qRef = Double.POSITIVE_INFINITY;
+			double qRef0 = 0;
 
 			if (isHier || isGCHSOM) {
 				// If it's hierarchical, calculates mqeRef from a 1 cell net
 
+				LFSSOMProperties props = new LFSSOMProperties(1, 1, seed,
+						trainingCycles, trainingIterations, 1, 1, tau, metric,
+						false, false, LFSUnit.INIT_RANDOM,
+						LFSGrowingLayer.NEIGH_GAUSS, 1, nameExp, false, 0.0,
+						false, false, false);
+				props.setDataPath(dataPath);
+				LFSGrowingSOM mapa1Celda = new LFSGrowingSOM(props.getExpName());
+				LFSUnit[][] units1Celda = new LFSUnit[1][1];
+				units1Celda[0][0] = new LFSUnit(0, 0, datos1.getMeanVector()
+						.toArray());
+				mapa1Celda.initLayer(true, props, datos1, units1Celda);
+				mapa1Celda.getLayer().mapCompleteDataAfterTraining(datos1);
+				mapa1Celda.getLayer()
+						.setQError(
+								new LFSQuantizationError(mapa1Celda.getLayer(),
+										datos1));
+				qRef0 = mapa1Celda.getLayer().getQualityMeasure("QError")
+						.getMapQuality(criterioSu);
+
 				if (exprops.getMqeIni() == -1) {
-					LFSSOMProperties props = new LFSSOMProperties(1, 1, seed,
-							trainingCycles, trainingIterations, 1, 1, tau,
-							metric, false, false, LFSUnit.INIT_RANDOM,
-							LFSGrowingLayer.NEIGH_GAUSS, 1, nameExp, false,
-							0.0, false, false, false);
-					props.setDataPath(dataPath);
-					LFSGrowingSOM mapa1Celda = new LFSGrowingSOM(
-							props.getExpName());
-					LFSUnit[][] units1Celda = new LFSUnit[1][1];
-					units1Celda[0][0] = new LFSUnit(0, 0, datos1
-							.getMeanVector().toArray());
-					mapa1Celda.initLayer(true, props, datos1, units1Celda);
-					mapa1Celda.getLayer().mapCompleteDataAfterTraining(datos1);
-					mapa1Celda.getLayer().setQError(
-							new LFSQuantizationError(mapa1Celda.getLayer(),
-									datos1));
-					qRef = mapa1Celda.getLayer().getQualityMeasure("QError")
-							.getMapQuality(criterioSu);
+					qRef = qRef0;
 				} else {
 					qRef = exprops.getMqeIni();
 				}
@@ -688,7 +691,7 @@ public class TrainSelector {
 							for (int bInitializationMode : bucleInitializationMode) {
 								boolean usePCA = bInitializationMode == LFSUnit.INIT_PCA;
 								nbSigma = 0;
-								for (int bSigma : bucleSigma) {
+								for (float bSigma : bucleSigma) {
 
 									boolean ejecuta = true;
 									// Si es Bubble, solo se ejecuta para el
@@ -811,7 +814,7 @@ public class TrainSelector {
 								rootPath, datos1, qRef);
 					} else if (isHier) {
 						lanza_experimento_units(tau2, mMejor, dataPath,
-								rootPath, datos1, qRef, qActualRef);
+								rootPath, datos1, qRef0, qRef, qActualRef);
 					}
 
 				}
@@ -890,11 +893,11 @@ public class TrainSelector {
 
 	// Generates a new experiment with data mapped to a unit
 	private void lanza_experimento_units(double tau2, LFSGrowingLayer mMejor,
-			String dataPath, String rootPath, LFSData datos1, Double qRef,
-			Double qActualRef) {
+			String dataPath, String rootPath, LFSData datos1, Double qRef0,
+			Double qRef, Double qActualRef) {
 
 		ArrayList<LFSUnit> ExpUnits = mMejor.getExpandedUnits(
-				mMejor.getQualityMeasure("QError"), "mqe", tau2, qRef,
+				mMejor.getQualityMeasure("QError"), "mqe", tau2, qRef0,
 				minDatosExp, datos1.numVectors());
 
 		// Se lanza un experimento para cada uno de ellos

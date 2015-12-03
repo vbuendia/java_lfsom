@@ -257,6 +257,10 @@ public class LFSGrowingSOM {
 	}
 
 	public void clusteriza(int nclusters) {
+		clusteriza(nclusters, 1);
+	}
+
+	public void clusteriza(int nclusters, int nparalels) {
 
 		if (this.layer.getXSize() * this.layer.getYSize() <= 20) {
 			int nclus = 3;
@@ -264,7 +268,7 @@ public class LFSGrowingSOM {
 			setLabelAgrupados(kmedias.getResultados());
 		} else {
 			LFSWEKACluster em = new LFSWEKACluster(nclusters,
-					this.getCodebook());
+					this.getCodebook(), nparalels);
 			setLabelAgrupados(em.getResultados());
 		}
 	}

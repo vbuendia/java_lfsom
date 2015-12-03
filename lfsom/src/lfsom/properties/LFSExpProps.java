@@ -69,14 +69,17 @@ public class LFSExpProps {
 	private boolean useBatch = true;
 
 	// Sigma
-	private int[] bucleSigma = { 3 };
+	private float[] bucleSigma = { 0.3f };
 
-	private String strBucleSigma = "5";
+	private String strBucleSigma = "0.3";
 
 	// Dimensions
 	private int widthSOM = 0;
 
 	private int heightSOM = 0;
+
+	private double tau = 0.7;
+	private double tau2 = 0.01;
 
 	// Number of CPUs
 	private int numCPUs = 8;
@@ -170,7 +173,7 @@ public class LFSExpProps {
 			"setBucleNeighFunc", "setSizeAut", "setExpName", "setNetNames",
 			"setNetFiles", "setBucleNeighWidth", "setGrowing", "setIsSubred",
 			"setSubredOrigen", "setFPadre", "setFDatosPadre", "setRootPath",
-			"setHier", "setGCHSOM", "setBuclePcNeighWidth" };
+			"setHier", "setGCHSOM", "setBuclePcNeighWidth", "setTau", "setTau2" };
 
 	private String[] variablesval = { "getStrBucleLearnRate",
 			"getStrBucleUseBatch", "getStrBucleSigma", "getStrXYSOM",
@@ -180,7 +183,8 @@ public class LFSExpProps {
 			"getStrNetNames", "getStrNetFiles", "getStrBucleNeighWidth",
 			"isStrGrowing", "getStrIsSubred", "getStrSubredOrigen",
 			"getFPadre", "getFDatosPadre", "getRootPath", "isStrHier",
-			"getStrGCHSOM", "getStrBuclePcNeighWidth" };
+			"getStrGCHSOM", "getStrBuclePcNeighWidth", "getStrTau",
+			"getStrTau2" };
 
 	/**
 	 * @return Returns the bucleLearnRate.
@@ -388,7 +392,7 @@ public class LFSExpProps {
 	/**
 	 * @return Returns the bucleSigma.
 	 */
-	public int[] getBucleSigma() {
+	public float[] getBucleSigma() {
 		return bucleSigma;
 	}
 
@@ -466,13 +470,13 @@ public class LFSExpProps {
 		this.strBucleSigma = strSigma;
 		String[] strbl = strSigma.split(",");
 		if (strbl.length > 0) {
-			this.bucleSigma = new int[strbl.length];
+			this.bucleSigma = new float[strbl.length];
 			for (int i = 0; i < strbl.length; i++) {
-				this.bucleSigma[i] = (int) Float.parseFloat(strbl[i]);
+				this.bucleSigma[i] = Float.parseFloat(strbl[i]);
 			}
 		} else {
-			this.bucleSigma = new int[1];
-			this.bucleSigma[0] = 4;
+			this.bucleSigma = new float[1];
+			this.bucleSigma[0] = 0.3f;
 		}
 	}
 
@@ -1124,7 +1128,7 @@ public class LFSExpProps {
 
 		double[] bucleLearnRate = getBucleLearnRate();
 		boolean[] bucleUseBatch = getBucleUseBatch();
-		int[] bucleSigma = getBucleSigma();
+		float[] bucleSigma = getBucleSigma();
 		int[] bucleInitializationMode = getBucleInitializationMode();
 		int[] bucleNeighFunc = getBucleNeighFunc();
 		float[] buclePcNeighWidth = getBuclePcNeighWidth();
@@ -1178,7 +1182,7 @@ public class LFSExpProps {
 						for (int bInitializationMode : bucleInitializationMode) {
 							boolean usePCA = bInitializationMode == LFSUnit.INIT_PCA;
 							nbSigma = 0;
-							for (int bSigma : bucleSigma) {
+							for (float bSigma : bucleSigma) {
 
 								boolean ejecuta = true;
 								if (nbSigma > 0
@@ -1224,5 +1228,55 @@ public class LFSExpProps {
 
 		return spList;
 
+	}
+
+	/**
+	 * @return the tau
+	 */
+	public double getTau() {
+		return tau;
+	}
+
+	public String getStrTau() {
+		return String.valueOf(tau);
+	}
+
+	/**
+	 * @param tau
+	 *            the tau to set
+	 */
+	public void setTau(double tau) {
+		this.tau = tau;
+	}
+
+	/**
+	 * @param tau
+	 *            the tau to set
+	 */
+	public void setTau(String tau) {
+		this.tau = Double.valueOf(tau);
+	}
+
+	/**
+	 * @return the tau2
+	 */
+	public double getTau2() {
+		return tau2;
+	}
+
+	public String getStrTau2() {
+		return String.valueOf(tau2);
+	}
+
+	/**
+	 * @param tau2
+	 *            the tau2 to set
+	 */
+	public void setTau2(double tau2) {
+		this.tau2 = tau2;
+	}
+
+	public void setTau2(String tau2) {
+		this.tau2 = Double.valueOf(tau2);
 	}
 }
