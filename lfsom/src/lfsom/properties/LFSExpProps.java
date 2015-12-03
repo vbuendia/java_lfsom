@@ -65,6 +65,8 @@ public class LFSExpProps {
 	// Option on-line selected
 	private boolean useOnline = true;
 
+	private int lambda = 400;
+
 	// Option batch selected
 	private boolean useBatch = true;
 
@@ -72,6 +74,8 @@ public class LFSExpProps {
 	private float[] bucleSigma = { 0.3f };
 
 	private String strBucleSigma = "0.3";
+
+	private int cycles = 1;
 
 	// Dimensions
 	private int widthSOM = 0;
@@ -173,7 +177,8 @@ public class LFSExpProps {
 			"setBucleNeighFunc", "setSizeAut", "setExpName", "setNetNames",
 			"setNetFiles", "setBucleNeighWidth", "setGrowing", "setIsSubred",
 			"setSubredOrigen", "setFPadre", "setFDatosPadre", "setRootPath",
-			"setHier", "setGCHSOM", "setBuclePcNeighWidth", "setTau", "setTau2" };
+			"setHier", "setGCHSOM", "setBuclePcNeighWidth", "setTau",
+			"setTau2", "setLambda", "setCycles" };
 
 	private String[] variablesval = { "getStrBucleLearnRate",
 			"getStrBucleUseBatch", "getStrBucleSigma", "getStrXYSOM",
@@ -184,7 +189,7 @@ public class LFSExpProps {
 			"isStrGrowing", "getStrIsSubred", "getStrSubredOrigen",
 			"getFPadre", "getFDatosPadre", "getRootPath", "isStrHier",
 			"getStrGCHSOM", "getStrBuclePcNeighWidth", "getStrTau",
-			"getStrTau2" };
+			"getStrTau2", "getStrLambda", "getStrCycles" };
 
 	/**
 	 * @return Returns the bucleLearnRate.
@@ -1207,7 +1212,7 @@ public class LFSExpProps {
 												bBatch, bInitializationMode,
 												bNeighFunc, bNeighWidth,
 												nameExp, isGrowing, mqeRef,
-												isSub, isHier, isGCHSOM);
+												isSub, isHier, isGCHSOM, 1);
 										props.setDataPath(dataPath);
 										spList[id++] = props;
 									} catch (LFSException e) {
@@ -1278,5 +1283,51 @@ public class LFSExpProps {
 
 	public void setTau2(String tau2) {
 		this.tau2 = Double.valueOf(tau2);
+	}
+
+	/**
+	 * @return the lambda
+	 */
+	public int getLambda() {
+		return lambda;
+	}
+
+	public String getStrLambda() {
+		return String.valueOf(lambda);
+	}
+
+	/**
+	 * @param lambda
+	 *            the lambda to set
+	 */
+	public void setLambda(int lambda) {
+		this.lambda = lambda;
+	}
+
+	public void setLambda(String lambda) {
+		this.lambda = Integer.valueOf(lambda);
+	}
+
+	/**
+	 * @return the cycles
+	 */
+	public int getCycles() {
+		return cycles;
+	}
+
+	public String getStrCycles() {
+		return String.valueOf(cycles);
+	}
+
+	/**
+	 * @param cycles
+	 *            the cycles to set
+	 */
+	public void setCycles(int cycles) {
+		this.cycles = cycles;
+	}
+
+	public void setCycles(String cycles) {
+		this.cycles = Integer.valueOf(cycles);
 	}
 }

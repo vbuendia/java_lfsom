@@ -542,6 +542,7 @@ public class TrainSelector {
 
 		widthSOM = dimSOM[0];
 		heightSOM = dimSOM[1];
+		int lambda = exprops.getLambda();
 
 		int numRepe = exprops.getNumRepe();
 		int numCPUs = exprops.getNumCPUs();
@@ -575,11 +576,8 @@ public class TrainSelector {
 			double tau = exprops.getTau();
 			double tau2 = exprops.getTau2();
 
-			// if (isHier)
-			// tau2 = 0.001;
-
 			long seed = 1;
-			int trainingCycles = 1;
+			int trainingCycles = exprops.getCycles();
 			int trainingIterations = 1;
 
 			String metric = null;
@@ -597,7 +595,7 @@ public class TrainSelector {
 						trainingCycles, trainingIterations, 1, 1, tau, metric,
 						false, false, LFSUnit.INIT_RANDOM,
 						LFSGrowingLayer.NEIGH_GAUSS, 1, nameExp, false, 0.0,
-						false, false, false);
+						false, false, false, 1);
 				props.setDataPath(dataPath);
 				LFSGrowingSOM mapa1Celda = new LFSGrowingSOM(props.getExpName());
 				LFSUnit[][] units1Celda = new LFSUnit[1][1];
@@ -717,7 +715,7 @@ public class TrainSelector {
 												bBatch, bInitializationMode,
 												bNeighFunc, bNeighWidth,
 												nameExp, isGrowing, qRef,
-												isSub, isHier, isGCHSOM);
+												isSub, isHier, isGCHSOM, lambda);
 										props.setDataPath(dataPath);
 
 										if (nThreads > 1) {

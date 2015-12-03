@@ -1045,8 +1045,7 @@ public class LFSGrowingLayer {
 	 * @param initialLearnrate
 	 * @param initialSigma
 	 */
-	public void train(LFSData data, int nIterations,
-			LFSSOMProperties trainingProps) {
+	public void train(LFSData data, LFSSOMProperties trainingProps) {
 
 		double PCNeighAct = trainingProps.pcNeighbourWidth();
 		double currentLearnrate = trainingProps.learnrate();
@@ -1058,13 +1057,13 @@ public class LFSGrowingLayer {
 		 * double sigmaDecayLearnRate = 0.4; double sigmaDecayNeigh = 0.8;
 		 * double sigmaDecaySigma = 0.7;
 		 */
-		int numIterations = nIterations;
+		int numIterations = data.numVectors();
 		int lambda = trainingProps.getLambda();
 
 		int i = 0;
 		int ultControl = i;
 
-		int ciclos = trainingProps.isHier() ? 2 : 1;
+		int ciclos = trainingProps.numCycles();
 		long totIter = numIterations * ciclos;
 
 		while (i < totIter) {

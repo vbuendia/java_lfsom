@@ -175,7 +175,8 @@ public class LFSSOMProperties extends Properties {
 			double sigma, double tau, String metric, boolean usePCA,
 			boolean usebatch, int initializationMode, int neighbourFunc,
 			float pcNighWidth, String expName, boolean growing, double qRef,
-			boolean isSub, boolean hiera, boolean gchs) throws LFSException {
+			boolean isSub, boolean hiera, boolean gchs, int lambd)
+			throws LFSException {
 
 		this.setxSize(xSize);
 		this.setySize(ySize);
@@ -198,6 +199,7 @@ public class LFSSOMProperties extends Properties {
 		this.setGCHSOM(gchs);
 		this.qRef = qRef;
 		this.isSubred = isSub;
+		this.setLambda(lambd);
 	}
 
 	/**

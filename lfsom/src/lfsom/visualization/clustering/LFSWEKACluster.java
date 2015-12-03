@@ -31,6 +31,8 @@ public class LFSWEKACluster {
 			data1.add(new DenseInstance(1.0, data[r]));
 
 		clusterer.setNumExecutionSlots(nparalels);
+		// double aver = clusterer.getMinLogLikelihoodImprovementCV();
+		clusterer.setMinLogLikelihoodImprovementCV(2e-6);
 		try {
 			if (k > 0) {
 				clusterer.setNumClusters(k);

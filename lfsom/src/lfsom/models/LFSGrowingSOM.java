@@ -384,12 +384,7 @@ public class LFSGrowingSOM {
 			labelAtrib[i] = data.getLabel(i);
 		}
 
-		int cycles = props.numCycles();
-		if (cycles < 1)
-			cycles = 1;
-		int iterationsToTrain = cycles * data.numVectors();
-
-		layer.train(data, iterationsToTrain, props);
+		layer.train(data, props);
 	}
 
 	public String[] getVariables() {
