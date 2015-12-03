@@ -92,9 +92,11 @@ public class LFSSOMProperties extends Properties {
 	private int neighbourWidth = 15;
 
 	private float pcNeighbourWidth = 0.5f;
+	private double sigmaDecayNeigh = 0.8;
 
 	// 16
 	private double learnrate = 0;
+	private double sigmaDecayLearnRate = 0.4;
 
 	// 17
 	private int neighbourFunc = 10;
@@ -108,6 +110,8 @@ public class LFSSOMProperties extends Properties {
 	// 21
 	private int numIterations = 0;
 
+	private int lambda = 400;
+
 	// 22
 
 	private String[] variables = { "setInitializationMode", "setUsePCA",
@@ -115,7 +119,9 @@ public class LFSSOMProperties extends Properties {
 			"setLearnrate", "setMetricName", "setNumCycles",
 			"setNumIterations", "setRandomSeed", "setSigma", "setTau",
 			"setExpName", "setQRef", "setGrowing", "setHier", "setIsSubred",
-			"setSubredOrigen", "setGCHSOM", "setPcNeighbourWidth", "setXYSize" };
+			"setSubredOrigen", "setGCHSOM", "setPcNeighbourWidth", "setXYSize",
+			"setSigmaDecayLearnRate", "setSigmaDecayNeigh",
+			"setSigmaDecaySigma", "setLambda" };
 
 	private String[] variablesval = { "getStrInitializationMode",
 			"getStrUsePCA", "getStrBatchSom", "getStrNeighbourWidth",
@@ -124,13 +130,15 @@ public class LFSSOMProperties extends Properties {
 			"getStrSigma", "getStrTau", "getExpName", "getStrQRef",
 			"getStrGrowing", "getStrHier", "getStrIsSubred",
 			"getStrSubredOrigen", "getStrGCHSOM", "getStrPcNeighbourWidth",
-			"getStrXYSize" };
+			"getStrXYSize", "getStrSigmaDecayLearnRate",
+			"getStrSigmaDecayNeigh", "getStrSigmaDecaySigma", "getStrLambda" };
 
 	// 23
 	private long randomSeed = -1;
 
 	// 24
-	private double sigma = -1;
+	private double sigma = 0.1;
+	private double sigmaDecaySigma = 0.7;
 
 	// 25
 	public double tau = 1;
@@ -168,9 +176,18 @@ public class LFSSOMProperties extends Properties {
 			boolean usebatch, int initializationMode, int neighbourFunc,
 			float pcNighWidth, String expName, boolean growing, double qRef,
 			boolean isSub, boolean hiera, boolean gchs) throws LFSException {
-		this(xSize, ySize, seed, trainingCycles, trainingIterations, lernrate,
-				sigma, tau, metric, usePCA);
 
+		this.setxSize(xSize);
+		this.setySize(ySize);
+		this.numIterations = trainingIterations;
+		this.learnrate = lernrate;
+		this.tau = tau;
+		this.metricName = metric;
+		this.numCycles = trainingCycles;
+		this.sigma = sigma;
+		this.randomSeed = -1;
+		this.usePCA = usePCA;
+		validatePropertyValues();
 		this.batchSom = usebatch;
 		this.setExpName(expName);
 		this.initializationMode = initializationMode;
@@ -181,28 +198,6 @@ public class LFSSOMProperties extends Properties {
 		this.setGCHSOM(gchs);
 		this.qRef = qRef;
 		this.isSubred = isSub;
-	}
-
-	private LFSSOMProperties(int xSize, int ySize, int numIterations,
-			double lernrate) throws LFSException {
-		this.setxSize(xSize);
-		this.setySize(ySize);
-		this.numIterations = numIterations;
-		this.learnrate = lernrate;
-	}
-
-	private LFSSOMProperties(int xSize, int ySize, long seed, int numCycles,
-			int numIterations, double learnrate, double sigma, double tau,
-			String metricName, boolean usePCA) throws LFSException {
-		this(xSize, ySize, numIterations, learnrate);
-
-		this.tau = tau;
-		this.metricName = metricName;
-		this.numCycles = numCycles;
-		this.sigma = sigma;
-		this.randomSeed = -1;
-		this.usePCA = usePCA;
-		validatePropertyValues();
 	}
 
 	/**
@@ -787,6 +782,98 @@ public class LFSSOMProperties extends Properties {
 
 	public void setPcNeighbourWidth(String pcNeighbourWidth) {
 		this.pcNeighbourWidth = Float.valueOf(pcNeighbourWidth);
+	}
+
+	/**
+	 * @return the sigmaDecayNeigh
+	 */
+	public double getSigmaDecayNeigh() {
+		return sigmaDecayNeigh;
+	}
+
+	public String getStrSigmaDecayNeigh() {
+		return String.valueOf(sigmaDecayNeigh);
+	}
+
+	/**
+	 * @param sigmaDecayNeigh
+	 *            the sigmaDecayNeigh to set
+	 */
+	public void setSigmaDecayNeigh(double sigmaDecayNeigh) {
+		this.sigmaDecayNeigh = sigmaDecayNeigh;
+	}
+
+	public void setSigmaDecayNeigh(String sigmaDecayNeigh) {
+		this.sigmaDecayNeigh = Double.valueOf(sigmaDecayNeigh);
+	}
+
+	/**
+	 * @return the sigmaDecayLearnRate
+	 */
+	public double getSigmaDecayLearnRate() {
+		return sigmaDecayLearnRate;
+	}
+
+	public String getStrSigmaDecayLearnRate() {
+		return String.valueOf(sigmaDecayLearnRate);
+	}
+
+	/**
+	 * @param sigmaDecayLearnRate
+	 *            the sigmaDecayLearnRate to set
+	 */
+	public void setSigmaDecayLearnRate(double sigmaDecayLearnRate) {
+		this.sigmaDecayLearnRate = sigmaDecayLearnRate;
+	}
+
+	public void setSigmaDecayLearnRate(String sigmaDecayLearnRate) {
+		this.sigmaDecayLearnRate = Double.valueOf(sigmaDecayLearnRate);
+	}
+
+	/**
+	 * @return the sigmaDecaySigma
+	 */
+	public double getSigmaDecaySigma() {
+		return sigmaDecaySigma;
+	}
+
+	public String getStrSigmaDecaySigma() {
+		return String.valueOf(sigmaDecaySigma);
+	}
+
+	/**
+	 * @param sigmaDecaySigma
+	 *            the sigmaDecaySigma to set
+	 */
+	public void setSigmaDecaySigma(double sigmaDecaySigma) {
+		this.sigmaDecaySigma = sigmaDecaySigma;
+	}
+
+	public void setSigmaDecaySigma(String sigmaDecaySigma) {
+		this.sigmaDecaySigma = Double.valueOf(sigmaDecaySigma);
+	}
+
+	/**
+	 * @return the lambda
+	 */
+	public int getLambda() {
+		return lambda;
+	}
+
+	public String getStrLambda() {
+		return String.valueOf(lambda);
+	}
+
+	/**
+	 * @param lambda
+	 *            the lambda to set
+	 */
+	public void setLambda(int lambda) {
+		this.lambda = lambda;
+	}
+
+	public void setLambda(String lambda) {
+		this.lambda = Integer.valueOf(lambda);
 	}
 
 }

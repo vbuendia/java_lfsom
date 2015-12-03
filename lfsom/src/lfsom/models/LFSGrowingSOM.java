@@ -258,11 +258,11 @@ public class LFSGrowingSOM {
 
 	public void clusteriza(int nclusters) {
 
-		if (nclusters > 0) {
-			LFSKMeans kmedias = new LFSKMeans(nclusters, this.getCodebook());
+		if (this.layer.getXSize() * this.layer.getYSize() <= 20) {
+			int nclus = 3;
+			LFSKMeans kmedias = new LFSKMeans(nclus, this.getCodebook());
 			setLabelAgrupados(kmedias.getResultados());
 		} else {
-
 			LFSWEKACluster em = new LFSWEKACluster(nclusters,
 					this.getCodebook());
 			setLabelAgrupados(em.getResultados());
@@ -385,8 +385,7 @@ public class LFSGrowingSOM {
 			cycles = 1;
 		int iterationsToTrain = cycles * data.numVectors();
 
-		layer.trainNormal(data, iterationsToTrain, 0, props, props.learnrate(),
-				props.sigma());
+		layer.train(data, iterationsToTrain, props);
 	}
 
 	public String[] getVariables() {
@@ -534,16 +533,15 @@ public class LFSGrowingSOM {
 		this.expName = expName;
 	}
 
-	/*
-	 * public void grabaTMP() {
-	 * 
-	 * this.clusteriza(5);
-	 * 
-	 * this.EscribeXML("d:/somtmp/fich.xml");
-	 * this.escribeProps("d:/somtmp/fich.xmlprops");
-	 * 
-	 * }
-	 */
+	public void grabaTMP() {
+
+		this.clusteriza(5);
+
+		this.EscribeXML("d:/dropbox/somtmp/fich.xml", this.layer.getData()
+				.getMaxValues(), this.layer.getData().getMinValues());
+		this.escribeProps("d:/dropbox/somtmp/fich.xmlprops");
+
+	}
 
 	/**
 	 * @return Returns the labelAgrupados.

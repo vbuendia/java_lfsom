@@ -57,7 +57,7 @@ public class TrainSelector {
 	/**
 	 * Version to show in client-side
 	 */
-	private String versionprog = "v1.3.3";
+	private String versionprog = "v1.4.1";
 
 	/**
 	 * Progress
@@ -572,8 +572,8 @@ public class TrainSelector {
 			cancelado = false;
 			Progreso = 0;
 
-			double tau = 0.99;
-			double tau2 = 0.1;
+			double tau = 1;
+			double tau2 = 0.001;
 
 			// if (isHier)
 			// tau2 = 0.001;
@@ -751,7 +751,7 @@ public class TrainSelector {
 
 				new File(dataPath).mkdirs();
 				String fiche = null;
-				int numClusters = isGCHSOM && !exprops.isSubred() ? 4 : 0;
+				int numClusters = isGCHSOM && !exprops.isSubred() ? 4 : -1;
 
 				mapaMejorTopo.getLayer().mapCompleteDataAfterTraining(datos1);
 				mapaMejorTopo.clusteriza(numClusters);

@@ -92,10 +92,7 @@ public class LFSGrowingLayer {
 	private int[][][][] distancesHex = null;
 
 	// Precalculed kernel depending on neighbour function
-	private double[][] distNeigh = null;
-
-	// Different ranges of disNeigh, assigning sigma decay
-	private int nRangos = 3;
+	private double[] distNeigh = null;
 
 	private int xSize = 0;
 
@@ -112,6 +109,7 @@ public class LFSGrowingLayer {
 
 	// Width of neighbour to apply in bubble and cut gauss
 	private float neighbourWidth = 15;
+	private double PCNeighbourWidth = 0.1;
 
 	// Declaration of the neighbour functions
 	public static final int NEIGH_GAUSS = 10;
@@ -156,15 +154,10 @@ public class LFSGrowingLayer {
 		props.setXYSize(this.xSize, this.ySize);
 		props.setNumIterations(data.getData().length);
 
-		if (props.getNeighbourFunc() == LFSGrowingLayer.NEIGH_BUBBLE) {
-			// There isn't sigma decay
-			nRangos = 1;
-		}
-
 		try {
 			props.validatePropertyValues();
 			calcDistancesNEIGH(this.xSize, this.ySize, props.learnrate(),
-					props.sigma());
+					props.sigma(), this.PCNeighbourWidth);
 		} catch (LFSException e) {
 			e.printStackTrace();
 		}
@@ -277,8 +270,7 @@ public class LFSGrowingLayer {
 		this.data = data;
 
 		this.neighbourFunc = neighFunc;
-		int maxSiz = this.xSize > this.ySize ? this.xSize : this.ySize;
-		this.neighbourWidth = (int) (maxSiz * pcNeighWidth);
+		this.PCNeighbourWidth = pcNeighWidth;
 
 		// Heuristic of size calculation
 		int ySizeCalc = 0;
@@ -413,20 +405,16 @@ public class LFSGrowingLayer {
 	 * @param sigma
 	 */
 	private void calcDistancesNEIGH(int xSize, int ySize, double learnrate,
-			double sigma) {
+			double sigma, double nPCNeighbourWidth) {
 
 		int diagonal = distancesHex[0][0][xSize][ySize];
-		distNeigh = new double[nRangos][diagonal];
+		distNeigh = new double[diagonal];
 		// long startTime = System.currentTimeMillis();
 		// long calc = 0;
 		for (int w = 1; w <= 1000; w++)
 			// Se calculan las distancias segun Neighbourfunc
-			for (int ran = 0; ran < nRangos; ran++) {
-				for (int x = 0; x < diagonal; x++) {
-					distNeigh[ran][x] = getHCI(x, learnrate, sigma / (ran + 1),
-							ran);
-					// calc++;
-				}
+			for (int x = 0; x < diagonal; x++) {
+				distNeigh[x] = getHCI(x, learnrate, sigma, nPCNeighbourWidth);
 			}
 
 		// long endTime = System.currentTimeMillis();
@@ -444,24 +432,23 @@ public class LFSGrowingLayer {
 	 * @param sigma
 	 */
 	private void calcDistancesNEIGH_add(int xSize, int ySize, double learnrate,
-			double sigma) {
+			double sigma, double nPCNeighbourWidth) {
 
 		int diagonal = distancesHex[0][0][xSize][ySize];
-		double[][] distNeigh_aux = new double[nRangos][diagonal];
+		double[] distNeigh_aux = new double[diagonal];
 
 		// System.arraycopy(distNeigh, 0, distNeigh_aux, 0, distNeigh.length);
-		for (int ran = 0; ran < nRangos; ran++) {
-			for (int x = 0; x < distNeigh[ran].length; x++) {
-				distNeigh_aux[ran][x] = distNeigh[ran][x];
-			}
+
+		for (int x = 0; x < distNeigh.length; x++) {
+			distNeigh_aux[x] = distNeigh[x];
 		}
+
 		// Se calculan las distancias segun Neighbourfunc
-		for (int ran = 0; ran < nRangos; ran++) {
-			for (int x = distNeigh[ran].length; x < diagonal; x++) {
-				distNeigh_aux[ran][x] = getHCI(x, learnrate, sigma / (ran + 1),
-						ran);
-			}
+
+		for (int x = distNeigh.length; x < diagonal; x++) {
+			distNeigh_aux[x] = getHCI(x, learnrate, sigma, nPCNeighbourWidth);
 		}
+
 		distNeigh = distNeigh_aux;
 
 	}
@@ -472,22 +459,37 @@ public class LFSGrowingLayer {
 	 * @param distancia
 	 * @param learnrate
 	 * @param opt1
-	 * @param rango
+	 * @param nPCNeighbourWidth
 	 * @return
 	 */
-	private double getHCI(double distancia, double learnrate, double opt1,
-			int rango) {
+	private double getHCI(double distancia, double learnrate, double sigma,
+			double nPCNeighbourWidth) {
 		double hci = 0;
-		float neigh = neighbourWidth - rango * neighbourWidth / nRangos;
+		int maxSiz = this.xSize > this.ySize ? this.xSize : this.ySize;
+		float neigh = (int) (Math.floor(maxSiz * nPCNeighbourWidth));
+
+		int nFunc = neighbourFunc;
+
+		// En el caso de que maxSiz < 2, neigh = 0 y no se utiliza NEIGH_GAUSS.
+		// Solo se cuantiza
+		if (maxSiz < 2) {
+			neigh = 0;
+			nFunc = NEIGH_BUBBLE;
+		}
+
 		try {
 
-			switch (neighbourFunc) {
+			switch (nFunc) {
 			case NEIGH_GAUSS:
-				hci = learnrate * Math.exp(-1 * distancia / opt1);
+				hci = learnrate
+						* Math.exp(-1 * distancia * distancia
+								/ (2 * sigma * sigma));
 				break;
 			case NEIGH_CUTGAUSS:
 				if (distancia <= neigh) {
-					hci = learnrate * Math.exp(-1 * distancia / opt1);
+					hci = learnrate
+							* Math.exp(-1 * distancia * distancia
+									/ (2 * sigma * sigma));
 				} else {
 					hci = 0;
 				}
@@ -501,7 +503,7 @@ public class LFSGrowingLayer {
 				break;
 			case NEIGH_EP:
 				if (distancia <= neigh) {
-					hci = learnrate * (1 - distancia) / (opt1 / 2);
+					hci = learnrate * (1 - distancia) / (sigma / 2);
 				} else {
 					hci = 0;
 				}
@@ -991,12 +993,11 @@ public class LFSGrowingLayer {
 			if (this.xSize < this.maxXSize || this.ySize < this.maxYSize) {
 				boolean hazCol = false;
 				boolean hazFil = false;
-				if (this.xSize < 2 * this.ySize) {
+				if (this.xSize < this.ySize) {
 					hazCol = true;
-				}
-				if (this.ySize < 2 * this.xSize) {
+				} else if (this.ySize < this.xSize) {
 					hazFil = true;
-				}
+				} else
 
 				if (this.ySize < 5 && this.xSize < 5) {
 					hazCol = false;
@@ -1044,129 +1045,137 @@ public class LFSGrowingLayer {
 	 * @param initialLearnrate
 	 * @param initialSigma
 	 */
-	public void trainNormal(LFSData data, int nIterations, int startIteration,
-			LFSSOMProperties trainingProps, double initialLearnrate,
-			double initialSigma) {
+	public void train(LFSData data, int nIterations,
+			LFSSOMProperties trainingProps) {
 
-		double expParam = nIterations / 5.0;
-
+		double PCNeighAct = trainingProps.pcNeighbourWidth();
+		double currentLearnrate = trainingProps.learnrate();
+		double sigmaAct = trainingProps.sigma();
+		double sigmaDecayLearnRate = trainingProps.getSigmaDecayLearnRate();
+		double sigmaDecayNeigh = trainingProps.getSigmaDecayNeigh();
+		double sigmaDecaySigma = trainingProps.getSigmaDecaySigma();
+		/*
+		 * double sigmaDecayLearnRate = 0.4; double sigmaDecayNeigh = 0.8;
+		 * double sigmaDecaySigma = 0.7;
+		 */
 		int numIterations = nIterations;
-		double currentLearnrate = initialLearnrate;
+		int lambda = trainingProps.getLambda();
 
-		float iniPcNeighWidth = trainingProps.pcNeighbourWidth();
-
-		double sigmaAct = initialSigma;
-
-		int i = startIteration;
-		int controlI = 400; // Control every controlI iterations
+		int i = 0;
 		int ultControl = i;
-		boolean endQuality = false;
 
-		while (i < numIterations && !endQuality) {
+		int ciclos = trainingProps.isHier() ? 2 : 1;
+		long totIter = numIterations * ciclos;
+
+		while (i < totIter) {
 
 			if (trainingProps.batchSom()) {
 				// If it is batch, only map data into units
 				almacenaBatch(data, numIterations, i, trainingProps);
 			} else {
-				trainFinalOnline(i, numIterations, expParam, trainingProps);
+				trainFinalOnline(i, numIterations, trainingProps);
 			}
 
 			boolean hazControl = false;
 
 			// The control adapts according to net size.
-			if (i > 0 && (i - ultControl) % controlI == 0) {
+			if (i > 0 && (i - ultControl) % lambda == 0) {
 				hazControl = true;
 				ultControl = i;
-				if (controlI < this.xSize * this.ySize * 1.2) {
-					controlI = (int) (this.xSize * this.ySize * 1.2);
-				}
-				if (qualityReached)
-					endQuality = true;
+				if (lambda < this.xSize * this.ySize * 1.2) {
+					lambda = (int) (this.xSize * this.ySize * 1.2);
+				} else if (lambda > 1200)
+					lambda = 1200;
 			}
 
-			if (!endQuality) {
+			if (trainingProps.batchSom() && (hazControl || i == numIterations)) {
+				// Applies modifications to units depending on their mapped
+				// data
+				finalBatch(data, i, trainingProps);
+			}
 
-				if (trainingProps.batchSom()
-						&& (hazControl || i == numIterations)) {
-					// Applies modifications to units depending on their mapped
-					// data
-					finalBatch(data, i, trainingProps);
+			boolean calcNuevoNeigh = false;
+
+			// Apply all parameter decay
+			// **************************************************
+			// Learnrate
+
+			// learnRate modification. Doesn't apply to growing
+			if (hazControl && !trainingProps.isGrowing()) {
+				double nLrate = trainingProps.learnrate()
+						* Math.exp(-1.0
+								* (totIter / i)
+								/ (2 * sigmaDecayLearnRate * sigmaDecayLearnRate));
+				if (nLrate < 0.01) {
+					nLrate = 0.01;
 				}
-
-				boolean calcNuevoNeigh = false;
-
-				// learnRate modification. Doesn't apply to growing
-				if (hazControl && !trainingProps.isGrowing()) {
-					double nLrate = initialLearnrate
-							* Math.exp(-1.0 * i / expParam);
-					if (nLrate < 0.01) {
-						nLrate = 0.01;
-					}
-					if (Math.round(nLrate * 100.0) != Math
-							.round(currentLearnrate * 100.0)) {
-						currentLearnrate = nLrate; // exponential
-						calcNuevoNeigh = true;
-					}
+				if (Math.round(nLrate * 100.0) != Math
+						.round(currentLearnrate * 100.0)) {
+					currentLearnrate = nLrate; // exponential
+					calcNuevoNeigh = true;
 				}
+			}
 
-				// neighbourwidth decay, except for gauss
-				if (trainingProps.getNeighbourFunc() != LFSGrowingLayer.NEIGH_GAUSS
-						&& hazControl) {
-					int neighDecay = 25;
-					if (trainingProps.isGrowing()) {
-						neighDecay = 1;
-					}
-
-					float nPcWidthAct = (float) (iniPcNeighWidth * Math
-							.exp(-1.0 * i / (numIterations / neighDecay)));
-					int nWidthAct = (int) ((this.xSize > this.ySize ? this.xSize
-							: this.ySize) * nPcWidthAct);
-					if (nWidthAct < 1) {
-						nWidthAct = 1;
-					}
-
-					if (nWidthAct != neighbourWidth) {
-						neighbourWidth = nWidthAct;
-						calcNuevoNeigh = true;
-					}
+			// Neighbourwidth
+			if (hazControl
+					&& trainingProps.getNeighbourFunc() != LFSGrowingLayer.NEIGH_GAUSS) {
+				double nPCNeigh = trainingProps.pcNeighbourWidth()
+						* Math.exp(-1.0 * (totIter / i)
+								/ (2 * sigmaDecayNeigh * sigmaDecayNeigh));
+				if (nPCNeigh < 0.01) {
+					nPCNeigh = 0.01;
 				}
-
-				if (calcNuevoNeigh) {
-					// If it have been modifications in parameters, recalculate
-					// kernel
-					calcDistancesNEIGH(this.xSize, this.ySize,
-							currentLearnrate, sigmaAct);
+				if (Math.round(nPCNeigh * 100.0) != Math
+						.round(this.PCNeighbourWidth * 100.0)) {
+					this.PCNeighbourWidth = nPCNeigh; // exponential
+					calcNuevoNeigh = true;
 				}
+			}
 
-				// Call to grow and hierarchical
-				if (trainingProps.isHier() && hazControl) {
-					growAndHier(i, numIterations, trainingProps);
+			// Sigma
+			if (hazControl
+					&& (trainingProps.getNeighbourFunc() == LFSGrowingLayer.NEIGH_GAUSS || trainingProps
+							.getNeighbourFunc() == LFSGrowingLayer.NEIGH_CUTGAUSS)) {
+				double nSigma = trainingProps.sigma()
+						* Math.exp(-1.0 * (totIter / i)
+								/ (2 * sigmaDecaySigma * sigmaDecaySigma));
+				if (nSigma < 0.01) {
+					nSigma = 0.01;
 				}
-
-				// Size control for growing.
-				// In batch case, always has to concur with "finalBatch"
-				if (hazControl
-						&& !qualityReached
-						&& !endQuality
-						&& (trainingProps.isGrowing() || trainingProps.isHier())
-						&& i < 0.85 * numIterations) {
-					compruebaErrUnits();
-					boolean okCalc = controlTamanyo(trainingProps, data, i,
-							numIterations);
-					if (okCalc) {
-						calcDistancesNEIGH_add(this.xSize, this.ySize,
-								currentLearnrate, sigmaAct);
-					}
-
+				if (Math.round(nSigma * 100.0) != Math.round(sigmaAct * 100.0)) {
+					sigmaAct = nSigma; // exponential
+					calcNuevoNeigh = true;
 				}
+			}
 
-				if (i == numIterations) {
-					qualityReached = true;
+			if (calcNuevoNeigh) {
+				// If it have been modifications in parameters, recalculate
+				// kernel
+				calcDistancesNEIGH(this.xSize, this.ySize, currentLearnrate,
+						sigmaAct, PCNeighAct);
+			}
+
+			// Call to grow and hierarchical
+			if (trainingProps.isHier() && hazControl) {
+				growAndHier(i, numIterations, trainingProps);
+			}
+
+			// Size control for growing.
+			// In batch case, always has to concur with "finalBatch"
+			if (hazControl && !qualityReached
+					&& (trainingProps.isGrowing() || trainingProps.isHier())) {
+				compruebaErrUnits();
+				boolean okCalc = controlTamanyo(trainingProps, data, i,
+						numIterations);
+				if (okCalc) {
+					calcDistancesNEIGH_add(this.xSize, this.ySize,
+							currentLearnrate, sigmaAct, PCNeighAct);
 				}
-
-				i++;
 
 			}
+
+			i++;
+
 		}
 		clearMappedInput();
 
@@ -1178,18 +1187,14 @@ public class LFSGrowingLayer {
 
 		LFSInputDatum currentInput = data.getRandomInputDatum();
 		LFSUnit winner = getWinner(currentInput);
-		int posRango = numIterations / this.nRangos;
-		int nRango = i / posRango;
-		if (nRango >= this.nRangos) {
-			nRango = nRangos - 1;
-		}
+
 		int xPos = winner.getXPos();
 		int yPos = winner.getYPos();
 
 		for (int r = 0; r < ySize; r++) {
 			for (int l = 0; l < xSize; l++) {
 				units[l][r].addBatchSomNeighbour(currentInput,
-						getDistNeigh()[nRango][distancesHex[xPos][yPos][l][r]]);
+						getDistNeigh()[distancesHex[xPos][yPos][l][r]]);
 			}
 		}
 	}
@@ -1207,7 +1212,7 @@ public class LFSGrowingLayer {
 	}
 
 	// Train on-line mode.
-	private void trainFinalOnline(int i, int numIterations, double expParam,
+	private void trainFinalOnline(int i, int numIterations,
 			LFSSOMProperties trainingProps) {
 		// get new input
 		LFSInputDatum currentInput = data.getRandomInputDatum();
@@ -1215,12 +1220,7 @@ public class LFSGrowingLayer {
 		// get winner & update weight vectors
 		final LFSUnit winner = getWinner(currentInput);
 
-		int rango = (int) Math.floor(i / Math.ceil(numIterations / nRangos));
-		if (rango >= nRangos) {
-			rango = nRangos - 1;
-		}
-
-		updateUnits(winner, currentInput, rango);
+		updateUnits(winner, currentInput);
 
 	}
 
@@ -1244,7 +1244,8 @@ public class LFSGrowingLayer {
 	private void growAndHier(int i, int numIterations,
 			LFSSOMProperties trainingProps) {
 
-		mapSomeDataAfterTraining(data, data.numVectors() / 20);
+		// mapSomeDataAfterTraining(data, data.numVectors() / 20);
+		mapCompleteDataAfterTraining(data);
 		this.calcQualityQError(data);
 		QError = this.getQError();// ualityMeasure("QError");
 		try {
@@ -1265,25 +1266,23 @@ public class LFSGrowingLayer {
 	 * 
 	 * @param winner
 	 * @param input
-	 * @param rango
 	 */
-	private void updateUnits(LFSUnit winner, LFSInputDatum input, int rango) {
+	private void updateUnits(LFSUnit winner, LFSInputDatum input) {
 		double[] inputVector = input.getVector().toArray();
 
-		updateUnitsInArea(winner, inputVector, 0, xSize, 0, ySize, rango);
+		updateUnitsInArea(winner, inputVector, 0, xSize, 0, ySize);
 
 	}
 
 	private void updateUnitsInArea(LFSUnit winner, double[] inputVector,
-			int startX, int endX, int startY, int endY, int rango) {
+			int startX, int endX, int startY, int endY) {
 		double[] unitVector = null;
 		double hci = 0;
 		for (int y = startY; y < endY; y++) {
 			for (int x = startX; x < endX; x++) {
 				// Euclidean metric on output layer
 
-				hci = distNeigh[rango][distancesHex[winner.getXPos()][winner
-						.getYPos()][x][y]];
+				hci = distNeigh[distancesHex[winner.getXPos()][winner.getYPos()][x][y]];
 
 				unitVector = units[x][y].getWeightVector();
 
@@ -1363,13 +1362,8 @@ public class LFSGrowingLayer {
 		newLayer.setDistancesHex(this.distancesHex);
 		newLayer.setData(this.data);
 		newLayer.setDistNeigh(this.distNeigh);
-		newLayer.setNRangos(this.nRangos);
 
 		return newLayer;
-	}
-
-	public void setNRangos(int nr) {
-		this.nRangos = nr;
 	}
 
 	public void setData(LFSData datos) {
@@ -1533,7 +1527,7 @@ public class LFSGrowingLayer {
 	/**
 	 * @return Returns the distNeigh.
 	 */
-	private double[][] getDistNeigh() {
+	private double[] getDistNeigh() {
 		return distNeigh;
 	}
 
@@ -1541,7 +1535,7 @@ public class LFSGrowingLayer {
 	 * @param distNeigh
 	 *            The distNeigh to set.
 	 */
-	private void setDistNeigh(double[][] distNeigh) {
+	private void setDistNeigh(double[] distNeigh) {
 		this.distNeigh = distNeigh;
 	}
 
@@ -1573,6 +1567,11 @@ public class LFSGrowingLayer {
 	 */
 	private void setKError(LFSQualityMeasure kError) {
 		KError = kError;
+	}
+
+	private void grabaTMP() {
+		this.calcQuality(this.getData());
+		this.getgSOM().grabaTMP();
 	}
 
 }

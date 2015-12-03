@@ -32,7 +32,7 @@ public class LFSWEKACluster {
 
 		try {
 			if (k > 0) {
-				clusterer.setNumClusters(-1);
+				clusterer.setNumClusters(k);
 				clusterer.setMaximumNumberOfClusters(k);
 			}
 
