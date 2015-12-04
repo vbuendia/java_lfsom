@@ -555,7 +555,7 @@ public class TrainSelector {
 		String nameExp = exprops.getExpName();
 		String dataPath = exprops.getDataPath();
 		String rootPath = exprops.getRootPath();
-		double sensiCluster = 5e-6;
+		double sensiCluster = exprops.getSensiCluster();
 		boolean isSub = exprops.isSubred();
 		// String celdasSubnet = exprops.getStrSubredOrigen();
 		String fPadre = exprops.getFPadre();
