@@ -12,7 +12,8 @@ public class LFSWEKACluster {
 	int numberOfInstances;
 	int[] instancesInClusters;
 
-	public LFSWEKACluster(int k, double[][] data, int nparalels) {
+	public LFSWEKACluster(int k, double[][] data, int nparalels,
+			double minLogLike) {
 		// Calcula el cluster empleando la clase de WEKA
 
 		numberOfInstances = data.length;
@@ -32,7 +33,7 @@ public class LFSWEKACluster {
 
 		clusterer.setNumExecutionSlots(nparalels);
 		// double aver = clusterer.getMinLogLikelihoodImprovementCV();
-		clusterer.setMinLogLikelihoodImprovementCV(2e-6);
+		clusterer.setMinLogLikelihoodImprovementCV(minLogLike);
 		try {
 			if (k > 0) {
 				clusterer.setNumClusters(k);

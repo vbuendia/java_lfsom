@@ -57,7 +57,7 @@ public class TrainSelector {
 	/**
 	 * Version to show in client-side
 	 */
-	private String versionprog = "v1.4.1";
+	private String versionprog = "v1.4.2";
 
 	/**
 	 * Progress
@@ -555,7 +555,7 @@ public class TrainSelector {
 		String nameExp = exprops.getExpName();
 		String dataPath = exprops.getDataPath();
 		String rootPath = exprops.getRootPath();
-
+		double sensiCluster = 5e-6;
 		boolean isSub = exprops.isSubred();
 		// String celdasSubnet = exprops.getStrSubredOrigen();
 		String fPadre = exprops.getFPadre();
@@ -755,7 +755,7 @@ public class TrainSelector {
 				int numClusters = isGCHSOM && !exprops.isSubred() ? 4 : -1;
 
 				mapaMejorTopo.getLayer().mapCompleteDataAfterTraining(datos1);
-				mapaMejorTopo.clusteriza(numClusters);
+				mapaMejorTopo.clusteriza(numClusters, nThreads, sensiCluster);
 
 				fiche = dataPath + "/topo.xml";
 				mapaMejorTopo.EscribeXML(fiche, datos1.getMaxValues(),
@@ -763,7 +763,7 @@ public class TrainSelector {
 				mapaMejorTopo.escribeProps(fiche + "props");
 
 				mapaMejorQuan.getLayer().mapCompleteDataAfterTraining(datos1);
-				mapaMejorQuan.clusteriza(numClusters);
+				mapaMejorQuan.clusteriza(numClusters, nThreads, sensiCluster);
 				// String fich = getfTopo();
 				fiche = dataPath + "/quan.xml";
 				mapaMejorQuan.EscribeXML(fiche, datos1.getMaxValues(),
@@ -771,7 +771,7 @@ public class TrainSelector {
 				mapaMejorQuan.escribeProps(fiche + "props");
 
 				mapaMejorKaski.getLayer().mapCompleteDataAfterTraining(datos1);
-				mapaMejorKaski.clusteriza(numClusters);
+				mapaMejorKaski.clusteriza(numClusters, nThreads, sensiCluster);
 				// String fich = getfTopo();
 				fiche = dataPath + "/kaski.xml";
 				mapaMejorKaski.EscribeXML(fiche, datos1.getMaxValues(),

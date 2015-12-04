@@ -85,6 +85,9 @@ public class LFSExpProps {
 	private double tau = 0.7;
 	private double tau2 = 0.01;
 
+	// Sensibility to generate new clusters with EM
+	private double sensiCluster = 5e-6;
+
 	// Number of CPUs
 	private int numCPUs = 8;
 
@@ -178,7 +181,7 @@ public class LFSExpProps {
 			"setNetFiles", "setBucleNeighWidth", "setGrowing", "setIsSubred",
 			"setSubredOrigen", "setFPadre", "setFDatosPadre", "setRootPath",
 			"setHier", "setGCHSOM", "setBuclePcNeighWidth", "setTau",
-			"setTau2", "setLambda", "setCycles" };
+			"setTau2", "setLambda", "setCycles", "setSensiCluster" };
 
 	private String[] variablesval = { "getStrBucleLearnRate",
 			"getStrBucleUseBatch", "getStrBucleSigma", "getStrXYSOM",
@@ -189,7 +192,7 @@ public class LFSExpProps {
 			"isStrGrowing", "getStrIsSubred", "getStrSubredOrigen",
 			"getFPadre", "getFDatosPadre", "getRootPath", "isStrHier",
 			"getStrGCHSOM", "getStrBuclePcNeighWidth", "getStrTau",
-			"getStrTau2", "getStrLambda", "getStrCycles" };
+			"getStrTau2", "getStrLambda", "getStrCycles", "getStrSensiCluster" };
 
 	/**
 	 * @return Returns the bucleLearnRate.
@@ -1330,4 +1333,28 @@ public class LFSExpProps {
 	public void setCycles(String cycles) {
 		this.cycles = Integer.valueOf(cycles);
 	}
+
+	/**
+	 * @return the sensiCluster
+	 */
+	public double getSensiCluster() {
+		return sensiCluster;
+	}
+
+	public String getStrSensiCluster() {
+		return String.valueOf(sensiCluster);
+	}
+
+	/**
+	 * @param sensiCluster
+	 *            the sensiCluster to set
+	 */
+	public void setSensiCluster(double sensiCluster) {
+		this.sensiCluster = sensiCluster;
+	}
+
+	public void setSensiCluster(String sensiCluster) {
+		this.sensiCluster = Double.valueOf(sensiCluster);
+	}
+
 }
