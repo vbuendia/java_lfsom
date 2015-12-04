@@ -140,18 +140,44 @@ public void customize_gui_train() {
   pnlTrain.addControl(cbxSetSize, posxtrain, alturas[altactual]-5);
   cbxSetSize.setSelected(propi.isSizeAut());
 
-  cbxSetGrow = new GCheckbox(this, 0, 0, 160, 18, "Growing");  
+  cbxSetGrow = new GCheckbox(this, 0, 0, 95, 18, "Growing");  
   pnlTrain.addControl(cbxSetGrow, posxtrain, alturas[altactual]+20);
   cbxSetGrow.setSelected(propi.isGrowing());
+  
+  GLabel lbLambda = new GLabel(this, 0, 0, 160, 30);
+  lbLambda.setText("Lda:", GAlign.LEFT, GAlign.LEFT);
+  pnlTrain.addControl(lbLambda, posxtrain + 80, alturas[altactual] + 14);
 
-  cbxSetHier = new GCheckbox(this, 0, 0, 160, 18, "GHSOM");  
+  gtLambda = new GTextField(this, 10, 13, 25, 17);
+  gtLambda.setText(propi.getStrLambda());
+  pnlTrain.addControl(gtLambda, posxtrain + 114, alturas[altactual] + 20);
+
+
+  cbxSetHier = new GCheckbox(this, 0, 0, 95, 18, "GHSOM");  
   pnlTrain.addControl(cbxSetHier, posxtrain, alturas[altactual]+45);
   cbxSetGrow.setSelected(propi.isHier());
+  
+  GLabel lbTau = new GLabel(this, 0, 0, 160, 30);
+  lbTau.setText("Tau:", GAlign.LEFT, GAlign.LEFT);
+  pnlTrain.addControl(lbTau, posxtrain + 80, alturas[altactual] + 39);
 
-  cbxSetGCHSOM = new GCheckbox(this, 0, 0, 160, 18, "GCHSOM");  
+  gtTau = new GTextField(this, 10, 13, 25, 17);
+  gtTau.setText(propi.getStrTau());
+  pnlTrain.addControl(gtTau, posxtrain + 114, alturas[altactual] + 45);
+
+  cbxSetGCHSOM = new GCheckbox(this, 0, 0, 95, 18, "GCHSOM");  
   pnlTrain.addControl(cbxSetGCHSOM, posxtrain, alturas[altactual]+70);
   cbxSetGCHSOM.setSelected(propi.isGCHSOM());
 
+  GLabel lbTau2 = new GLabel(this, 0, 0, 160, 30);
+  lbTau2.setText("Tau2:", GAlign.LEFT, GAlign.LEFT);
+  pnlTrain.addControl(lbTau2, posxtrain + 80, alturas[altactual] + 64);
+
+  gtTau2 = new GTextField(this, 10, 13, 25, 17);
+  gtTau2.setText(propi.getStrTau2());
+  pnlTrain.addControl(gtTau2, posxtrain + 114, alturas[altactual] + 70);
+    
+    
 
   altactual++;
   
@@ -330,7 +356,7 @@ public void createGUIPVisualization(){
   // show          opaque  ticks value limits
   sdnClusters.setShowDecor(false, true, true, true);
   sdnClusters.setNumberFormat(G4P.EXPONENT, 1);
-  sdnClusters.setLimits(4,15);
+  sdnClusters.setLimits(3,15);
   nCluster = sdnClusters.getValueI();
   
   btnCluster = new GButton(this, 120, 260, 80, 30);
@@ -366,20 +392,34 @@ public void createGUIPVisualization(){
 public void createGUIWIteration(){
   
   int desp = 20;
-  wIteration = new GPanel(this, 250, 100, 310, 520 , "Train Bucle Config");
+  wIteration = new GPanel(this, 250, 100, 310, 560, "Train Bucle Config");
   wIteration.setLocalColorScheme(7);
   wIteration.setVisible(false);
   wIteration.setCollapsible(false);
-  
+
   GLabel lbIterations = new GLabel(this, 20, 20, 138, 20);
   lbIterations.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-  lbIterations.setText("Number of iterations:");
+  lbIterations.setText("Number of trainings:");
   lbIterations.setTextBold();
-  lbIterations.setTextItalic();  
-  wIteration.addControl(lbIterations,20,20+desp);
-  
-  gtIterations = new GTextField(this, 170, 20, 100, 20, G4P.SCROLLBARS_NONE);
-  wIteration.addControl(gtIterations,170,20+desp);
+  lbIterations.setTextItalic();
+  wIteration.addControl(lbIterations, 20, 20 + desp);
+
+  gtIterations = new GTextField(this, 170, 20, 100, 20,
+  G4P.SCROLLBARS_NONE);
+  wIteration.addControl(gtIterations, 170, 20 + desp);
+
+  GLabel lbCycles = new GLabel(this, 20, 20, 138, 20);
+  lbCycles.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+  lbCycles.setText("Training cycles:");
+  lbCycles.setTextBold();
+  lbCycles.setTextItalic();
+  wIteration.addControl(lbCycles, 20, 50 + desp);
+
+  gtCycles = new GTextField(this, 10, 13, 25, 17);
+  gtCycles.setText(propi.getStrCycles());
+  wIteration.addControl(gtCycles, 170, 53 + desp);
+
+  desp += 30;
   
   GLabel lbsetinits = new GLabel(this, 20, 50, 80, 20);
   lbsetinits.setText("Initializations");
@@ -409,7 +449,7 @@ public void createGUIWIteration(){
  
   GLabel lbsetneigh = new GLabel(this, 20, 150, 150, 20);
   lbsetneigh.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-  lbsetneigh.setText("Neighbor Functions");
+  lbsetneigh.setText("Neighborhood Functions");
   lbsetneigh.setTextBold();
   lbsetneigh.setTextItalic();
   wIteration.addControl(lbsetneigh,20,150+desp);
@@ -480,12 +520,21 @@ public void createGUIWIteration(){
   gtNWidth.setOpaque(true);
   wIteration.addControl(gtNWidth,20,420+desp);
   
-  
-  
+  GLabel lbsetSensiCluster = new GLabel(this, 20, 310, 140, 20);
+  lbsetSensiCluster.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+  lbsetSensiCluster.setText("Cluster sensivity");
+  lbsetSensiCluster.setTextBold();
+  lbsetnwidth.setTextItalic();
+  wIteration.addControl(lbsetSensiCluster, 170, 390 + desp);
+
+  gtSensiCluster = new GTextField(this, 20, 360, 120, 20, G4P.SCROLLBARS_NONE);
+  gtSensiCluster.setOpaque(true);
+  wIteration.addControl(gtSensiCluster, 170, 420 + desp);
+
   btCloseWIteration = new GButton(this, 210, 450, 80, 30);
   btCloseWIteration.setText("Close");
   btCloseWIteration.setLocalColorScheme(7);
-  wIteration.addControl(btCloseWIteration,210,450+desp);
+  wIteration.addControl(btCloseWIteration, 210, 460 + desp);
   
   gtIterations.setDefaultText(String.valueOf(propi.getNumRepe()));
   cbxPCA.setSelected(propi.getInitPCA());
@@ -501,7 +550,11 @@ public void createGUIWIteration(){
   gtSigma.setText(propi.getStrBucleSigma());
   gtNWidth.setText(propi.getStrBuclePcNeighWidth());
 
-  
+  gtTau.setText(propi.getStrTau());
+  gtTau2.setText(propi.getStrTau2());
+  gtLambda.setText(propi.getStrLambda());
+  gtCycles.setText(propi.getStrCycles());
+  gtSensiCluster.setText(propi.getStrSensiCluster());
   
 }
 

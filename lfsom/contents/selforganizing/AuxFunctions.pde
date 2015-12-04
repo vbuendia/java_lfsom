@@ -236,7 +236,8 @@ public void gestionDrags() {
     kb.setValue((float) 0.25);  
     gsom.clusteriza(nCluster);
     kb.setValue((float) 0.75);  
-    gsom.EscribeXML(dataPath(actualFolder+"/"+xmlActual));
+    gsom.EscribeXML(dataPath(actualFolder + "/" + xmlActual),
+          datos1.getMaxValues(), datos1.getMinValues());
     kb.setValue((float) 0.99);  
     modoSeco = true;
     carga_som();
@@ -261,7 +262,7 @@ public void gestionDrags() {
     gsom.clusterSelec(HexDist.traspon(HexDist.getIncluidos()));
     //gsom.clusteriza(nCluster);
     kb.setValue((float) 0.75);  
-    gsom.EscribeXML(dataPath(actualFolder+"/"+xmlActual));
+    gsom.EscribeXML(dataPath(actualFolder+"/"+xmlActual),datos1.getMaxValues(), datos1.getMinValues());
     kb.setValue((float) 0.99);  
     modoSeco = true;
     carga_som();

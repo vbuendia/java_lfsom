@@ -194,6 +194,16 @@ public void EnviaEntrenador () {
        }   
     }     
    
+   propi.setSensiCluster(gtSensiCluster.getText());
+   propi.setCycles(gtCycles.getText());
+   propi.setLambda(gtLambda.getText());
+   
+   propi.setSigma(gtSigma.getText());
+   propi.setTau(gtTau.getText());
+   propi.setTau2(gtTau2.getText());
+      
+   propi.setSizeAut(!slParamSom.isVisible());
+      
    propi.setExpName(gtTitle.getText());
    propi.setGCHSOM(cbxSetGCHSOM.isSelected());
    propi.setGrowing(cbxSetGrow.isSelected());

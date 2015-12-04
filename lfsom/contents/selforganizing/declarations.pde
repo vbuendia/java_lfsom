@@ -123,7 +123,7 @@ Button bCancel;
 
 HexMapDistancer HexDist;
 GTextField gtIterations; 
-GTextField gtSigma,gtLearning,gtCPU,gtTitle,gtNWidth;
+GTextField gtSigma,gtLearning,gtCPU,gtTitle,gtNWidth, gtTau, gtTau2, gtLambda,gtCycles,gtSensiCluster;
 
 
 GKnob kb;
