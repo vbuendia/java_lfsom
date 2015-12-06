@@ -91,7 +91,7 @@ float[] listaHits = null;
 
 GCheckbox cbxBatch, cbxOnline;
 GCheckbox cbxPCA, cbxRandom, cbxInter, cbxVector;
-GCheckbox cbxGauss, cbxCutGauss, cbxBobble;  
+GCheckbox cbxGauss, cbxCutGauss, cbxBobble,cbxMH;  
 
 float sinRad;
 String tituloSOM = "";

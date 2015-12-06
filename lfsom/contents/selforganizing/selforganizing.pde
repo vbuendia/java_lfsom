@@ -20,6 +20,7 @@ import processing.pdf.*;
 //*** FUNCIONES DE DESPLAZAMIENTO
 
 public void keyReleased() {
+  
  if (key == 'P'&&!PDFtotal) {
    PDFtotal=true;  
    fPDFOutput = G4P.selectOutput("PDF output");

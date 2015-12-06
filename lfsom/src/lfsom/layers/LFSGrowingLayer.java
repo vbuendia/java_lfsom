@@ -118,7 +118,7 @@ public class LFSGrowingLayer {
 
 	public static final int NEIGH_BUBBLE = 30;
 
-	public static final int NEIGH_EP = 40;
+	public static final int NEIGH_MH = 40;
 
 	private int maxYSize, maxXSize;
 
@@ -162,6 +162,26 @@ public class LFSGrowingLayer {
 			e.printStackTrace();
 		}
 
+	}
+
+	/*
+	 * Returns mqe of a group of units
+	 */
+
+	public double devuelve_mqe_units(ArrayList<Integer> arrInc) {
+		double KL = 0;
+
+		int numCells = 0;
+		double tempKL = 0;
+
+		for (int z = 0; z < arrInc.size(); z++) {
+			int filaac = (int) Math.floor(arrInc.get(z) / xSize);
+			int colac = arrInc.get(z) % xSize;
+			numCells += units[colac][filaac].getNumberOfMappedInputs();
+			tempKL += units[colac][filaac].getMQEError();
+		}
+		KL = tempKL / numCells;
+		return KL;
 	}
 
 	/**
@@ -480,11 +500,13 @@ public class LFSGrowingLayer {
 		try {
 
 			switch (nFunc) {
+
 			case NEIGH_GAUSS:
 				hci = learnrate
 						* Math.exp(-1 * distancia * distancia
 								/ (2 * sigma * sigma));
 				break;
+
 			case NEIGH_CUTGAUSS:
 				if (distancia <= neigh) {
 					hci = learnrate
@@ -501,13 +523,13 @@ public class LFSGrowingLayer {
 					hci = 0;
 				}
 				break;
-			case NEIGH_EP:
-				if (distancia <= neigh) {
-					hci = learnrate * (1 - distancia) / (sigma / 2);
-				} else {
-					hci = 0;
-				}
+			case NEIGH_MH:
 
+				hci = learnrate
+						* (2 * 0.7511 / Math.sqrt(3))
+						* (1 - distancia / sigma)
+						* Math.exp(-1 * distancia * distancia
+								/ (2 * sigma * sigma));
 				break;
 			}
 
@@ -529,10 +551,22 @@ public class LFSGrowingLayer {
 		double largestDistance = 0;
 		double distance = 0;
 		try {
+			if (getNeighbouringUnits(u).size() == 0) {
+				Logger.getLogger("at.tuwien.ifs.somtoolbox").severe(
+						"No neighbour.");
+				System.exit(-1);
+				return null;
+			}
+		} catch (LFSException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
 			for (LFSUnit neighbouringUnit : getNeighbouringUnits(u)) {
 				try {
-					distance = LFSL2Metric.distance(u.getWeightVector(),
-							neighbouringUnit.getWeightVector());
+					distance = Math.abs(LFSL2Metric.distance(
+							u.getWeightVector(),
+							neighbouringUnit.getWeightVector()));
 				} catch (LFSException e) {
 					Logger.getLogger("at.tuwien.ifs.somtoolbox").severe(
 							e.getMessage());
@@ -838,7 +872,7 @@ public class LFSGrowingLayer {
 	 * @param data
 	 * @param Calc
 	 */
-	private void mapCompleteDataAfterTraining(LFSData data, boolean Calc) {
+	public void mapCompleteDataAfterTraining(LFSData data, boolean Calc) {
 
 		LFSInputDatum datum = null;
 		LFSUnit winner = null;
@@ -1063,6 +1097,10 @@ public class LFSGrowingLayer {
 		int i = 0;
 		int ultControl = i;
 
+		boolean grows = !trainingProps.isGrowing();
+		boolean isGauss = trainingProps.getNeighbourFunc() == LFSGrowingLayer.NEIGH_GAUSS
+				|| trainingProps.getNeighbourFunc() == LFSGrowingLayer.NEIGH_CUTGAUSS
+				|| trainingProps.getNeighbourFunc() == LFSGrowingLayer.NEIGH_MH;
 		int ciclos = trainingProps.numCycles();
 		long totIter = numIterations * ciclos;
 
@@ -1099,8 +1137,8 @@ public class LFSGrowingLayer {
 			// **************************************************
 			// Learnrate
 
-			// learnRate modification. Doesn't apply to growing
-			if (hazControl && !trainingProps.isGrowing()) {
+			// learnRate modification.
+			if (hazControl) {
 				double nLrate = trainingProps.learnrate()
 						* Math.exp(-1.0
 								* (i / totIter)
@@ -1116,8 +1154,7 @@ public class LFSGrowingLayer {
 			}
 
 			// Neighbourwidth
-			if (hazControl
-					&& trainingProps.getNeighbourFunc() != LFSGrowingLayer.NEIGH_GAUSS) {
+			if (hazControl && !isGauss && !grows) {
 				double nPCNeigh = trainingProps.pcNeighbourWidth()
 						* Math.exp(-1.0 * (i / totIter)
 								/ (2 * sigmaDecayNeigh * sigmaDecayNeigh));
@@ -1132,11 +1169,9 @@ public class LFSGrowingLayer {
 			}
 
 			// Sigma
-			if (hazControl
-					&& (trainingProps.getNeighbourFunc() == LFSGrowingLayer.NEIGH_GAUSS || trainingProps
-							.getNeighbourFunc() == LFSGrowingLayer.NEIGH_CUTGAUSS)) {
+			if (hazControl && isGauss) {
 				double nSigma = trainingProps.sigma()
-						* Math.exp(-1.0 * (totIter / i)
+						* Math.exp(-1.0 * (i / totIter)
 								/ (2 * sigmaDecaySigma * sigmaDecaySigma));
 				if (nSigma < 0.01) {
 					nSigma = 0.01;

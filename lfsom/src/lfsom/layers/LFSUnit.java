@@ -356,4 +356,8 @@ public class LFSUnit extends InputContainer {
 		return quantizationError;
 	}
 
+	public double getMQEError() {
+		return quantizationError / this.getNumberOfMappedInputs();
+	}
+
 }

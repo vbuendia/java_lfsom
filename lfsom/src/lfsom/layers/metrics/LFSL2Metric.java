@@ -66,7 +66,7 @@ public class LFSL2Metric {
 		for (int i = 0; i < vector1.length; i++) {
 			dist += (vector1[i] - vector2[i]) * (vector1[i] - vector2[i]);
 		}
-		return Math.sqrt(dist);
+		return Math.abs(Math.sqrt(dist));
 	}
 
 	@Override

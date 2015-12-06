@@ -57,7 +57,7 @@ public class TrainSelector {
 	/**
 	 * Version to show in client-side
 	 */
-	private String versionprog = "v1.4.2";
+	private String versionprog = "v1.4.3";
 
 	/**
 	 * Progress
@@ -594,7 +594,7 @@ public class TrainSelector {
 				LFSSOMProperties props = new LFSSOMProperties(1, 1, seed,
 						trainingCycles, trainingIterations, 1, 1, tau, metric,
 						false, false, LFSUnit.INIT_RANDOM,
-						LFSGrowingLayer.NEIGH_GAUSS, 1, nameExp, false, 0.0,
+						LFSGrowingLayer.NEIGH_BUBBLE, 1, nameExp, false, 0.0,
 						false, false, false, 1);
 				props.setDataPath(dataPath);
 				LFSGrowingSOM mapa1Celda = new LFSGrowingSOM(props.getExpName());
@@ -626,9 +626,12 @@ public class TrainSelector {
 			// Calculate number of nets to train
 			int numItera = 0;
 			for (int element : bucleNeighFunc) {
-				if (element == LFSGrowingLayer.NEIGH_GAUSS) { // GAUSS doesn't
-																// use
-																// neighwidth
+				if (element == LFSGrowingLayer.NEIGH_GAUSS
+						|| element == LFSGrowingLayer.NEIGH_MH) {
+					// GAUSS
+					// doesn't
+					// use
+					// neighwidth
 					numItera += numRepe * bucleLearnRate.length
 							* bucleUseBatch.length * bucleSigma.length
 							* bucleInitializationMode.length;
@@ -640,8 +643,7 @@ public class TrainSelector {
 							* bucleInitializationMode.length
 							* buclePcNeighWidth.length;
 				}
-				if (element == LFSGrowingLayer.NEIGH_EP
-						|| element == LFSGrowingLayer.NEIGH_CUTGAUSS) {
+				if (element == LFSGrowingLayer.NEIGH_CUTGAUSS) {
 					numItera += numRepe * bucleLearnRate.length
 							* bucleUseBatch.length * bucleSigma.length
 							* bucleInitializationMode.length
@@ -702,7 +704,7 @@ public class TrainSelector {
 									// Si es Gauss, solo se ejecuta una vez para
 									// un Neighwidth
 									if (nbNeighWidth > 0
-											&& bNeighFunc == LFSGrowingLayer.NEIGH_GAUSS) {
+											&& (bNeighFunc == LFSGrowingLayer.NEIGH_MH || bNeighFunc == LFSGrowingLayer.NEIGH_GAUSS)) {
 										ejecuta = false;
 									}
 
@@ -770,7 +772,8 @@ public class TrainSelector {
 						datos1.getMinValues());
 				mapaMejorQuan.escribeProps(fiche + "props");
 
-				mapaMejorKaski.getLayer().mapCompleteDataAfterTraining(datos1);
+				mapaMejorKaski.getLayer().mapCompleteDataAfterTraining(datos1,
+						true);
 				mapaMejorKaski.clusteriza(numClusters, nThreads, sensiCluster);
 				// String fich = getfTopo();
 				fiche = dataPath + "/kaski.xml";
@@ -804,15 +807,14 @@ public class TrainSelector {
 
 				if ((isHier || isGCHSOM) && prof < maxProf) {
 
-					LFSGrowingLayer mMejor = mapaMejorKaski.getLayer();
-					double qActualRef = mMejor.getQualityMeasure("QError")
-							.getMapQuality(criterioSu);
 					if (isGCHSOM) {
-						lanza_experimento_clusters(tau2, mMejor, dataPath,
-								rootPath, datos1, qRef);
+						lanza_experimento_clusters(tau2,
+								mapaMejorKaski.getLayer(), dataPath, rootPath,
+								datos1, qRef0);
 					} else if (isHier) {
-						lanza_experimento_units(tau2, mMejor, dataPath,
-								rootPath, datos1, qRef0, qRef, qActualRef);
+						lanza_experimento_units(tau2,
+								mapaMejorKaski.getLayer(), dataPath, rootPath,
+								datos1, qRef0);
 					}
 
 				}
@@ -853,8 +855,8 @@ public class TrainSelector {
 
 				if (quality > tau2 * mqeRef) {
 					// No cumple, se envia a entrenar el cluster completo
-					generaExp(mMejor, dataPath, rootPath, mqeRef, datos1,
-							arrInc, iteini, z);
+					generaExp(mMejor, dataPath, rootPath, datos1, arrInc,
+							iteini, z);
 				}
 
 			}
@@ -863,8 +865,8 @@ public class TrainSelector {
 	}
 
 	private void generaExp(LFSGrowingLayer mMejor, String dataPath,
-			String rootPath, Double mqeRef, LFSData datos1,
-			ArrayList<Integer> arrInc, long iteini, int z) {
+			String rootPath, LFSData datos1, ArrayList<Integer> arrInc,
+			long iteini, int z) {
 		try {
 			LFSExpProps nexprops = new LFSExpProps(dataPath + "/ExpProps.xml");
 			String directorio = dataPath + "/n" + z;
@@ -872,7 +874,7 @@ public class TrainSelector {
 					directorio + "/data.csv");
 			nexprops.setRootPath(rootPath);
 			nexprops.setIsSubred(true);
-			nexprops.setMqeIni(mqeRef);
+			nexprops.setMqeIni(mMejor.devuelve_mqe_units(arrInc));
 			nexprops.setFicheroEntrada(directorio + "/data.csv");
 			nexprops.setSubredOrigen(arrInc);
 			nexprops.setFPadre("kaski.xml");
@@ -891,8 +893,7 @@ public class TrainSelector {
 
 	// Generates a new experiment with data mapped to a unit
 	private void lanza_experimento_units(double tau2, LFSGrowingLayer mMejor,
-			String dataPath, String rootPath, LFSData datos1, Double qRef0,
-			Double qRef, Double qActualRef) {
+			String dataPath, String rootPath, LFSData datos1, Double qRef0) {
 
 		ArrayList<LFSUnit> ExpUnits = mMejor.getExpandedUnits(
 				mMejor.getQualityMeasure("QError"), "mqe", tau2, qRef0,
@@ -908,8 +909,7 @@ public class TrainSelector {
 
 				arrInc.add(unidad.getYPos() * mMejor.getXSize()
 						+ unidad.getXPos());
-				generaExp(mMejor, dataPath, rootPath, qActualRef, datos1,
-						arrInc, iteini, z);
+				generaExp(mMejor, dataPath, rootPath, datos1, arrInc, iteini, z);
 
 			}
 		} catch (Exception e) {

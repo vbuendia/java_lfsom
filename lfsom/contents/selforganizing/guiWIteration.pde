@@ -200,7 +200,7 @@ public void customize_gui_train() {
   lbCurCsv.setTextBold();
   //lbCurFile = new GLabel(this, 0, 0, 180,60);
   //lbCurFile.setText(propi.getFicheroEntrada(), GAlign.LEFT, GAlign.LEFT);
-  btnInput = new GButton(this, 0, 0, 140, 20, "Train from CSV file"); 
+  btnInput = new GButton(this, 0, 0, 140, 20, "Train from data file"); 
   btnSelected = new GButton(this, 0, 0, 140, 20, "Train from selection"); 
   
   altactual++;
@@ -288,7 +288,7 @@ public void createGUIPSelection(){
   snRadius = new GCustomSlider(this, 100, 75, 100, 70, "grey_blue");
   snRadius.setShowDecor(false, true, true, true);
   snRadius.setNumberFormat(G4P.EXPONENT, 1);
-  snRadius.setLimits(0,10);
+  snRadius.setLimits(0,14);
   snRadius.setValue(radiusSel);
   snRadius.setOpaque(false);
 
@@ -464,6 +464,12 @@ public void createGUIWIteration(){
   cbxBobble.setText("Bubble");
   wIteration.addControl(cbxBobble,20,210+desp);
  
+  cbxMH = new GCheckbox(this, 20, 180, 120, 20);
+  cbxMH.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+  cbxMH.setText("Mexican Hat");
+  wIteration.addControl(cbxMH, 170, 210 + desp);
+    
+    
   cbxGauss = new GCheckbox(this, 20, 180, 120, 20);
   cbxGauss.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
   cbxGauss.setText("Gauss");
@@ -544,6 +550,7 @@ public void createGUIWIteration(){
   cbxGauss.setSelected(propi.getNeighGauss());
   cbxCutGauss.setSelected(propi.getNeighCutGauss());
   cbxBobble.setSelected(propi.getNeighBobble());
+  cbxMH.setSelected(propi.getNeighMH());
   cbxOnline.setSelected(propi.getUseOnline());
   cbxBatch.setSelected(propi.getUseBatch());
   gtLearning.setText(propi.getStrBucleLearnRate());

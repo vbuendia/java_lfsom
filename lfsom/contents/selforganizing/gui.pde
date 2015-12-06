@@ -48,6 +48,7 @@ public void handleToggleControlEvents(GToggleControl option, GEvent event) {
   if (option == cbxVector) propi.setInitVector(option.isSelected());
   
   if (option == cbxGauss) propi.setNeighGauss(option.isSelected()); 
+  if (option == cbxMH) propi.setNeighMH(option.isSelected());
   if (option == cbxCutGauss) propi.setNeighCutGauss(option.isSelected());
   if (option == cbxBobble) propi.setNeighBobble(option.isSelected());
   
@@ -72,7 +73,7 @@ public void handleButtonEvents(GButton button, GEvent event) {
   
     String[] datosFich = G4P.selectInputDif("Seleccione fichero", "CSV", "Ficheros CSV");
     String fname = datosFich[0];
-    if (fname!=null) {
+    if (fname!=null && !modoCalculando) {
     if (trim(propi.getExpName()).equals("")) propi.setExpName(datosFich[1]);
     //lbCurFile.setText(fname, GAlign.LEFT, GAlign.MIDDLE);
     propi.setFicheroEntrada(fname);
@@ -127,7 +128,7 @@ public void handleButtonEvents(GButton button, GEvent event) {
   if (button == btCloseWIteration) wIteration.setVisible(false);
   
   if (button == btDelete) {
-    int reply = G4P.selectOption(this, "Delete current net? This process is undoable", "Delete",  G4P.QUERY, G4P.YES_NO);
+    int reply = G4P.selectOption(this, "Delete current net?", "Delete",  G4P.QUERY, G4P.YES_NO);
     if (reply== G4P.OK) {
       File fil = new File(actualFolder);
       deleteFile(fil);
@@ -217,6 +218,7 @@ public void EnviaEntrenador () {
    propi.setInitVector(cbxVector.isSelected());
    propi.setNeighCutGauss(cbxCutGauss.isSelected());
    propi.setNeighGauss(cbxGauss.isSelected());
+   propi.setNeighMH(cbxMH.isSelected());
    propi.setNeighBobble(cbxBobble.isSelected());
    propi.setNumCPUs(gtCPU.getText());
  

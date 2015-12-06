@@ -58,9 +58,9 @@ public class LFSExpProps {
 	 */
 
 	// Learn Rate, by default with a single option (0.2)
-	private double[] bucleLearnRate = { 0.2 };
+	private double[] bucleLearnRate = { 0.8 };
 
-	private String strLearnRate = "0.4";
+	private String strLearnRate = "0.8";
 
 	// Option on-line selected
 	private boolean useOnline = true;
@@ -71,9 +71,9 @@ public class LFSExpProps {
 	private boolean useBatch = true;
 
 	// Sigma
-	private float[] bucleSigma = { 0.3f };
+	private float[] bucleSigma = { 1f };
 
-	private String strBucleSigma = "0.3";
+	private String strBucleSigma = "1";
 
 	private int cycles = 1;
 
@@ -82,7 +82,7 @@ public class LFSExpProps {
 
 	private int heightSOM = 0;
 
-	private double tau = 0.7;
+	private double tau = 0.9;
 	private double tau2 = 0.01;
 
 	// Sensibility to generate new clusters with EM
@@ -98,7 +98,7 @@ public class LFSExpProps {
 	private double mqeIni = -1;
 
 	// File containing the data
-	private String ficheroEntrada = "(Select a CSV file to train)";
+	private String ficheroEntrada = "(Select a file to train)";
 
 	// Path folders
 	private String dataPath = "";
@@ -124,7 +124,8 @@ public class LFSExpProps {
 
 	// Neighbour functions
 	private int[] bucleNeighFunc = { LFSGrowingLayer.NEIGH_GAUSS,
-			LFSGrowingLayer.NEIGH_CUTGAUSS, LFSGrowingLayer.NEIGH_BUBBLE };
+			LFSGrowingLayer.NEIGH_CUTGAUSS, LFSGrowingLayer.NEIGH_BUBBLE,
+			LFSGrowingLayer.NEIGH_MH };
 
 	// Options of neighbour functions (user interface purpose)
 	private int[] bucleNeighWidth = { 8 };
@@ -135,7 +136,9 @@ public class LFSExpProps {
 
 	private int[] neighCutGauss = { 1, LFSGrowingLayer.NEIGH_CUTGAUSS };
 
-	private int[] neighBobble = { 1, LFSGrowingLayer.NEIGH_BUBBLE };
+	private int[] neighBobble = { 0, LFSGrowingLayer.NEIGH_BUBBLE };
+
+	private int[] neighMH = { 1, LFSGrowingLayer.NEIGH_MH };
 
 	// Option of automatic size calculation
 	private boolean sizeAut = true;
@@ -171,7 +174,7 @@ public class LFSExpProps {
 	// Neigbour width, in absolute and percent values
 	private String strBucleNeighWidth = "8";
 
-	private String strBuclePcNeighWidth = "0.3";
+	private String strBuclePcNeighWidth = "0.1";
 
 	// Methods to set and get variables, to serialize
 	private String[] variables = { "setBucleLearnRate", "setBucleUseBatch",
@@ -638,6 +641,25 @@ public class LFSExpProps {
 	 * @param neighGauss
 	 *            The neighGauss to set.
 	 */
+	public void setNeighMH(boolean neighGauss) {
+		if (neighGauss) {
+			this.neighMH[0] = 1;
+		} else {
+			this.neighMH[0] = 0;
+		}
+	}
+
+	/**
+	 * @return Returns the neighGauss.
+	 */
+	public boolean getNeighMH() {
+		return neighMH[0] == 1;
+	}
+
+	/**
+	 * @param neighGauss
+	 *            The neighGauss to set.
+	 */
 	public void setNeighGauss(boolean neighGauss) {
 		if (neighGauss) {
 			this.neighGauss[0] = 1;
@@ -701,6 +723,7 @@ public class LFSExpProps {
 		neighGauss[0] = 0;
 		neighCutGauss[0] = 0;
 		neighBobble[0] = 0;
+		neighMH[0] = 0;
 
 		String[] strbl = bucle.split(",");
 
@@ -716,6 +739,9 @@ public class LFSExpProps {
 				neighBobble[0] = 1;
 			}
 
+			if (valor == neighMH[1]) {
+				neighMH[0] = 1;
+			}
 		}
 	}
 
@@ -741,7 +767,8 @@ public class LFSExpProps {
 	 * @return Returns the bucleNeighFunc.
 	 */
 	public int[] getBucleNeighFunc() {
-		int suma = neighGauss[0] + neighCutGauss[0] + neighBobble[0];
+		int suma = neighGauss[0] + neighCutGauss[0] + neighBobble[0]
+				+ neighMH[0];
 		bucleNeighFunc = new int[suma];
 		int actual = 0;
 		if (neighGauss[0] == 1) {
@@ -753,6 +780,11 @@ public class LFSExpProps {
 		if (neighBobble[0] == 1) {
 			bucleNeighFunc[actual++] = neighBobble[1];
 		}
+
+		if (neighMH[0] == 1) {
+			bucleNeighFunc[actual++] = neighMH[1];
+		}
+
 		return bucleNeighFunc;
 	}
 
@@ -1155,9 +1187,10 @@ public class LFSExpProps {
 		// Number of nets to train
 		int numProps = 0;
 		for (int element : bucleNeighFunc) {
-			if (element == LFSGrowingLayer.NEIGH_GAUSS) { // GAUSS doesn't
-															// use
-															// neighwidth
+			if (element == LFSGrowingLayer.NEIGH_GAUSS
+					|| element == LFSGrowingLayer.NEIGH_MH) { // GAUSS doesn't
+				// use
+				// neighwidth
 				numProps += bucleLearnRate.length * bucleUseBatch.length
 						* bucleSigma.length * bucleInitializationMode.length;
 			}
@@ -1167,8 +1200,7 @@ public class LFSExpProps {
 						* bucleInitializationMode.length
 						* buclePcNeighWidth.length;
 			}
-			if (element == LFSGrowingLayer.NEIGH_EP
-					|| element == LFSGrowingLayer.NEIGH_CUTGAUSS) {
+			if (element == LFSGrowingLayer.NEIGH_CUTGAUSS) {
 				numProps += bucleLearnRate.length * bucleUseBatch.length
 						* bucleSigma.length * bucleInitializationMode.length
 						* buclePcNeighWidth.length;
@@ -1199,7 +1231,7 @@ public class LFSExpProps {
 								}
 
 								if (nbNeighWidth > 0
-										&& bNeighFunc == LFSGrowingLayer.NEIGH_GAUSS) {
+										&& (bNeighFunc == LFSGrowingLayer.NEIGH_GAUSS || bNeighFunc == LFSGrowingLayer.NEIGH_MH)) {
 									ejecuta = false;
 								}
 

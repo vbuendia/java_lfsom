@@ -534,8 +534,8 @@ public void compruebaAccesoSubnet() {
    
    fill(40);
    
-   textSize((float) (tamtexto*1.5));
-   text(this.nombre, posxLeyen,(posyTransla-rad-70)/constescala);
+   textSize((float) (tamtexto*1.7));
+   text(this.nombre, posxLeyen,(posyTransla-rad-72)/constescala);
  }
  
  
