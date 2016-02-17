@@ -294,28 +294,30 @@ public class LFSData {
 		}
 
 		// Se normaliza la matriz
-		if (norm)
+		if (norm) {
 			matrix = normalize(matrixD);
 
-		meanVector = new DenseDoubleMatrix1D(dim);
+			meanVector = new DenseDoubleMatrix1D(dim);
 
-		if (matrix.length > 0) {
-			LFSInputDatum[] vectors = getInputDatum(dataNames);
-			for (int i = 0; i < dataNames.length; i++) {
-				meanVector.assign(vectors[i].getVector(), Functions.plus); // add
-																			// to
-																			// mean
-																			// vector
-			}
-			meanVector.assign(Functions.div(dataNames.length)); // calculating
-																// mean
-																// vector
+			if (matrix.length > 0) {
+				LFSInputDatum[] vectors = getInputDatum(dataNames);
+				for (int i = 0; i < dataNames.length; i++) {
+					meanVector.assign(vectors[i].getVector(), Functions.plus); // add
+																				// to
+																				// mean
+																				// vector
+				}
+				meanVector.assign(Functions.div(dataNames.length)); // calculating
+																	// mean
+																	// vector
 
-			// pca = new PCA(matrix);
-			if (matrix.length > 1) {
-				pca = new LFSPCA(matrix);
+				// pca = new PCA(matrix);
+				if (matrix.length > 1) {
+					pca = new LFSPCA(matrix);
+				}
 			}
-		}
+		} else
+			matrix = matrixD;
 
 	}
 
