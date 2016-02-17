@@ -39,7 +39,9 @@
  */
 package lfsom.data;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.util.Random;
 
 import lfsom.util.LFSPCA;
@@ -220,6 +222,20 @@ public class LFSData {
 				}
 			}
 
+			BufferedWriter br = new BufferedWriter(new FileWriter(
+					"d:/tmp/fich.csv"));
+			StringBuilder sb = new StringBuilder();
+
+			for (int i = 0; i < matrixAssign.length; i++) {
+				String cad = String.valueOf(matrixAssign[i][0]);
+				for (int k = 1; k < matrixAssign[i].length; k++)
+					cad += "," + matrixAssign[i][k];
+				sb.append(cad + "\n");
+			}
+
+			br.write(sb.toString());
+			br.close();
+
 			setMatrix(matrixAssign);
 
 		} catch (Exception e) {
@@ -263,6 +279,10 @@ public class LFSData {
 	 * @param matrizEntrada
 	 */
 	public void setMatrix(double[][] matrizEntrada) {
+		setMatrix(matrizEntrada, true);
+	}
+
+	public void setMatrix(double[][] matrizEntrada, boolean norm) {
 
 		double[][] matrixD = matrizEntrada;
 		dim = matrixD[0].length;
@@ -274,7 +294,8 @@ public class LFSData {
 		}
 
 		// Se normaliza la matriz
-		matrix = normalize(matrixD);
+		if (norm)
+			matrix = normalize(matrixD);
 
 		meanVector = new DenseDoubleMatrix1D(dim);
 

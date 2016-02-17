@@ -57,7 +57,7 @@ public class TrainSelector {
 	/**
 	 * Version to show in client-side
 	 */
-	private String versionprog = "v1.4.3";
+	private String versionprog = "v1.4.4";
 
 	/**
 	 * Progress
@@ -799,7 +799,7 @@ public class TrainSelector {
 							+ "/data.csv"));
 				}
 
-				datosResul.setMatrix(matrixResults);
+				datosResul.setMatrix(matrixResults, false);
 				LFSDataCSVWriter.writeAsCSV(datosResul, indiceResul, dataPath
 						+ "/results.csv");
 

@@ -267,6 +267,7 @@ public class LFSGrowingSOM {
 			LFSKMeans kmedias = new LFSKMeans(nclus, this.getCodebook());
 			setLabelAgrupados(kmedias.getResultados());
 		} else {
+			nparalels = 1;
 			LFSWEKACluster em = new LFSWEKACluster(nclusters,
 					this.getCodebook(), nparalels, minLogLike);
 			setLabelAgrupados(em.getResultados());
