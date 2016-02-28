@@ -162,6 +162,7 @@ public class LFSData {
 			boolean cambio_col = false;
 
 			cargador.setSource(new File(fileName));
+
 			Instances data1 = cargador.getDataSet();
 
 			double[][] matrix2 = new double[data1.size()][data1.numAttributes()];

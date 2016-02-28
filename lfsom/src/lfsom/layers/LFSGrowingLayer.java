@@ -101,8 +101,9 @@ public class LFSGrowingLayer {
 	// The "worst" error
 	private double maxQe = 0;
 
-	// The unif having maxQe
+	// The unit having maxQe
 	private LFSUnit unitmaxQe;
+	private LFSUnit unitmaxVec;
 
 	// Neighbour function to apply training
 	private int neighbourFunc = NEIGH_GAUSS;
@@ -1040,23 +1041,23 @@ public class LFSGrowingLayer {
 
 				LFSUnit d = null;
 				if (hazCol) {
-					if (this.unitmaxQe.getXPos() > 0) {
-						d = this.getUnit(this.unitmaxQe.getXPos() - 1,
-								this.unitmaxQe.getYPos());
+					if (this.unitmaxVec.getXPos() > 0) {
+						d = this.getUnit(this.unitmaxVec.getXPos() - 1,
+								this.unitmaxVec.getYPos());
 					} else {
-						d = this.getUnit(1, this.unitmaxQe.getYPos());
+						d = this.getUnit(1, this.unitmaxVec.getYPos());
 					}
 				} else if (hazFil) {
-					if (this.unitmaxQe.getYPos() > 0) {
-						d = this.getUnit(this.unitmaxQe.getXPos(),
-								this.unitmaxQe.getYPos() - 1);
+					if (this.unitmaxVec.getYPos() > 0) {
+						d = this.getUnit(this.unitmaxVec.getXPos(),
+								this.unitmaxVec.getYPos() - 1);
 					} else {
-						d = this.getUnit(this.unitmaxQe.getXPos(), 1);
+						d = this.getUnit(this.unitmaxVec.getXPos(), 1);
 					}
 				} else {
-					d = this.getMostDissimilarNeighbor(this.unitmaxQe);
+					d = this.getMostDissimilarNeighbor(this.unitmaxVec);
 				}
-				this.insertRowColumn(this.unitmaxQe, d, props.learnrate(),
+				this.insertRowColumn(this.unitmaxVec, d, props.learnrate(),
 						props.sigma());
 				okCalc = true;
 				props.setXYSize(this.xSize, this.ySize);
@@ -1262,6 +1263,7 @@ public class LFSGrowingLayer {
 	private void compruebaErrUnits() {
 		this.maxQe = 0;
 		this.unitmaxQe = units[0][0];
+		this.unitmaxVec = units[0][0];
 		for (int j = 0; j < ySize; j++) {
 			for (int l = 0; l < xSize; l++) {
 				double err = units[l][j].getQError();
@@ -1269,6 +1271,11 @@ public class LFSGrowingLayer {
 				if (err >= this.maxQe) {
 					this.maxQe = err;
 					this.unitmaxQe = units[l][j];
+				}
+
+				double numVec = units[l][j].getNumberOfMappedInputs();
+				if (numVec > this.unitmaxVec.getNumberOfMappedInputs()) {
+					this.unitmaxVec = units[l][j];
 				}
 			}
 		}
@@ -1278,7 +1285,10 @@ public class LFSGrowingLayer {
 	private void growAndHier(int i, int numIterations,
 			LFSSOMProperties trainingProps) {
 
-		// mapSomeDataAfterTraining(data, data.numVectors() / 20);
+		// if (data.numVectors() > 5000) {
+		// int numMap = 5000;
+		// mapSomeDataAfterTraining(data, numMap);
+		// } else
 		mapCompleteDataAfterTraining(data);
 		this.calcQualityQError(data);
 		QError = this.getQError();// ualityMeasure("QError");
